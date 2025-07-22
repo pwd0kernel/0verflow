@@ -187,6 +187,7 @@ screenGui.Parent = PlayerGui
 
 -- New Minimalist Loading Screen (user design)
 
+
 local loadingFrame = Instance.new("Frame")
 loadingFrame.Name = "LoadingFrame"
 loadingFrame.Size = UDim2.new(0, 374, 0, 114)
@@ -195,6 +196,15 @@ loadingFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 loadingFrame.BackgroundColor3 = Color3.fromRGB(25, 33, 43)
 loadingFrame.BorderSizePixel = 0
 loadingFrame.Parent = screenGui
+
+-- Use the same gradient as the main window for the loader
+local loaderGradient = Instance.new("UIGradient")
+loaderGradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(30, 38, 52)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(18, 22, 32))
+}
+loaderGradient.Rotation = 45
+loaderGradient.Parent = loadingFrame
 
 -- Subtle drop shadow
 local shadow = Instance.new("ImageLabel")
@@ -316,6 +326,7 @@ loadingFrame:Destroy()
 
 -- Main Window (Polished, perfectly centered)
 
+
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
 mainFrame.Size = UDim2.new(0, Theme.WindowWidth, 0, Theme.WindowHeight)
@@ -328,27 +339,49 @@ mainFrame.Parent = screenGui
 Templates.Corner(mainFrame, Theme.CornerRadius)
 Templates.Shadow(mainFrame)
 
+-- Use the same gradient as the loader for the main window
+local mainGradient = Instance.new("UIGradient")
+mainGradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(30, 38, 52)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(18, 22, 32))
+}
+mainGradient.Rotation = 45
+mainGradient.Parent = mainFrame
+
 
 -- Top Bar (Polished)
 
+
+
 local topBar = Instance.new("Frame")
 topBar.Name = "TopBar"
-topBar.Size = UDim2.new(1, 0, 0, Theme.TopBarHeight)
-topBar.BackgroundColor3 = Theme.Accent2
+topBar.Size = UDim2.new(1, 0, 0, Theme.TopBarHeight + 4)
+topBar.BackgroundColor3 = Color3.fromRGB(30, 38, 52)
 topBar.BorderSizePixel = 0
 topBar.Parent = mainFrame
 Templates.Corner(topBar, Theme.CornerRadius)
 
+-- Subtle bottom border for header
+local headerBorder = Instance.new("Frame")
+headerBorder.Name = "HeaderBorder"
+headerBorder.Size = UDim2.new(1, 0, 0, 2)
+headerBorder.Position = UDim2.new(0, 0, 1, -2)
+headerBorder.BackgroundColor3 = Color3.fromRGB(0, 140, 255)
+headerBorder.BackgroundTransparency = 0.82
+headerBorder.BorderSizePixel = 0
+headerBorder.ZIndex = 2
+headerBorder.Parent = topBar
 
 local titleLabel = Instance.new("TextLabel")
-titleLabel.Size = UDim2.new(1, -60, 1, 0)
-titleLabel.Position = UDim2.new(0, Theme.Padding, 0, 0)
+titleLabel.Size = UDim2.new(1, -80, 1, 0)
+titleLabel.Position = UDim2.new(0, Theme.Padding + 8, 0, 0)
 titleLabel.BackgroundTransparency = 1
 titleLabel.Text = "<b>Overflow Hub</b>"
-titleLabel.Font = Theme.Font
+titleLabel.Font = Enum.Font.GothamBlack
 titleLabel.TextColor3 = Theme.Text
-titleLabel.TextSize = Theme.TitleFontSize
+titleLabel.TextSize = Theme.TitleFontSize + 2
 titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+titleLabel.TextYAlignment = Enum.TextYAlignment.Center
 titleLabel.RichText = true
 titleLabel.Parent = topBar
 
@@ -388,12 +421,14 @@ makeDraggable(mainFrame, topBar)
 
 -- Tabs (Polished)
 
+
 local tabBar = Instance.new("Frame")
 tabBar.Name = "TabBar"
 tabBar.Size = UDim2.new(1, -Theme.Padding*2, 0, Theme.TabHeight)
 tabBar.Position = UDim2.new(0, Theme.Padding, 0, Theme.TopBarHeight + Theme.TabTopSpacing)
 tabBar.BackgroundTransparency = 1
 tabBar.Parent = mainFrame
+-- Optionally, add a subtle border or shadow for tabBar for more loader-like look
 
 local tabList = Instance.new("UIListLayout")
 tabList.FillDirection = Enum.FillDirection.Horizontal
