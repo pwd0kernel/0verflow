@@ -1,18 +1,3 @@
-
---[[
-    Overflow Hub UI Library for Roblox Exploit Scripts
-    Author: github copilot
-    Description: Modern, animated, modular UI library for cheat scripts.
-    Usage: local library = loadstring(game:HttpGet("url_to_library"))()
-           local window = library:CreateWindow("Overflow Hub")
-           local tab = window:CreateTab("Combat")
-           tab:CreateToggle(...)
-    Supports: Synapse X, Krnl, Script-Ware, etc.
-    Theme: Dark, blue accents, rounded corners, smooth animations.
-    Components: Toggles, Sliders, Buttons, Textboxes, Dropdowns, Labels
-    Features: Loading screen, draggable/resizable window, tabs, hotkey toggle, config save/load, theme customization
-]]
-
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
