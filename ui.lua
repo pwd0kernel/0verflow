@@ -1,3 +1,18 @@
+
+--[[
+    Overflow Hub UI Library for Roblox Exploit Scripts
+    Author: github copilot
+    Description: Modern, animated, modular UI library for cheat scripts.
+    Usage: local library = loadstring(game:HttpGet("url_to_library"))()
+           local window = library:CreateWindow("Overflow Hub")
+           local tab = window:CreateTab("Combat")
+           tab:CreateToggle(...)
+    Supports: Synapse X, Krnl, Script-Ware, etc.
+    Theme: Dark, blue accents, rounded corners, smooth animations.
+    Components: Toggles, Sliders, Buttons, Textboxes, Dropdowns, Labels
+    Features: Loading screen, draggable/resizable window, tabs, hotkey toggle, config save/load, theme customization
+]]
+
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
@@ -190,8 +205,21 @@ loadingFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 loadingFrame.BackgroundColor3 = Theme.Accent3
 loadingFrame.BorderSizePixel = 0
 loadingFrame.Parent = screenGui
+
 Templates.Corner(loadingFrame, Theme.CornerRadius)
-Templates.Shadow(loadingFrame)
+
+-- Remove shadow, add blur and transparency
+local blur = Instance.new("UIStroke")
+blur.Thickness = 0
+blur.Transparency = 1
+blur.Parent = loadingFrame
+
+local blurEffect = Instance.new("UIBlur")
+blurEffect.Size = 12
+blurEffect.Parent = loadingFrame
+
+loadingFrame.BackgroundTransparency = 0.35
+loadingFrame.BackgroundColor3 = Theme.Accent3:Lerp(Theme.Background, 0.5)
 
 -- Icon (Rayfield-style)
 local icon = Instance.new("ImageLabel")
