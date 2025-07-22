@@ -1,5 +1,3 @@
-
-
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
@@ -40,8 +38,8 @@ local Themes = {
         WindowHeight = 440,
         LoadingWidth = 420,
         LoadingHeight = 160,
-        TabSpacing = 10,
-        TabTopSpacing = 8,
+        TabSpacing = 12,
+        TabTopSpacing = 10,
     },
     Light = {
         Name = "Light",
@@ -317,6 +315,7 @@ loadingFrame:Destroy()
 
 
 -- Main Window (Polished, perfectly centered)
+
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
 mainFrame.Size = UDim2.new(0, Theme.WindowWidth, 0, Theme.WindowHeight)
@@ -330,50 +329,52 @@ Templates.Corner(mainFrame, Theme.CornerRadius)
 Templates.Shadow(mainFrame)
 
 
+-- Top Bar (Polished)
 
--- Tabs (with spacing and modern look)
-local tabBar = Instance.new("Frame")
-tabBar.Name = "TabBar"
-tabBar.Size = UDim2.new(1, -Theme.Padding*2, 0, Theme.TabHeight)
-tabBar.Position = UDim2.new(0, Theme.Padding, 0, Theme.TopBarHeight + (Theme.TabTopSpacing or 8))
-tabBar.BackgroundTransparency = 1
-tabBar.Parent = mainFrame
+local topBar = Instance.new("Frame")
+topBar.Name = "TopBar"
+topBar.Size = UDim2.new(1, 0, 0, Theme.TopBarHeight)
+topBar.BackgroundColor3 = Theme.Accent2
+topBar.BorderSizePixel = 0
+topBar.Parent = mainFrame
+Templates.Corner(topBar, Theme.CornerRadius)
 
-local tabList = Instance.new("UIListLayout")
-tabList.FillDirection = Enum.FillDirection.Horizontal
-tabList.SortOrder = Enum.SortOrder.LayoutOrder
-tabList.Padding = UDim.new(0, Theme.TabSpacing or 10)
-tabList.Parent = tabBar
 
-local tabContent = Instance.new("Frame")
-tabContent.Name = "TabContent"
-tabContent.Size = UDim2.new(1, 0, 1, -(Theme.TopBarHeight + Theme.TabHeight + (Theme.TabTopSpacing or 8) + Theme.Padding))
-tabContent.Position = UDim2.new(0, 0, 0, Theme.TopBarHeight + Theme.TabHeight + (Theme.TabTopSpacing or 8) + Theme.Padding)
-tabContent.BackgroundTransparency = 1
-tabContent.ClipsDescendants = true
-tabContent.Parent = mainFrame
-local closeButton = Instance.new("TextButton")
-closeButton.Size = UDim2.new(0, 38, 0, 38)
-closeButton.Position = UDim2.new(1, -46, 0.5, -19)
-closeButton.BackgroundColor3 = Color3.fromRGB(255, 60, 60)
-closeButton.Text = "⨉"
-closeButton.Font = Enum.Font.GothamBold
-closeButton.TextColor3 = Color3.fromRGB(255,255,255)
-closeButton.TextSize = 22
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Size = UDim2.new(1, -60, 1, 0)
+titleLabel.Position = UDim2.new(0, Theme.Padding, 0, 0)
+titleLabel.BackgroundTransparency = 1
+titleLabel.Text = "<b>Overflow Hub</b>"
+titleLabel.Font = Theme.Font
+titleLabel.TextColor3 = Theme.Text
+titleLabel.TextSize = Theme.TitleFontSize
+titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+titleLabel.RichText = true
+titleLabel.Parent = topBar
+
+
+-- Modern Exit button (icon, only hides UI)
+local closeButton = Instance.new("ImageButton")
+closeButton.Size = UDim2.new(0, 36, 0, 36)
+closeButton.Position = UDim2.new(1, -44, 0.5, -18)
+closeButton.BackgroundColor3 = Color3.fromRGB(40, 48, 60)
+closeButton.Image = "rbxassetid://3926305904" -- Feather X icon
+closeButton.ImageRectOffset = Vector2.new(284, 4)
+closeButton.ImageRectSize = Vector2.new(24, 24)
+closeButton.ImageColor3 = Theme.Text
 closeButton.AutoButtonColor = false
 closeButton.Parent = topBar
-Templates.Corner(closeButton, UDim.new(0, 12))
-local closeStroke = Instance.new("UIStroke")
-closeStroke.Color = Color3.fromRGB(255, 90, 90)
-closeStroke.Thickness = 1.5
-closeStroke.Transparency = 0.2
-closeStroke.Parent = closeButton
-
+Templates.Corner(closeButton, UDim.new(0, 10))
+local closeHover = false
 closeButton.MouseEnter:Connect(function()
-    tween(closeButton, {BackgroundColor3=Color3.fromRGB(220, 40, 40)}, 0.18)
+    closeHover = true
+    tween(closeButton, {BackgroundColor3=Theme.Accent}, 0.18)
+    tween(closeButton, {ImageColor3=Color3.fromRGB(255,80,80)}, 0.18)
 end)
 closeButton.MouseLeave:Connect(function()
-    tween(closeButton, {BackgroundColor3=Color3.fromRGB(255, 60, 60)}, 0.18)
+    closeHover = false
+    tween(closeButton, {BackgroundColor3=Color3.fromRGB(40, 48, 60)}, 0.18)
+    tween(closeButton, {ImageColor3=Theme.Text}, 0.18)
 end)
 closeButton.MouseButton1Click:Connect(function()
     tween(mainFrame, {BackgroundTransparency=1}, 0.3)
@@ -386,17 +387,18 @@ makeDraggable(mainFrame, topBar)
 
 
 -- Tabs (Polished)
+
 local tabBar = Instance.new("Frame")
 tabBar.Name = "TabBar"
-tabBar.Size = UDim2.new(1, 0, 0, Theme.TabHeight)
-tabBar.Position = UDim2.new(0, 0, 0, Theme.TopBarHeight)
+tabBar.Size = UDim2.new(1, -Theme.Padding*2, 0, Theme.TabHeight)
+tabBar.Position = UDim2.new(0, Theme.Padding, 0, Theme.TopBarHeight + Theme.TabTopSpacing)
 tabBar.BackgroundTransparency = 1
 tabBar.Parent = mainFrame
 
 local tabList = Instance.new("UIListLayout")
 tabList.FillDirection = Enum.FillDirection.Horizontal
 tabList.SortOrder = Enum.SortOrder.LayoutOrder
-tabList.Padding = UDim.new(0, Theme.Padding)
+tabList.Padding = UDim.new(0, Theme.TabSpacing)
 tabList.Parent = tabBar
 
 local tabContent = Instance.new("Frame")
@@ -445,14 +447,14 @@ function Window:CreateTab(tabName)
 
     local tabBtn = Instance.new("TextButton")
     tabBtn.Size = UDim2.new(0, 120, 1, 0)
-    tabBtn.BackgroundColor3 = Theme.Accent2
+    tabBtn.BackgroundColor3 = Theme.Accent3
     tabBtn.Text = tabName
     tabBtn.Font = Theme.Font
     tabBtn.TextColor3 = Theme.Text
     tabBtn.TextSize = Theme.TabFontSize
     tabBtn.AutoButtonColor = false
     tabBtn.Parent = tabBar
-    Templates.Corner(tabBtn, UDim.new(0, 12))
+    Templates.Corner(tabBtn, UDim.new(0, 10))
 
 
     local tabFrame = Instance.new("Frame")
