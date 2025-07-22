@@ -41,6 +41,7 @@ local Themes = {
         CornerRadius = UDim.new(0, 12),
         Padding = 16,
         Shadow = false,
+        TabHeight = 40,
         TopBarHeight = 46,
         TabFontSize = 20,
         TitleFontSize = 28,
@@ -54,6 +55,7 @@ local Themes = {
         LoadingHeight = 160,
         TabSpacing = 12,
         TabTopSpacing = 10,
+    },
     Light = {
         Name = "Light",
         Background = Color3.fromRGB(240, 240, 245),
@@ -65,8 +67,10 @@ local Themes = {
         Font = Enum.Font.Gotham,
         CornerRadius = UDim.new(0, 12),
         Padding = 14,
+        Shadow = false,
         TabHeight = 40,
         TopBarHeight = 46,
+        TabFontSize = 20,
         TitleFontSize = 28,
         LabelFontSize = 20,
         DescFontSize = 15,
@@ -83,18 +87,21 @@ local Themes = {
 local Theme = Themes.Default
 
 -- Theme switcher
+function Overflow.SetTheme(name)
     if Themes[name] then
         Theme = Themes[name]
     end
 end
 
 
+-- Component templates (Rayfield-inspired)
 local Templates = {}
 
 function Templates.Corner(parent, radius)
     local c = Instance.new("UICorner")
     c.CornerRadius = radius or Theme.CornerRadius
     c.Parent = parent
+    return c
 end
 
 function Templates.Shadow(parent)
@@ -306,24 +313,11 @@ mainFrame.Name = "MainFrame"
 mainFrame.Size = UDim2.new(0, Theme.WindowWidth, 0, Theme.WindowHeight)
 mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
 mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-mainFrame.BackgroundColor3 = Theme.Background
-mainFrame.BorderColor3 = Theme.Border
-mainFrame.BorderSizePixel = 1
+mainFrame.BackgroundColor3 = Theme.Background -- flat premium dark
+mainFrame.BorderSizePixel = 0
 mainFrame.Visible = false
 mainFrame.Parent = screenGui
 Templates.Corner(mainFrame, Theme.CornerRadius)
--- MacOS-style subtle shadow
-local macShadow = Instance.new("ImageLabel")
-macShadow.Name = "MacShadow"
-macShadow.BackgroundTransparency = 1
-macShadow.Image = "rbxassetid://1316045217"
-macShadow.ImageTransparency = 0.92
-macShadow.ScaleType = Enum.ScaleType.Slice
-macShadow.SliceCenter = Rect.new(10,10,118,118)
-macShadow.Size = UDim2.new(1, 32, 1, 32)
-macShadow.Position = UDim2.new(0, -16, 0, -16)
-macShadow.ZIndex = 0
-macShadow.Parent = mainFrame
 -- (Removed white drop shadow from main window for cleaner look)
 
 
@@ -333,17 +327,11 @@ macShadow.Parent = mainFrame
 
 local topBar = Instance.new("Frame")
 topBar.Name = "TopBar"
-topBar.Size = UDim2.new(1, 0, 0, 54) -- MacOS style, slightly taller
+topBar.Size = UDim2.new(1, 0, 0, Theme.TopBarHeight)
 topBar.BackgroundColor3 = Theme.Accent2
 topBar.BorderSizePixel = 0
 topBar.Parent = mainFrame
-local topBarCorner = Instance.new("UICorner")
-topBarCorner.CornerRadius = Theme.CornerRadius
-topBarCorner.TopLeft = true
-topBarCorner.TopRight = true
-topBarCorner.BottomLeft = false
-topBarCorner.BottomRight = false
-topBarCorner.Parent = topBar
+Templates.Corner(topBar, Theme.CornerRadius)
 -- (Removed white drop shadow from top bar for cleaner look)
 
 
@@ -361,35 +349,32 @@ titleLabel.Parent = topBar
 
 
 -- Modern Exit button (icon, only hides UI)
--- MacOS-style close button (red circle with white X)
-local closeButton = Instance.new("Frame")
-closeButton.Size = UDim2.new(0, 22, 0, 22)
-closeButton.Position = UDim2.new(0, 16, 0.5, -11)
-closeButton.BackgroundColor3 = Color3.fromRGB(255, 95, 86) -- MacOS red
-closeButton.BorderSizePixel = 0
+local closeButton = Instance.new("ImageButton")
+closeButton.Size = UDim2.new(0, 36, 0, 36)
+closeButton.Position = UDim2.new(1, -44, 0.5, -18)
+closeButton.BackgroundColor3 = Color3.fromRGB(40, 48, 60)
+closeButton.Image = "rbxassetid://3926305904" -- Feather X icon
+closeButton.ImageRectOffset = Vector2.new(284, 4)
+closeButton.ImageRectSize = Vector2.new(24, 24)
+closeButton.ImageColor3 = Theme.Text
+closeButton.AutoButtonColor = false
 closeButton.Parent = topBar
-local closeCorner = Instance.new("UICorner")
-closeCorner.CornerRadius = UDim.new(1, 0)
-closeCorner.Parent = closeButton
-local xIcon = Instance.new("ImageLabel")
-xIcon.Size = UDim2.new(0, 12, 0, 12)
-xIcon.Position = UDim2.new(0.5, -6, 0.5, -6)
-xIcon.BackgroundTransparency = 1
-xIcon.Image = "rbxassetid://7072719332" -- Simple white X icon
-xIcon.ImageColor3 = Color3.fromRGB(255,255,255)
-xIcon.Parent = closeButton
+Templates.Corner(closeButton, UDim.new(0, 10))
+local closeHover = false
 closeButton.MouseEnter:Connect(function()
-    closeButton.BackgroundColor3 = Color3.fromRGB(255, 120, 110)
+    closeHover = true
+    tween(closeButton, {BackgroundColor3=Theme.Accent}, 0.18)
+    tween(closeButton, {ImageColor3=Color3.fromRGB(255,80,80)}, 0.18)
 end)
 closeButton.MouseLeave:Connect(function()
-    closeButton.BackgroundColor3 = Color3.fromRGB(255, 95, 86)
+    closeHover = false
+    tween(closeButton, {BackgroundColor3=Color3.fromRGB(40, 48, 60)}, 0.18)
+    tween(closeButton, {ImageColor3=Theme.Text}, 0.18)
 end)
-closeButton.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        tween(mainFrame, {BackgroundTransparency=1}, 0.3)
-        wait(0.3)
-        mainFrame.Visible = false
-    end
+closeButton.MouseButton1Click:Connect(function()
+    tween(mainFrame, {BackgroundTransparency=1}, 0.3)
+    wait(0.3)
+    mainFrame.Visible = false
 end)
 
 -- Draggable
@@ -422,17 +407,11 @@ tabContent.ClipsDescendants = true
 tabContent.Parent = mainFrame
 
 
-
-mainFrame.Visible = false -- Start hidden, will show after loader
+-- Show main window with animation (centered)
+mainFrame.Visible = true
 mainFrame.BackgroundTransparency = 1
 mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-
--- Show main window after loading screen is gone
-spawn(function()
-    wait(0.01)
-    mainFrame.Visible = true
-    tween(mainFrame, {BackgroundTransparency=0}, 0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-end)
+tween(mainFrame, {BackgroundTransparency=0}, 0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 
 -- Hotkey toggle (Insert)
 local hotkey = Enum.KeyCode.Insert
