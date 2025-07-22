@@ -25,7 +25,7 @@ local Themes = {
         Font = Enum.Font.Gotham,
         CornerRadius = UDim.new(0, 12),
         Padding = 16,
-        Shadow = true,
+        Shadow = false,
         TabHeight = 40,
         TopBarHeight = 46,
         TabFontSize = 20,
@@ -52,7 +52,7 @@ local Themes = {
         Font = Enum.Font.Gotham,
         CornerRadius = UDim.new(0, 12),
         Padding = 14,
-        Shadow = true,
+        Shadow = false,
         TabHeight = 40,
         TopBarHeight = 46,
         TabFontSize = 20,
@@ -90,19 +90,8 @@ function Templates.Corner(parent, radius)
 end
 
 function Templates.Shadow(parent)
-    if not Theme.Shadow then return end
-    local shadow = Instance.new("ImageLabel")
-    shadow.Name = "Shadow"
-    shadow.BackgroundTransparency = 1
-    shadow.Image = "rbxassetid://1316045217"
-    shadow.ImageTransparency = 0.7
-    shadow.ScaleType = Enum.ScaleType.Slice
-    shadow.SliceCenter = Rect.new(10,10,118,118)
-    shadow.Size = UDim2.new(1,24,1,24)
-    shadow.Position = UDim2.new(0,-12,0,-12)
-    shadow.ZIndex = 0
-    shadow.Parent = parent
-    return shadow
+    -- Shadow disabled for clean look
+    return nil
 end
 
 function Templates.Label(text, size, color, parent, font, align, rich)
@@ -193,40 +182,23 @@ loadingFrame.Name = "LoadingFrame"
 loadingFrame.Size = UDim2.new(0, 374, 0, 114)
 loadingFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
 loadingFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-loadingFrame.BackgroundColor3 = Color3.fromRGB(25, 33, 43)
+loadingFrame.BackgroundColor3 = Color3.fromRGB(0, 140, 255) -- Use main accent as base
 loadingFrame.BorderSizePixel = 0
 loadingFrame.Parent = screenGui
 
 -- Use the same gradient as the main window for the loader
 local loaderGradient = Instance.new("UIGradient")
 loaderGradient.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(30, 38, 52)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(18, 22, 32))
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 140, 255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(30, 38, 52))
 }
 loaderGradient.Rotation = 45
 loaderGradient.Parent = loadingFrame
 
--- Subtle drop shadow
-local shadow = Instance.new("ImageLabel")
-shadow.Name = "Shadow"
-shadow.BackgroundTransparency = 1
-shadow.Image = "rbxassetid://1316045217"
-shadow.ImageTransparency = 0.85
-shadow.ScaleType = Enum.ScaleType.Slice
-shadow.SliceCenter = Rect.new(10,10,118,118)
-shadow.Size = UDim2.new(1, 32, 1, 32)
-shadow.Position = UDim2.new(0, -16, 0, -16)
-shadow.ZIndex = 0
-shadow.Parent = loadingFrame
+-- (Removed white drop shadow for cleaner look)
 
 -- Gradient background
-local gradient = Instance.new("UIGradient")
-gradient.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(30, 38, 52)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(18, 22, 32))
-}
-gradient.Rotation = 45
-gradient.Parent = loadingFrame
+-- Remove old gradient (now replaced by loaderGradient above)
 
 local loadingCorner = Instance.new("UICorner")
 loadingCorner.CornerRadius = UDim.new(0, 12)
@@ -327,23 +299,24 @@ loadingFrame:Destroy()
 -- Main Window (Polished, perfectly centered)
 
 
+
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
 mainFrame.Size = UDim2.new(0, Theme.WindowWidth, 0, Theme.WindowHeight)
 mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
 mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-mainFrame.BackgroundColor3 = Theme.Background
+mainFrame.BackgroundColor3 = Color3.fromRGB(0, 140, 255) -- Use main accent as base
 mainFrame.BorderSizePixel = 0
 mainFrame.Visible = false
 mainFrame.Parent = screenGui
 Templates.Corner(mainFrame, Theme.CornerRadius)
-Templates.Shadow(mainFrame)
+-- (Removed white drop shadow from main window for cleaner look)
 
 -- Use the same gradient as the loader for the main window
 local mainGradient = Instance.new("UIGradient")
 mainGradient.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(30, 38, 52)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(18, 22, 32))
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 140, 255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(30, 38, 52))
 }
 mainGradient.Rotation = 45
 mainGradient.Parent = mainFrame
@@ -355,33 +328,24 @@ mainGradient.Parent = mainFrame
 
 local topBar = Instance.new("Frame")
 topBar.Name = "TopBar"
-topBar.Size = UDim2.new(1, 0, 0, Theme.TopBarHeight + 4)
-topBar.BackgroundColor3 = Color3.fromRGB(30, 38, 52)
+topBar.Size = UDim2.new(1, 0, 0, Theme.TopBarHeight)
+topBar.BackgroundColor3 = Color3.fromRGB(0, 140, 255) -- Use main accent for header
 topBar.BorderSizePixel = 0
 topBar.Parent = mainFrame
 Templates.Corner(topBar, Theme.CornerRadius)
 
--- Subtle bottom border for header
-local headerBorder = Instance.new("Frame")
-headerBorder.Name = "HeaderBorder"
-headerBorder.Size = UDim2.new(1, 0, 0, 2)
-headerBorder.Position = UDim2.new(0, 0, 1, -2)
-headerBorder.BackgroundColor3 = Color3.fromRGB(0, 140, 255)
-headerBorder.BackgroundTransparency = 0.82
-headerBorder.BorderSizePixel = 0
-headerBorder.ZIndex = 2
-headerBorder.Parent = topBar
+-- (Removed white drop shadow from top bar for cleaner look)
+
 
 local titleLabel = Instance.new("TextLabel")
-titleLabel.Size = UDim2.new(1, -80, 1, 0)
-titleLabel.Position = UDim2.new(0, Theme.Padding + 8, 0, 0)
+titleLabel.Size = UDim2.new(1, -60, 1, 0)
+titleLabel.Position = UDim2.new(0, Theme.Padding, 0, 0)
 titleLabel.BackgroundTransparency = 1
 titleLabel.Text = "<b>Overflow Hub</b>"
-titleLabel.Font = Enum.Font.GothamBlack
+titleLabel.Font = Theme.Font
 titleLabel.TextColor3 = Theme.Text
-titleLabel.TextSize = Theme.TitleFontSize + 2
+titleLabel.TextSize = Theme.TitleFontSize
 titleLabel.TextXAlignment = Enum.TextXAlignment.Left
-titleLabel.TextYAlignment = Enum.TextYAlignment.Center
 titleLabel.RichText = true
 titleLabel.Parent = topBar
 
