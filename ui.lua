@@ -1,4 +1,17 @@
 
+--[[
+    Overflow Hub UI Library for Roblox Exploit Scripts
+    Author: github copilot
+    Description: Modern, animated, modular UI library for cheat scripts.
+    Usage: local library = loadstring(game:HttpGet("url_to_library"))()
+           local window = library:CreateWindow("Overflow Hub")
+           local tab = window:CreateTab("Combat")
+           tab:CreateToggle(...)
+    Supports: Synapse X, Krnl, Script-Ware, etc.
+    Theme: Dark, blue accents, rounded corners, smooth animations.
+    Components: Toggles, Sliders, Buttons, Textboxes, Dropdowns, Labels
+    Features: Loading screen, draggable/resizable window, tabs, hotkey toggle, config save/load, theme customization
+]]
 
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
@@ -183,179 +196,88 @@ screenGui.Parent = PlayerGui
 
 -- Loading Screen (Polished)
 
--- Enhanced Loading Screen (Rayfield-inspired)
+
+-- New Minimalist Loading Screen (user design)
 local loadingFrame = Instance.new("Frame")
 loadingFrame.Name = "LoadingFrame"
-loadingFrame.Size = UDim2.new(0, Theme.LoadingWidth, 0, Theme.LoadingHeight)
+loadingFrame.Size = UDim2.new(0, 374, 0, 114)
 loadingFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
 loadingFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-loadingFrame.BackgroundColor3 = Theme.Accent3
+loadingFrame.BackgroundColor3 = Color3.fromRGB(25, 33, 43)
 loadingFrame.BorderSizePixel = 0
 loadingFrame.Parent = screenGui
+local loadingCorner = Instance.new("UICorner")
+loadingCorner.CornerRadius = UDim.new(0, 12)
+loadingCorner.Parent = loadingFrame
 
+local nameLabel = Instance.new("TextLabel")
+nameLabel.Name = "Name"
+nameLabel.Parent = loadingFrame
+nameLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+nameLabel.BackgroundTransparency = 1
+nameLabel.BorderSizePixel = 0
+nameLabel.Position = UDim2.new(0.1417, 0, 0.1491, 0)
+nameLabel.Size = UDim2.new(0, 268, 0, 50)
+nameLabel.Font = Enum.Font.GothamBold
+nameLabel.Text = "0verflow Hub"
+nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+nameLabel.TextSize = 44
+nameLabel.TextWrapped = true
+nameLabel.TextTransparency = 1
 
-Templates.Corner(loadingFrame, Theme.CornerRadius)
+local versionLabel = Instance.new("TextLabel")
+versionLabel.Name = "Version"
+versionLabel.Parent = loadingFrame
+versionLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+versionLabel.BackgroundTransparency = 1
+versionLabel.BorderSizePixel = 0
+versionLabel.Position = UDim2.new(0.7995, 0, 0.8509, 0)
+versionLabel.Size = UDim2.new(0, 75, 0, 17)
+versionLabel.Font = Enum.Font.Ubuntu
+versionLabel.Text = "0.0.1 alpha"
+versionLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+versionLabel.TextTransparency = 1
 
--- Add a subtle border for glassy effect
-local border = Instance.new("Frame")
-border.Name = "LoadingBorder"
-border.Size = UDim2.new(1, 0, 1, 0)
-border.Position = UDim2.new(0, 0, 0, 0)
-border.BackgroundTransparency = 1
-border.BorderSizePixel = 0
-border.Parent = loadingFrame
-local borderStroke = Instance.new("UIStroke")
-borderStroke.Thickness = 2
-borderStroke.Color = Theme.Accent:lerp(Theme.Text, 0.7)
-borderStroke.Transparency = 0.25
-borderStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-borderStroke.Parent = border
+local dotsLabel = Instance.new("TextLabel")
+dotsLabel.Name = "LoadingDots"
+dotsLabel.Parent = loadingFrame
+dotsLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+dotsLabel.BackgroundTransparency = 1
+dotsLabel.BorderSizePixel = 0
+dotsLabel.Position = UDim2.new(0.2326, 0, 0.4474, 0)
+dotsLabel.Size = UDim2.new(0, 200, 0, 33)
+dotsLabel.Font = Enum.Font.GothamBold
+dotsLabel.Text = ". . ."
+dotsLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+dotsLabel.TextSize = 54
+dotsLabel.TextTransparency = 1
 
+-- Animate fade/scale in
+loadingFrame.BackgroundTransparency = 1
+loadingFrame.Size = UDim2.new(0, 320, 0, 80)
+tween(loadingFrame, {BackgroundTransparency=0, Size=UDim2.new(0, 374, 0, 114)}, 0.32, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+tween(nameLabel, {TextTransparency=0}, 0.32)
+tween(versionLabel, {TextTransparency=0.18}, 0.32)
+tween(dotsLabel, {TextTransparency=0.08}, 0.32)
 
-
--- Use only transparency and color for soft effect (no UIBlur/UIStroke)
-loadingFrame.BackgroundTransparency = 0.18
-loadingFrame.BackgroundColor3 = Theme.Background:Lerp(Theme.Accent3, 0.6)
-
--- Icon (Rayfield-style)
-
--- Icon with drop shadow for depth
-local icon = Instance.new("ImageLabel")
-icon.Name = "LogoIcon"
-icon.Size = UDim2.new(0, 48, 0, 48)
-icon.Position = UDim2.new(0, Theme.Padding, 0, Theme.Padding)
-icon.BackgroundTransparency = 1
-icon.Image = "rbxassetid://7733964646"
-icon.ImageColor3 = Theme.Accent
-icon.ImageTransparency = 0.05
-icon.Parent = loadingFrame
-local iconShadow = Instance.new("ImageLabel")
-iconShadow.Size = UDim2.new(1, 8, 1, 8)
-iconShadow.Position = UDim2.new(0, -4, 0, -4)
-iconShadow.BackgroundTransparency = 1
-iconShadow.Image = "rbxassetid://1316045217"
-iconShadow.ImageTransparency = 0.85
-iconShadow.ZIndex = icon.ZIndex - 1
-iconShadow.Parent = icon
-
-
-local loadingLabel = Instance.new("TextLabel")
-loadingLabel.Size = UDim2.new(1, -Theme.Padding*2-48, 0, 54)
-loadingLabel.Position = UDim2.new(0, Theme.Padding+54, 0, Theme.Padding+2)
-loadingLabel.BackgroundTransparency = 1
-loadingLabel.Text = "<b>Overflow Hub</b>"
-loadingLabel.Font = Theme.Font
-loadingLabel.TextColor3 = Theme.Accent
-loadingLabel.TextTransparency = 0
-loadingLabel.TextSize = Theme.TitleFontSize
-loadingLabel.TextStrokeTransparency = 0.6
-loadingLabel.TextStrokeColor3 = Theme.Border
-loadingLabel.TextXAlignment = Enum.TextXAlignment.Left
-loadingLabel.TextYAlignment = Enum.TextYAlignment.Top
-loadingLabel.RichText = true
-loadingLabel.Parent = loadingFrame
-
-
-local loadingSub = Instance.new("TextLabel")
-loadingSub.Size = UDim2.new(1, -Theme.Padding*2, 0, 26)
-loadingSub.Position = UDim2.new(0, Theme.Padding, 0, Theme.Padding + 48)
-loadingSub.BackgroundTransparency = 1
-loadingSub.Text = "Loading, please wait..."
-loadingSub.Font = Theme.Font
-loadingSub.TextColor3 = Theme.Text:lerp(Theme.Accent, 0.2)
-loadingSub.TextSize = Theme.DescFontSize + 1
-loadingSub.TextTransparency = 0.12
-loadingSub.TextXAlignment = Enum.TextXAlignment.Left
-loadingSub.TextYAlignment = Enum.TextYAlignment.Top
-loadingSub.RichText = true
-loadingSub.Parent = loadingFrame
-
--- Progress Bar
-
--- Modern progress bar with subtle shadow and rounded ends
-local progressBarBG = Instance.new("Frame")
-progressBarBG.Name = "ProgressBarBG"
-progressBarBG.Size = UDim2.new(1, -Theme.Padding*2, 0, 10)
-progressBarBG.Position = UDim2.new(0, Theme.Padding, 1, -Theme.Padding-18)
-progressBarBG.BackgroundColor3 = Theme.Accent2:lerp(Theme.Background, 0.2)
-progressBarBG.BorderSizePixel = 0
-progressBarBG.Parent = loadingFrame
-Templates.Corner(progressBarBG, UDim.new(0, 8))
-local pbShadow = Instance.new("ImageLabel")
-pbShadow.Size = UDim2.new(1, 8, 1, 8)
-pbShadow.Position = UDim2.new(0, -4, 0, -4)
-pbShadow.BackgroundTransparency = 1
-pbShadow.Image = "rbxassetid://1316045217"
-pbShadow.ImageTransparency = 0.92
-pbShadow.ZIndex = progressBarBG.ZIndex - 1
-pbShadow.Parent = progressBarBG
-
-local progressBar = Instance.new("Frame")
-progressBar.Name = "ProgressBar"
-progressBar.Size = UDim2.new(0, 0, 1, 0)
-progressBar.BackgroundColor3 = Theme.Accent
-progressBar.BorderSizePixel = 0
-progressBar.Parent = progressBarBG
-Templates.Corner(progressBar, UDim.new(0, 8))
-
--- Spinner (Rayfield-style, smaller, right side)
-
--- Spinner with subtle shadow
-local spinner = Instance.new("ImageLabel")
-spinner.Size = UDim2.new(0, 32, 0, 32)
-spinner.Position = UDim2.new(1, -Theme.Padding-32, 1, -Theme.Padding-32)
-spinner.AnchorPoint = Vector2.new(0, 0)
-spinner.BackgroundTransparency = 1
-spinner.Image = "rbxassetid://2790382286"
-spinner.ImageColor3 = Theme.Accent
-spinner.ImageTransparency = 0.05
-spinner.Parent = loadingFrame
-local spinnerShadow = Instance.new("ImageLabel")
-spinnerShadow.Size = UDim2.new(1, 8, 1, 8)
-spinnerShadow.Position = UDim2.new(0, -4, 0, -4)
-spinnerShadow.BackgroundTransparency = 1
-spinnerShadow.Image = "rbxassetid://1316045217"
-spinnerShadow.ImageTransparency = 0.88
-spinnerShadow.ZIndex = spinner.ZIndex - 1
-spinnerShadow.Parent = spinner
-
--- Spinner Animation (smoother)
-local spinning = true
+-- Animated loading dots
+local dots = {".", ". .", ". . .", ". .", "."}
+local running = true
 spawn(function()
-    while spinning do
-        spinner.Rotation = (spinner.Rotation + 8) % 360
-        RunService.RenderStepped:Wait()
+    local i = 1
+    while running do
+        dotsLabel.Text = dots[i]
+        i = i % #dots + 1
+        wait(0.22)
     end
 end)
 
-
-
--- Modern loading animation (fade/scale, progress bar fill, subtle bounce)
-loadingFrame.BackgroundTransparency = 1
-loadingFrame.Size = UDim2.new(0, Theme.LoadingWidth*0.85, 0, Theme.LoadingHeight*0.85)
-tween(loadingFrame, {BackgroundTransparency=0.18, Size=UDim2.new(0, Theme.LoadingWidth, 0, Theme.LoadingHeight)}, 0.38, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-tween(loadingLabel, {TextTransparency=0}, 0.38)
-tween(loadingSub, {TextTransparency=0.12}, 0.38)
-tween(spinner, {ImageTransparency=0.05}, 0.38)
-tween(icon, {ImageTransparency=0.05}, 0.38)
-
-progressBar.Size = UDim2.new(0, 0, 1, 0)
-for i = 1, 100 do
-    progressBar.Size = UDim2.new(i/100, 0, 1, 0)
-    RunService.RenderStepped:Wait()
-end
-
-wait(0.32)
-spinning = false
-tween(loadingFrame, {Size=UDim2.new(0, Theme.LoadingWidth*1.04, 0, Theme.LoadingHeight*1.04)}, 0.18, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
-wait(0.13)
-tween(loadingFrame, {BackgroundTransparency=1, Size=UDim2.new(0, Theme.LoadingWidth*1.12, 0, Theme.LoadingHeight*1.12)}, 0.36, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
-tween(loadingLabel, {TextTransparency=1}, 0.36)
-tween(loadingSub, {TextTransparency=1}, 0.36)
-tween(spinner, {ImageTransparency=1}, 0.36)
-tween(icon, {ImageTransparency=1}, 0.36)
-tween(progressBar, {BackgroundTransparency=1}, 0.36)
-tween(progressBarBG, {BackgroundTransparency=1}, 0.36)
+wait(2.1)
+running = false
+tween(loadingFrame, {BackgroundTransparency=1, Size=UDim2.new(0, 420, 0, 130)}, 0.36, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
+tween(nameLabel, {TextTransparency=1}, 0.36)
+tween(versionLabel, {TextTransparency=1}, 0.36)
+tween(dotsLabel, {TextTransparency=1}, 0.36)
 wait(0.38)
 loadingFrame:Destroy()
 
