@@ -316,7 +316,14 @@ topBar.Size = UDim2.new(1, 0, 0, Theme.TopBarHeight)
 topBar.BackgroundColor3 = Theme.Accent2
 topBar.BorderSizePixel = 0
 topBar.Parent = mainFrame
-Templates.Corner(topBar, Theme.CornerRadius)
+-- Only round top corners for topBar
+local topBarCorner = Instance.new("UICorner")
+topBarCorner.CornerRadius = Theme.CornerRadius
+topBarCorner.TopLeft = true
+topBarCorner.TopRight = true
+topBarCorner.BottomLeft = false
+topBarCorner.BottomRight = false
+topBarCorner.Parent = topBar
 -- (Removed white drop shadow from top bar for cleaner look)
 
 
@@ -334,32 +341,35 @@ titleLabel.Parent = topBar
 
 
 -- Modern Exit button (icon, only hides UI)
-local closeButton = Instance.new("ImageButton")
-closeButton.Size = UDim2.new(0, 36, 0, 36)
-closeButton.Position = UDim2.new(1, -44, 0.5, -18)
-closeButton.BackgroundColor3 = Color3.fromRGB(40, 48, 60)
-closeButton.Image = "rbxassetid://3926305904" -- Feather X icon
-closeButton.ImageRectOffset = Vector2.new(284, 4)
-closeButton.ImageRectSize = Vector2.new(24, 24)
-closeButton.ImageColor3 = Theme.Text
-closeButton.AutoButtonColor = false
+-- MacOS-style close button (red circle with white X)
+local closeButton = Instance.new("Frame")
+closeButton.Size = UDim2.new(0, 22, 0, 22)
+closeButton.Position = UDim2.new(0, 16, 0.5, -11)
+closeButton.BackgroundColor3 = Color3.fromRGB(255, 95, 86) -- MacOS red
+closeButton.BorderSizePixel = 0
 closeButton.Parent = topBar
-Templates.Corner(closeButton, UDim.new(0, 10))
-local closeHover = false
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(1, 0)
+closeCorner.Parent = closeButton
+local xIcon = Instance.new("ImageLabel")
+xIcon.Size = UDim2.new(0, 12, 0, 12)
+xIcon.Position = UDim2.new(0.5, -6, 0.5, -6)
+xIcon.BackgroundTransparency = 1
+xIcon.Image = "rbxassetid://7072719332" -- Simple white X icon
+xIcon.ImageColor3 = Color3.fromRGB(255,255,255)
+xIcon.Parent = closeButton
 closeButton.MouseEnter:Connect(function()
-    closeHover = true
-    tween(closeButton, {BackgroundColor3=Theme.Accent}, 0.18)
-    tween(closeButton, {ImageColor3=Color3.fromRGB(255,80,80)}, 0.18)
+    closeButton.BackgroundColor3 = Color3.fromRGB(255, 120, 110)
 end)
 closeButton.MouseLeave:Connect(function()
-    closeHover = false
-    tween(closeButton, {BackgroundColor3=Color3.fromRGB(40, 48, 60)}, 0.18)
-    tween(closeButton, {ImageColor3=Theme.Text}, 0.18)
+    closeButton.BackgroundColor3 = Color3.fromRGB(255, 95, 86)
 end)
-closeButton.MouseButton1Click:Connect(function()
-    tween(mainFrame, {BackgroundTransparency=1}, 0.3)
-    wait(0.3)
-    mainFrame.Visible = false
+closeButton.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        tween(mainFrame, {BackgroundTransparency=1}, 0.3)
+        wait(0.3)
+        mainFrame.Visible = false
+    end
 end)
 
 -- Draggable
