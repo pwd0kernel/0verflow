@@ -1,5 +1,4 @@
 
-
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
@@ -196,7 +195,8 @@ loadingFrame.Parent = screenGui
 Templates.Corner(loadingFrame, Theme.CornerRadius)
 
 
--- Remove shadow, add soft blur effect using transparency and color only (UIBlur is not supported on Frame)
+
+-- Use only transparency and color for soft effect (no UIBlur/UIStroke)
 loadingFrame.BackgroundTransparency = 0.25
 loadingFrame.BackgroundColor3 = Theme.Background:Lerp(Theme.Accent3, 0.55)
 
@@ -604,4 +604,10 @@ function Library:LoadConfig(name)
     return nil
 end
 
-return setmetatable(Library, {__call=function(_,...) return Library end})
+
+-- Fix: Return a callable library that returns the Library table (with correct API)
+return setmetatable(Library, {
+    __call = function(_, ...)
+        return Library
+    end
+})
