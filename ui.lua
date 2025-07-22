@@ -1,4 +1,3 @@
-
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
@@ -187,15 +186,7 @@ loadingFrame.BackgroundColor3 = Color3.fromRGB(18, 20, 28)
 loadingFrame.BorderSizePixel = 0
 loadingFrame.Parent = screenGui
 
--- Premium dark gradient for loader
-local loaderGradient = Instance.new("UIGradient")
-loaderGradient.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(28, 32, 40)),
-    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(18, 20, 28)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(38, 44, 60))
-}
-loaderGradient.Rotation = 35
-loaderGradient.Parent = loadingFrame
+-- (Removed gradient for flat premium dark look)
 
 -- (Removed white drop shadow for cleaner look)
 
@@ -314,15 +305,7 @@ mainFrame.Parent = screenGui
 Templates.Corner(mainFrame, Theme.CornerRadius)
 -- (Removed white drop shadow from main window for cleaner look)
 
--- Premium dark gradient for main window
-local mainGradient = Instance.new("UIGradient")
-mainGradient.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(28, 32, 40)),
-    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(18, 20, 28)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(38, 44, 60))
-}
-mainGradient.Rotation = 35
-mainGradient.Parent = mainFrame
+-- (Removed gradient for flat premium dark look)
 
 
 -- Top Bar (Polished)
