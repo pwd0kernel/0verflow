@@ -1,3 +1,4 @@
+
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
@@ -340,20 +341,21 @@ titleLabel.RichText = true
 titleLabel.Parent = topBar
 
 
--- Modern Exit button (icon, only hides UI)
--- MacOS-style close button (red circle with white X)
-local closeButton = Instance.new("Frame")
-closeButton.Size = UDim2.new(0, 22, 0, 22)
-closeButton.Position = UDim2.new(0, 16, 0.5, -11)
-closeButton.BackgroundColor3 = Color3.fromRGB(255, 95, 86) -- MacOS red
+
+-- MacOS-style close button (red circle with white X, always top left)
+local closeButton = Instance.new("ImageButton")
+closeButton.Size = UDim2.new(0, 16, 0, 16)
+closeButton.Position = UDim2.new(0, 14, 0, 9)
+closeButton.BackgroundColor3 = Color3.fromRGB(255, 95, 86)
 closeButton.BorderSizePixel = 0
+closeButton.Image = ""
 closeButton.Parent = topBar
 local closeCorner = Instance.new("UICorner")
 closeCorner.CornerRadius = UDim.new(1, 0)
 closeCorner.Parent = closeButton
 local xIcon = Instance.new("ImageLabel")
-xIcon.Size = UDim2.new(0, 12, 0, 12)
-xIcon.Position = UDim2.new(0.5, -6, 0.5, -6)
+xIcon.Size = UDim2.new(0, 8, 0, 8)
+xIcon.Position = UDim2.new(0.5, -4, 0.5, -4)
 xIcon.BackgroundTransparency = 1
 xIcon.Image = "rbxassetid://7072719332" -- Simple white X icon
 xIcon.ImageColor3 = Color3.fromRGB(255,255,255)
@@ -364,12 +366,10 @@ end)
 closeButton.MouseLeave:Connect(function()
     closeButton.BackgroundColor3 = Color3.fromRGB(255, 95, 86)
 end)
-closeButton.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        tween(mainFrame, {BackgroundTransparency=1}, 0.3)
-        wait(0.3)
-        mainFrame.Visible = false
-    end
+closeButton.MouseButton1Click:Connect(function()
+    tween(mainFrame, {BackgroundTransparency=1}, 0.3)
+    wait(0.3)
+    mainFrame.Visible = false
 end)
 
 -- Draggable
