@@ -1,17 +1,4 @@
 
---[[
-    Overflow Hub UI Library for Roblox Exploit Scripts
-    Author: github copilot
-    Description: Modern, animated, modular UI library for cheat scripts.
-    Usage: local library = loadstring(game:HttpGet("url_to_library"))()
-           local window = library:CreateWindow("Overflow Hub")
-           local tab = window:CreateTab("Combat")
-           tab:CreateToggle(...)
-    Supports: Synapse X, Krnl, Script-Ware, etc.
-    Theme: Dark, blue accents, rounded corners, smooth animations.
-    Components: Toggles, Sliders, Buttons, Textboxes, Dropdowns, Labels
-    Features: Loading screen, draggable/resizable window, tabs, hotkey toggle, config save/load, theme customization
-]]
 
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
@@ -208,18 +195,10 @@ loadingFrame.Parent = screenGui
 
 Templates.Corner(loadingFrame, Theme.CornerRadius)
 
--- Remove shadow, add blur and transparency
-local blur = Instance.new("UIStroke")
-blur.Thickness = 0
-blur.Transparency = 1
-blur.Parent = loadingFrame
 
-local blurEffect = Instance.new("UIBlur")
-blurEffect.Size = 12
-blurEffect.Parent = loadingFrame
-
-loadingFrame.BackgroundTransparency = 0.35
-loadingFrame.BackgroundColor3 = Theme.Accent3:Lerp(Theme.Background, 0.5)
+-- Remove shadow, add soft blur effect using transparency and color only (UIBlur is not supported on Frame)
+loadingFrame.BackgroundTransparency = 0.25
+loadingFrame.BackgroundColor3 = Theme.Background:Lerp(Theme.Accent3, 0.55)
 
 -- Icon (Rayfield-style)
 local icon = Instance.new("ImageLabel")
@@ -239,6 +218,7 @@ loadingLabel.BackgroundTransparency = 1
 loadingLabel.Text = "<b>Overflow Hub</b>"
 loadingLabel.Font = Theme.Font
 loadingLabel.TextColor3 = Theme.Accent
+loadingLabel.TextTransparency = 0
 loadingLabel.TextSize = Theme.TitleFontSize
 loadingLabel.TextStrokeTransparency = 0.7
 loadingLabel.TextStrokeColor3 = Theme.Border
@@ -298,20 +278,20 @@ spawn(function()
     end
 end)
 
+
 -- Loading Animation (fade/scale, progress bar fill)
 loadingFrame.BackgroundTransparency = 1
 loadingFrame.Size = UDim2.new(0, Theme.LoadingWidth*0.8, 0, Theme.LoadingHeight*0.8)
-tween(loadingFrame, {BackgroundTransparency=0, Size=UDim2.new(0, Theme.LoadingWidth, 0, Theme.LoadingHeight)}, 0.4)
+tween(loadingFrame, {BackgroundTransparency=0.25, Size=UDim2.new(0, Theme.LoadingWidth, 0, Theme.LoadingHeight)}, 0.4)
 tween(loadingLabel, {TextTransparency=0}, 0.4)
 tween(loadingSub, {TextTransparency=0.15}, 0.4)
 tween(spinner, {ImageTransparency=0.05}, 0.4)
 tween(icon, {ImageTransparency=0.05}, 0.4)
 
--- Progress bar fill animation
 progressBar.Size = UDim2.new(0, 0, 1, 0)
 for i = 1, 100 do
     progressBar.Size = UDim2.new(i/100, 0, 1, 0)
-    wait(0.012)
+    RunService.RenderStepped:Wait()
 end
 
 wait(0.5)
