@@ -9,17 +9,30 @@ local PlayerGui = LocalPlayer:FindFirstChildOfClass("PlayerGui")
 local Overflow = {}
 Overflow.__index = Overflow
 
--- Theme
+-- Theme (Polished, modern, better spacing/colors)
 local Theme = {
-    Background = Color3.fromRGB(30,30,30),
-    Accent = Color3.fromRGB(0,123,255),
-    Accent2 = Color3.fromRGB(40,40,40),
-    Text = Color3.fromRGB(230,230,230),
-    Border = Color3.fromRGB(50,50,50),
+    Background = Color3.fromRGB(24, 26, 32),
+    Accent = Color3.fromRGB(0, 140, 255),
+    Accent2 = Color3.fromRGB(36, 38, 48),
+    Accent3 = Color3.fromRGB(18, 20, 26),
+    Text = Color3.fromRGB(235, 240, 255),
+    Border = Color3.fromRGB(60, 70, 90),
     Font = Enum.Font.Gotham,
-    CornerRadius = UDim.new(0,10),
-    Padding = 8,
+    CornerRadius = UDim.new(0, 12),
+    Padding = 14,
     Shadow = true,
+    TabHeight = 40,
+    TopBarHeight = 46,
+    TabFontSize = 20,
+    TitleFontSize = 28,
+    LabelFontSize = 20,
+    DescFontSize = 15,
+    ToggleHeight = 44,
+    LabelHeight = 32,
+    WindowWidth = 540,
+    WindowHeight = 440,
+    LoadingWidth = 420,
+    LoadingHeight = 160,
 }
 
 local function createCorner(radius)
@@ -81,111 +94,141 @@ for _,v in ipairs(PlayerGui:GetChildren()) do
     if v.Name == "OverflowHub" then v:Destroy() end
 end
 
--- Create base ScreenGui
+
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "OverflowHub"
 screenGui.IgnoreGuiInset = true
 screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+screenGui.ResetOnSpawn = false
 screenGui.Parent = PlayerGui
 
--- Loading Screen
+
+-- Loading Screen (Polished)
 local loadingFrame = Instance.new("Frame")
 loadingFrame.Name = "LoadingFrame"
-loadingFrame.Size = UDim2.new(0, 350, 0, 120)
-loadingFrame.Position = UDim2.new(0.5, -175, 0.5, -60)
-loadingFrame.BackgroundColor3 = Theme.Background
+loadingFrame.Size = UDim2.new(0, Theme.LoadingWidth, 0, Theme.LoadingHeight)
+loadingFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+loadingFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+loadingFrame.BackgroundColor3 = Theme.Accent3
 loadingFrame.BorderSizePixel = 0
-loadingFrame.AnchorPoint = Vector2.new(0.5,0.5)
 loadingFrame.Parent = screenGui
-createCorner(UDim.new(0,12)).Parent = loadingFrame
+createCorner(Theme.CornerRadius).Parent = loadingFrame
 createShadow(loadingFrame)
 
 local loadingLabel = Instance.new("TextLabel")
-loadingLabel.Size = UDim2.new(1,0,0,50)
-loadingLabel.Position = UDim2.new(0,0,0,10)
+loadingLabel.Size = UDim2.new(1, 0, 0, 60)
+loadingLabel.Position = UDim2.new(0, 0, 0, Theme.Padding)
 loadingLabel.BackgroundTransparency = 1
-loadingLabel.Text = "Overflow Hub"
+loadingLabel.Text = "<b>Overflow Hub</b>"
 loadingLabel.Font = Theme.Font
-loadingLabel.TextColor3 = Theme.Text
-loadingLabel.TextSize = 32
+loadingLabel.TextColor3 = Theme.Accent
+loadingLabel.TextSize = Theme.TitleFontSize
+loadingLabel.TextStrokeTransparency = 0.7
+loadingLabel.TextStrokeColor3 = Theme.Border
+loadingLabel.TextXAlignment = Enum.TextXAlignment.Center
+loadingLabel.TextYAlignment = Enum.TextYAlignment.Top
+loadingLabel.RichText = true
 loadingLabel.Parent = loadingFrame
 
+local loadingSub = Instance.new("TextLabel")
+loadingSub.Size = UDim2.new(1, 0, 0, 28)
+loadingSub.Position = UDim2.new(0, 0, 0, Theme.Padding + 54)
+loadingSub.BackgroundTransparency = 1
+loadingSub.Text = "Loading, please wait..."
+loadingSub.Font = Theme.Font
+loadingSub.TextColor3 = Theme.Text
+loadingSub.TextSize = Theme.DescFontSize
+loadingSub.TextTransparency = 0.15
+loadingSub.TextXAlignment = Enum.TextXAlignment.Center
+loadingSub.TextYAlignment = Enum.TextYAlignment.Top
+loadingSub.Parent = loadingFrame
+
 local spinner = Instance.new("ImageLabel")
-spinner.Size = UDim2.new(0,36,0,36)
-spinner.Position = UDim2.new(0.5,-18,1,-46)
+spinner.Size = UDim2.new(0, 48, 0, 48)
+spinner.Position = UDim2.new(0.5, -24, 1, -64)
 spinner.BackgroundTransparency = 1
-spinner.Image = "rbxassetid://2790382286" -- spinning circle asset
+spinner.Image = "rbxassetid://2790382286"
 spinner.ImageColor3 = Theme.Accent
+spinner.ImageTransparency = 0.05
 spinner.Parent = loadingFrame
 
--- Spinner Animation
+-- Spinner Animation (smoother)
 local spinning = true
 spawn(function()
     while spinning do
-        spinner.Rotation = (spinner.Rotation + 6) % 360
-        wait(0.016)
+        spinner.Rotation = (spinner.Rotation + 8) % 360
+        RunService.RenderStepped:Wait()
     end
 end)
 
--- Loading Animation (2.5s)
+-- Loading Animation (2.5s, fade/scale)
+loadingFrame.BackgroundTransparency = 1
+tween(loadingFrame, {BackgroundTransparency=0}, 0.4)
+tween(loadingLabel, {TextTransparency=0}, 0.4)
+tween(loadingSub, {TextTransparency=0.15}, 0.4)
+tween(spinner, {ImageTransparency=0.05}, 0.4)
 wait(2.5)
 spinning = false
-tween(loadingFrame, {BackgroundTransparency=1}, 0.4)
-tween(loadingLabel, {TextTransparency=1}, 0.4)
-tween(spinner, {ImageTransparency=1}, 0.4)
-wait(0.45)
+tween(loadingFrame, {BackgroundTransparency=1}, 0.5)
+tween(loadingLabel, {TextTransparency=1}, 0.5)
+tween(loadingSub, {TextTransparency=1}, 0.5)
+tween(spinner, {ImageTransparency=1}, 0.5)
+wait(0.55)
 loadingFrame:Destroy()
 
--- Main Window
+
+-- Main Window (Polished, perfectly centered)
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
-mainFrame.Size = UDim2.new(0, 500, 0, 400)
-mainFrame.Position = UDim2.new(0.5, -250, 0.5, -200)
+mainFrame.Size = UDim2.new(0, Theme.WindowWidth, 0, Theme.WindowHeight)
+mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 mainFrame.BackgroundColor3 = Theme.Background
 mainFrame.BorderSizePixel = 0
-mainFrame.AnchorPoint = Vector2.new(0.5,0.5)
 mainFrame.Visible = false
 mainFrame.Parent = screenGui
-createCorner(UDim.new(0,12)).Parent = mainFrame
+createCorner(Theme.CornerRadius).Parent = mainFrame
 createShadow(mainFrame)
 
--- Top Bar
+
+-- Top Bar (Polished)
 local topBar = Instance.new("Frame")
 topBar.Name = "TopBar"
-topBar.Size = UDim2.new(1,0,0,38)
+topBar.Size = UDim2.new(1, 0, 0, Theme.TopBarHeight)
 topBar.BackgroundColor3 = Theme.Accent2
 topBar.BorderSizePixel = 0
 topBar.Parent = mainFrame
-createCorner(UDim.new(0,12)).Parent = topBar
+createCorner(Theme.CornerRadius).Parent = topBar
 
 local titleLabel = Instance.new("TextLabel")
-titleLabel.Size = UDim2.new(1,-48,1,0)
-titleLabel.Position = UDim2.new(0,12,0,0)
+titleLabel.Size = UDim2.new(1, -60, 1, 0)
+titleLabel.Position = UDim2.new(0, Theme.Padding, 0, 0)
 titleLabel.BackgroundTransparency = 1
-titleLabel.Text = "Overflow Hub"
+titleLabel.Text = "<b>Overflow Hub</b>"
 titleLabel.Font = Theme.Font
 titleLabel.TextColor3 = Theme.Text
-titleLabel.TextSize = 22
+titleLabel.TextSize = Theme.TitleFontSize
 titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+titleLabel.RichText = true
 titleLabel.Parent = topBar
 
 local closeButton = Instance.new("TextButton")
-closeButton.Size = UDim2.new(0,32,0,32)
-closeButton.Position = UDim2.new(1,-40,0,3)
-closeButton.BackgroundColor3 = Theme.Accent2
+closeButton.Size = UDim2.new(0, 38, 0, 38)
+closeButton.Position = UDim2.new(1, -46, 0.5, -19)
+closeButton.BackgroundColor3 = Theme.Accent3
 closeButton.Text = "✕"
 closeButton.Font = Theme.Font
 closeButton.TextColor3 = Theme.Text
 closeButton.TextSize = 22
 closeButton.AutoButtonColor = false
 closeButton.Parent = topBar
-createCorner(UDim.new(0,8)).Parent = closeButton
+createCorner(UDim.new(0, 10)).Parent = closeButton
 
 closeButton.MouseEnter:Connect(function()
-    tween(closeButton, {BackgroundColor3=Theme.Accent}, 0.2)
+    tween(closeButton, {BackgroundColor3=Theme.Accent}, 0.18)
 end)
 closeButton.MouseLeave:Connect(function()
-    tween(closeButton, {BackgroundColor3=Theme.Accent2}, 0.2)
+    tween(closeButton, {BackgroundColor3=Theme.Accent3}, 0.18)
 end)
 closeButton.MouseButton1Click:Connect(function()
     tween(mainFrame, {BackgroundTransparency=1}, 0.3)
@@ -196,31 +239,34 @@ end)
 -- Draggable
 makeDraggable(mainFrame, topBar)
 
--- Tabs
+
+-- Tabs (Polished)
 local tabBar = Instance.new("Frame")
 tabBar.Name = "TabBar"
-tabBar.Size = UDim2.new(1,0,0,36)
-tabBar.Position = UDim2.new(0,0,0,38)
+tabBar.Size = UDim2.new(1, 0, 0, Theme.TabHeight)
+tabBar.Position = UDim2.new(0, 0, 0, Theme.TopBarHeight)
 tabBar.BackgroundTransparency = 1
 tabBar.Parent = mainFrame
 
 local tabList = Instance.new("UIListLayout")
 tabList.FillDirection = Enum.FillDirection.Horizontal
 tabList.SortOrder = Enum.SortOrder.LayoutOrder
-tabList.Padding = UDim.new(0,Theme.Padding)
+tabList.Padding = UDim.new(0, Theme.Padding)
 tabList.Parent = tabBar
 
 local tabContent = Instance.new("Frame")
 tabContent.Name = "TabContent"
-tabContent.Size = UDim2.new(1,0,1,-74)
-tabContent.Position = UDim2.new(0,0,0,74)
+tabContent.Size = UDim2.new(1, 0, 1, -(Theme.TopBarHeight + Theme.TabHeight + Theme.Padding))
+tabContent.Position = UDim2.new(0, 0, 0, Theme.TopBarHeight + Theme.TabHeight + Theme.Padding)
 tabContent.BackgroundTransparency = 1
 tabContent.ClipsDescendants = true
 tabContent.Parent = mainFrame
 
--- Show main window with animation
+
+-- Show main window with animation (centered)
 mainFrame.Visible = true
 mainFrame.BackgroundTransparency = 1
+mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
 tween(mainFrame, {BackgroundTransparency=0}, 0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 
 -- Hotkey toggle (Insert)
@@ -251,20 +297,22 @@ function Library:CreateWindow(title)
 end
 
 function Window:CreateTab(tabName)
+
     local tabBtn = Instance.new("TextButton")
-    tabBtn.Size = UDim2.new(0,110,1,0)
-    tabBtn.BackgroundColor3 = Theme.Accent2
+    tabBtn.Size = UDim2.new(0, 120, 1, 0)
+    tabBtn.BackgroundColor3 = Theme.Accent3
     tabBtn.Text = tabName
     tabBtn.Font = Theme.Font
     tabBtn.TextColor3 = Theme.Text
-    tabBtn.TextSize = 18
+    tabBtn.TextSize = Theme.TabFontSize
     tabBtn.AutoButtonColor = false
     tabBtn.Parent = tabBar
-    createCorner(UDim.new(0,8)).Parent = tabBtn
+    createCorner(UDim.new(0, 10)).Parent = tabBtn
+
 
     local tabFrame = Instance.new("Frame")
     tabFrame.Name = tabName .. "_Tab"
-    tabFrame.Size = UDim2.new(1,0,1,0)
+    tabFrame.Size = UDim2.new(1, 0, 1, 0)
     tabFrame.BackgroundTransparency = 1
     tabFrame.Visible = false
     tabFrame.Parent = tabContent
@@ -281,12 +329,13 @@ function Window:CreateTab(tabName)
     self._tabs[tabName] = tabApi
     self._tabButtons[tabName] = tabBtn
 
+
     tabBtn.MouseButton1Click:Connect(function()
-        for n,btn in pairs(self._tabButtons) do
-            tween(btn, {BackgroundColor3=Theme.Accent2}, 0.2)
+        for n, btn in pairs(self._tabButtons) do
+            tween(btn, {BackgroundColor3 = Theme.Accent3}, 0.2)
             self._tabs[n]._frame.Visible = false
         end
-        tween(tabBtn, {BackgroundColor3=Theme.Accent}, 0.2)
+        tween(tabBtn, {BackgroundColor3 = Theme.Accent}, 0.22)
         tabFrame.Visible = true
     end)
 
@@ -297,64 +346,67 @@ function Window:CreateTab(tabName)
     end
 
     -- Component API
+
     function tabApi:CreateLabel(text)
         local label = Instance.new("TextLabel")
-        label.Size = UDim2.new(1,-Theme.Padding*2,0,28)
-        label.Position = UDim2.new(0,Theme.Padding,0,Theme.Padding + #self._components*38)
+        label.Size = UDim2.new(1, -Theme.Padding * 2, 0, Theme.LabelHeight)
+        label.Position = UDim2.new(0, Theme.Padding, 0, Theme.Padding + #self._components * (Theme.LabelHeight + Theme.Padding))
         label.BackgroundTransparency = 1
-        label.Text = text
+        label.Text = "<b>" .. tostring(text) .. "</b>"
         label.Font = Theme.Font
         label.TextColor3 = Theme.Text
-        label.TextSize = 18
+        label.TextSize = Theme.LabelFontSize
         label.TextXAlignment = Enum.TextXAlignment.Left
+        label.RichText = true
         label.Parent = tabFrame
         table.insert(self._components, label)
         return label
     end
 
+
     function tabApi:CreateToggle(text, callback, description)
         local toggleFrame = Instance.new("Frame")
-        toggleFrame.Size = UDim2.new(1,-Theme.Padding*2,0,38)
-        toggleFrame.Position = UDim2.new(0,Theme.Padding,0,Theme.Padding + #self._components*44)
+        toggleFrame.Size = UDim2.new(1, -Theme.Padding * 2, 0, Theme.ToggleHeight)
+        toggleFrame.Position = UDim2.new(0, Theme.Padding, 0, Theme.Padding + #self._components * (Theme.ToggleHeight + Theme.Padding))
         toggleFrame.BackgroundTransparency = 1
         toggleFrame.Parent = tabFrame
 
         local label = Instance.new("TextLabel")
-        label.Size = UDim2.new(1,-50,1,0)
-        label.Position = UDim2.new(0,0,0,0)
+        label.Size = UDim2.new(1, -60, 1, 0)
+        label.Position = UDim2.new(0, 0, 0, 0)
         label.BackgroundTransparency = 1
         label.Text = text
         label.Font = Theme.Font
         label.TextColor3 = Theme.Text
-        label.TextSize = 17
+        label.TextSize = Theme.LabelFontSize
         label.TextXAlignment = Enum.TextXAlignment.Left
         label.Parent = toggleFrame
 
         local toggleBtn = Instance.new("TextButton")
-        toggleBtn.Size = UDim2.new(0,40,0,24)
-        toggleBtn.Position = UDim2.new(1,-44,0.5,-12)
-        toggleBtn.BackgroundColor3 = Theme.Accent2
+        toggleBtn.Size = UDim2.new(0, 48, 0, 28)
+        toggleBtn.Position = UDim2.new(1, -54, 0.5, -14)
+        toggleBtn.BackgroundColor3 = Theme.Accent3
         toggleBtn.Text = ""
         toggleBtn.AutoButtonColor = false
         toggleBtn.Parent = toggleFrame
-        createCorner(UDim.new(0,12)).Parent = toggleBtn
+        createCorner(UDim.new(0, 14)).Parent = toggleBtn
 
         local knob = Instance.new("Frame")
-        knob.Size = UDim2.new(0,20,1,-8)
-        knob.Position = UDim2.new(0,4,0,4)
+        knob.Size = UDim2.new(0, 22, 1, -10)
+        knob.Position = UDim2.new(0, 5, 0, 5)
         knob.BackgroundColor3 = Theme.Border
         knob.Parent = toggleBtn
-        createCorner(UDim.new(0,10)).Parent = knob
+        createCorner(UDim.new(0, 11)).Parent = knob
 
         local enabled = false
         local function setToggle(state)
             enabled = state
             if enabled then
-                tween(toggleBtn, {BackgroundColor3=Theme.Accent}, 0.2)
-                tween(knob, {Position=UDim2.new(1,-24,0,4), BackgroundColor3=Theme.Accent2}, 0.2)
+                tween(toggleBtn, {BackgroundColor3 = Theme.Accent}, 0.18)
+                tween(knob, {Position = UDim2.new(1, -27, 0, 5), BackgroundColor3 = Theme.Accent2}, 0.18)
             else
-                tween(toggleBtn, {BackgroundColor3=Theme.Accent2}, 0.2)
-                tween(knob, {Position=UDim2.new(0,4,0,4), BackgroundColor3=Theme.Border}, 0.2)
+                tween(toggleBtn, {BackgroundColor3 = Theme.Accent3}, 0.18)
+                tween(knob, {Position = UDim2.new(0, 5, 0, 5), BackgroundColor3 = Theme.Border}, 0.18)
             end
         end
         toggleBtn.MouseButton1Click:Connect(function()
@@ -365,13 +417,13 @@ function Window:CreateTab(tabName)
 
         if description then
             local desc = Instance.new("TextLabel")
-            desc.Size = UDim2.new(1,0,0,16)
-            desc.Position = UDim2.new(0,0,1,-16)
+            desc.Size = UDim2.new(1, 0, 0, Theme.DescFontSize + 4)
+            desc.Position = UDim2.new(0, 0, 1, -Theme.DescFontSize - 2)
             desc.BackgroundTransparency = 1
             desc.Text = description
             desc.Font = Theme.Font
             desc.TextColor3 = Theme.Border
-            desc.TextSize = 13
+            desc.TextSize = Theme.DescFontSize
             desc.TextXAlignment = Enum.TextXAlignment.Left
             desc.Parent = toggleFrame
         end
