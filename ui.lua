@@ -1,4 +1,3 @@
-
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
@@ -415,11 +414,17 @@ tabContent.ClipsDescendants = true
 tabContent.Parent = mainFrame
 
 
--- Show main window with animation (centered)
-mainFrame.Visible = true
+
+mainFrame.Visible = false -- Start hidden, will show after loader
 mainFrame.BackgroundTransparency = 1
 mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-tween(mainFrame, {BackgroundTransparency=0}, 0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+
+-- Show main window after loading screen is gone
+spawn(function()
+    wait(0.01)
+    mainFrame.Visible = true
+    tween(mainFrame, {BackgroundTransparency=0}, 0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+end)
 
 -- Hotkey toggle (Insert)
 local hotkey = Enum.KeyCode.Insert
