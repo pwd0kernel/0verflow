@@ -1,18 +1,3 @@
-
---[[
-    Overflow Hub UI Library for Roblox Exploit Scripts
-    Author: github copilot
-    Description: Modern, animated, modular UI library for cheat scripts.
-    Usage: local library = loadstring(game:HttpGet("url_to_library"))()
-           local window = library:CreateWindow("Overflow Hub")
-           local tab = window:CreateTab("Combat")
-           tab:CreateToggle(...)
-    Supports: Synapse X, Krnl, Script-Ware, etc.
-    Theme: Dark, blue accents, rounded corners, smooth animations.
-    Components: Toggles, Sliders, Buttons, Textboxes, Dropdowns, Labels
-    Features: Loading screen, draggable/resizable window, tabs, hotkey toggle, config save/load, theme customization
-]]
-
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
@@ -195,6 +180,8 @@ screenGui.Parent = PlayerGui
 
 
 -- Loading Screen (Polished)
+
+-- Enhanced Loading Screen (Rayfield-inspired)
 local loadingFrame = Instance.new("Frame")
 loadingFrame.Name = "LoadingFrame"
 loadingFrame.Size = UDim2.new(0, Theme.LoadingWidth, 0, Theme.LoadingHeight)
@@ -206,9 +193,20 @@ loadingFrame.Parent = screenGui
 Templates.Corner(loadingFrame, Theme.CornerRadius)
 Templates.Shadow(loadingFrame)
 
+-- Icon (Rayfield-style)
+local icon = Instance.new("ImageLabel")
+icon.Name = "LogoIcon"
+icon.Size = UDim2.new(0, 48, 0, 48)
+icon.Position = UDim2.new(0, Theme.Padding, 0, Theme.Padding)
+icon.BackgroundTransparency = 1
+icon.Image = "rbxassetid://7733964646" -- Rayfield uses a logo, you can change this asset id
+icon.ImageColor3 = Theme.Accent
+icon.ImageTransparency = 0.05
+icon.Parent = loadingFrame
+
 local loadingLabel = Instance.new("TextLabel")
-loadingLabel.Size = UDim2.new(1, 0, 0, 60)
-loadingLabel.Position = UDim2.new(0, 0, 0, Theme.Padding)
+loadingLabel.Size = UDim2.new(1, -Theme.Padding*2-48, 0, 60)
+loadingLabel.Position = UDim2.new(0, Theme.Padding+54, 0, Theme.Padding)
 loadingLabel.BackgroundTransparency = 1
 loadingLabel.Text = "<b>Overflow Hub</b>"
 loadingLabel.Font = Theme.Font
@@ -216,7 +214,7 @@ loadingLabel.TextColor3 = Theme.Accent
 loadingLabel.TextSize = Theme.TitleFontSize
 loadingLabel.TextStrokeTransparency = 0.7
 loadingLabel.TextStrokeColor3 = Theme.Border
-loadingLabel.TextXAlignment = Enum.TextXAlignment.Center
+loadingLabel.TextXAlignment = Enum.TextXAlignment.Left
 loadingLabel.TextYAlignment = Enum.TextYAlignment.Top
 loadingLabel.RichText = true
 loadingLabel.Parent = loadingFrame
@@ -234,9 +232,29 @@ loadingSub.TextXAlignment = Enum.TextXAlignment.Center
 loadingSub.TextYAlignment = Enum.TextYAlignment.Top
 loadingSub.Parent = loadingFrame
 
+-- Progress Bar
+local progressBarBG = Instance.new("Frame")
+progressBarBG.Name = "ProgressBarBG"
+progressBarBG.Size = UDim2.new(1, -Theme.Padding*2, 0, 10)
+progressBarBG.Position = UDim2.new(0, Theme.Padding, 1, -Theme.Padding-18)
+progressBarBG.BackgroundColor3 = Theme.Accent2
+progressBarBG.BorderSizePixel = 0
+progressBarBG.Parent = loadingFrame
+Templates.Corner(progressBarBG, UDim.new(0, 6))
+
+local progressBar = Instance.new("Frame")
+progressBar.Name = "ProgressBar"
+progressBar.Size = UDim2.new(0, 0, 1, 0)
+progressBar.BackgroundColor3 = Theme.Accent
+progressBar.BorderSizePixel = 0
+progressBar.Parent = progressBarBG
+Templates.Corner(progressBar, UDim.new(0, 6))
+
+-- Spinner (Rayfield-style, smaller, right side)
 local spinner = Instance.new("ImageLabel")
-spinner.Size = UDim2.new(0, 48, 0, 48)
-spinner.Position = UDim2.new(0.5, -24, 1, -64)
+spinner.Size = UDim2.new(0, 32, 0, 32)
+spinner.Position = UDim2.new(1, -Theme.Padding-32, 1, -Theme.Padding-32)
+spinner.AnchorPoint = Vector2.new(0, 0)
 spinner.BackgroundTransparency = 1
 spinner.Image = "rbxassetid://2790382286"
 spinner.ImageColor3 = Theme.Accent
@@ -252,18 +270,31 @@ spawn(function()
     end
 end)
 
--- Loading Animation (2.5s, fade/scale)
+-- Loading Animation (fade/scale, progress bar fill)
 loadingFrame.BackgroundTransparency = 1
-tween(loadingFrame, {BackgroundTransparency=0}, 0.4)
+loadingFrame.Size = UDim2.new(0, Theme.LoadingWidth*0.8, 0, Theme.LoadingHeight*0.8)
+tween(loadingFrame, {BackgroundTransparency=0, Size=UDim2.new(0, Theme.LoadingWidth, 0, Theme.LoadingHeight)}, 0.4)
 tween(loadingLabel, {TextTransparency=0}, 0.4)
 tween(loadingSub, {TextTransparency=0.15}, 0.4)
 tween(spinner, {ImageTransparency=0.05}, 0.4)
-wait(2.5)
+tween(icon, {ImageTransparency=0.05}, 0.4)
+
+-- Progress bar fill animation
+progressBar.Size = UDim2.new(0, 0, 1, 0)
+for i = 1, 100 do
+    progressBar.Size = UDim2.new(i/100, 0, 1, 0)
+    wait(0.012)
+end
+
+wait(0.5)
 spinning = false
-tween(loadingFrame, {BackgroundTransparency=1}, 0.5)
+tween(loadingFrame, {BackgroundTransparency=1, Size=UDim2.new(0, Theme.LoadingWidth*1.1, 0, Theme.LoadingHeight*1.1)}, 0.5)
 tween(loadingLabel, {TextTransparency=1}, 0.5)
 tween(loadingSub, {TextTransparency=1}, 0.5)
 tween(spinner, {ImageTransparency=1}, 0.5)
+tween(icon, {ImageTransparency=1}, 0.5)
+tween(progressBar, {BackgroundTransparency=1}, 0.5)
+tween(progressBarBG, {BackgroundTransparency=1}, 0.5)
 wait(0.55)
 loadingFrame:Destroy()
 
