@@ -1,3 +1,4 @@
+
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
@@ -16,12 +17,12 @@ local Themes = {
     Default = {
         Name = "Default",
         -- Loader palette
-        Background = Color3.fromRGB(25, 33, 43),
-        Accent = Color3.fromRGB(0, 140, 255),
-        Accent2 = Color3.fromRGB(30, 38, 52),
-        Accent3 = Color3.fromRGB(18, 22, 32),
-        Text = Color3.fromRGB(255, 255, 255),
-        Border = Color3.fromRGB(60, 70, 90),
+        Background = Color3.fromRGB(18, 20, 28), -- deep dark
+        Accent = Color3.fromRGB(64, 120, 242), -- premium blue
+        Accent2 = Color3.fromRGB(28, 32, 40), -- dark secondary
+        Accent3 = Color3.fromRGB(24, 26, 34), -- dark tertiary
+        Text = Color3.fromRGB(230, 235, 245), -- soft white
+        Border = Color3.fromRGB(38, 44, 60),
         Font = Enum.Font.Gotham,
         CornerRadius = UDim.new(0, 12),
         Padding = 16,
@@ -44,7 +45,7 @@ local Themes = {
     Light = {
         Name = "Light",
         Background = Color3.fromRGB(240, 240, 245),
-        Accent = Color3.fromRGB(0, 140, 255),
+        Accent = Color3.fromRGB(64, 120, 242),
         Accent2 = Color3.fromRGB(220, 220, 230),
         Accent3 = Color3.fromRGB(200, 200, 210),
         Text = Color3.fromRGB(24, 26, 32),
@@ -182,17 +183,18 @@ loadingFrame.Name = "LoadingFrame"
 loadingFrame.Size = UDim2.new(0, 374, 0, 114)
 loadingFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
 loadingFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-loadingFrame.BackgroundColor3 = Color3.fromRGB(0, 140, 255) -- Use main accent as base
+loadingFrame.BackgroundColor3 = Color3.fromRGB(18, 20, 28)
 loadingFrame.BorderSizePixel = 0
 loadingFrame.Parent = screenGui
 
--- Use the same gradient as the main window for the loader
+-- Premium dark gradient for loader
 local loaderGradient = Instance.new("UIGradient")
 loaderGradient.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 140, 255)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(30, 38, 52))
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(28, 32, 40)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(18, 20, 28)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(38, 44, 60))
 }
-loaderGradient.Rotation = 45
+loaderGradient.Rotation = 35
 loaderGradient.Parent = loadingFrame
 
 -- (Removed white drop shadow for cleaner look)
@@ -305,20 +307,21 @@ mainFrame.Name = "MainFrame"
 mainFrame.Size = UDim2.new(0, Theme.WindowWidth, 0, Theme.WindowHeight)
 mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
 mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-mainFrame.BackgroundColor3 = Color3.fromRGB(0, 140, 255) -- Use main accent as base
+mainFrame.BackgroundColor3 = Theme.Background
 mainFrame.BorderSizePixel = 0
 mainFrame.Visible = false
 mainFrame.Parent = screenGui
 Templates.Corner(mainFrame, Theme.CornerRadius)
 -- (Removed white drop shadow from main window for cleaner look)
 
--- Use the same gradient as the loader for the main window
+-- Premium dark gradient for main window
 local mainGradient = Instance.new("UIGradient")
 mainGradient.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 140, 255)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(30, 38, 52))
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(28, 32, 40)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(18, 20, 28)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(38, 44, 60))
 }
-mainGradient.Rotation = 45
+mainGradient.Rotation = 35
 mainGradient.Parent = mainFrame
 
 
@@ -329,11 +332,10 @@ mainGradient.Parent = mainFrame
 local topBar = Instance.new("Frame")
 topBar.Name = "TopBar"
 topBar.Size = UDim2.new(1, 0, 0, Theme.TopBarHeight)
-topBar.BackgroundColor3 = Color3.fromRGB(0, 140, 255) -- Use main accent for header
+topBar.BackgroundColor3 = Theme.Accent2
 topBar.BorderSizePixel = 0
 topBar.Parent = mainFrame
 Templates.Corner(topBar, Theme.CornerRadius)
-
 -- (Removed white drop shadow from top bar for cleaner look)
 
 
