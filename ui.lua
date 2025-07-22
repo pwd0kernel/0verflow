@@ -185,6 +185,7 @@ screenGui.Parent = PlayerGui
 
 
 -- New Minimalist Loading Screen (user design)
+
 local loadingFrame = Instance.new("Frame")
 loadingFrame.Name = "LoadingFrame"
 loadingFrame.Size = UDim2.new(0, 374, 0, 114)
@@ -193,6 +194,29 @@ loadingFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 loadingFrame.BackgroundColor3 = Color3.fromRGB(25, 33, 43)
 loadingFrame.BorderSizePixel = 0
 loadingFrame.Parent = screenGui
+
+-- Subtle drop shadow
+local shadow = Instance.new("ImageLabel")
+shadow.Name = "Shadow"
+shadow.BackgroundTransparency = 1
+shadow.Image = "rbxassetid://1316045217"
+shadow.ImageTransparency = 0.85
+shadow.ScaleType = Enum.ScaleType.Slice
+shadow.SliceCenter = Rect.new(10,10,118,118)
+shadow.Size = UDim2.new(1, 32, 1, 32)
+shadow.Position = UDim2.new(0, -16, 0, -16)
+shadow.ZIndex = 0
+shadow.Parent = loadingFrame
+
+-- Gradient background
+local gradient = Instance.new("UIGradient")
+gradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(30, 38, 52)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(18, 22, 32))
+}
+gradient.Rotation = 45
+gradient.Parent = loadingFrame
+
 local loadingCorner = Instance.new("UICorner")
 loadingCorner.CornerRadius = UDim.new(0, 12)
 loadingCorner.Parent = loadingFrame
@@ -225,19 +249,28 @@ versionLabel.Text = "0.0.1 alpha"
 versionLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 versionLabel.TextTransparency = 1
 
-local dotsLabel = Instance.new("TextLabel")
-dotsLabel.Name = "LoadingDots"
-dotsLabel.Parent = loadingFrame
-dotsLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-dotsLabel.BackgroundTransparency = 1
-dotsLabel.BorderSizePixel = 0
-dotsLabel.Position = UDim2.new(0.2326, 0, 0.4474, 0)
-dotsLabel.Size = UDim2.new(0, 200, 0, 33)
-dotsLabel.Font = Enum.Font.GothamBold
-dotsLabel.Text = ". . ."
-dotsLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-dotsLabel.TextSize = 54
-dotsLabel.TextTransparency = 1
+
+-- Animated dots as separate labels for fade/scale
+local dotObjs = {}
+local dotCount = 3
+local dotSpacing = 54
+for i = 1, dotCount do
+    local dot = Instance.new("TextLabel")
+    dot.Name = "Dot"..i
+    dot.Parent = loadingFrame
+    dot.BackgroundTransparency = 1
+    dot.BorderSizePixel = 0
+    dot.Position = UDim2.new(0, 88 + (i-1)*dotSpacing, 0, 51)
+    dot.Size = UDim2.new(0, 40, 0, 40)
+    dot.Font = Enum.Font.GothamBold
+    dot.Text = "."
+    dot.TextColor3 = Color3.fromRGB(255, 255, 255)
+    dot.TextSize = 54
+    dot.TextTransparency = 1
+    dot.ZIndex = 2
+    dotObjs[i] = dot
+end
+
 
 -- Animate fade/scale in
 loadingFrame.BackgroundTransparency = 1
@@ -245,17 +278,26 @@ loadingFrame.Size = UDim2.new(0, 320, 0, 80)
 tween(loadingFrame, {BackgroundTransparency=0, Size=UDim2.new(0, 374, 0, 114)}, 0.32, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 tween(nameLabel, {TextTransparency=0}, 0.32)
 tween(versionLabel, {TextTransparency=0.18}, 0.32)
-tween(dotsLabel, {TextTransparency=0.08}, 0.32)
+for i, dot in ipairs(dotObjs) do
+    tween(dot, {TextTransparency=0.08}, 0.32)
+end
 
--- Animated loading dots
-local dots = {".", ". .", ". . .", ". .", "."}
+
+-- Animated loading dots (fade/scale in sequence)
 local running = true
 spawn(function()
-    local i = 1
+    local t = 0
     while running do
-        dotsLabel.Text = dots[i]
-        i = i % #dots + 1
-        wait(0.22)
+        for i, dot in ipairs(dotObjs) do
+            local delay = (i-1)*0.08
+            spawn(function()
+                tween(dot, {TextTransparency=0.08, Size=UDim2.new(0, 48, 0, 48)}, 0.13)
+                wait(0.13)
+                tween(dot, {TextTransparency=0.35, Size=UDim2.new(0, 40, 0, 40)}, 0.13)
+            end)
+            wait(0.11)
+        end
+        wait(0.18)
     end
 end)
 
@@ -264,7 +306,9 @@ running = false
 tween(loadingFrame, {BackgroundTransparency=1, Size=UDim2.new(0, 420, 0, 130)}, 0.36, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
 tween(nameLabel, {TextTransparency=1}, 0.36)
 tween(versionLabel, {TextTransparency=1}, 0.36)
-tween(dotsLabel, {TextTransparency=1}, 0.36)
+for i, dot in ipairs(dotObjs) do
+    tween(dot, {TextTransparency=1}, 0.36)
+end
 wait(0.38)
 loadingFrame:Destroy()
 
