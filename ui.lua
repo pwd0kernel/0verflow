@@ -1,3 +1,18 @@
+
+--[[
+    Overflow Hub UI Library for Roblox Exploit Scripts
+    Author: github copilot
+    Description: Modern, animated, modular UI library for cheat scripts.
+    Usage: local library = loadstring(game:HttpGet("url_to_library"))()
+           local window = library:CreateWindow("Overflow Hub")
+           local tab = window:CreateTab("Combat")
+           tab:CreateToggle(...)
+    Supports: Synapse X, Krnl, Script-Ware, etc.
+    Theme: Dark, blue accents, rounded corners, smooth animations.
+    Components: Toggles, Sliders, Buttons, Textboxes, Dropdowns, Labels
+    Features: Loading screen, draggable/resizable window, tabs, hotkey toggle, config save/load, theme customization
+]]
+
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
@@ -10,38 +25,83 @@ local Overflow = {}
 Overflow.__index = Overflow
 
 -- Theme (Polished, modern, better spacing/colors)
-local Theme = {
-    Background = Color3.fromRGB(24, 26, 32),
-    Accent = Color3.fromRGB(0, 140, 255),
-    Accent2 = Color3.fromRGB(36, 38, 48),
-    Accent3 = Color3.fromRGB(18, 20, 26),
-    Text = Color3.fromRGB(235, 240, 255),
-    Border = Color3.fromRGB(60, 70, 90),
-    Font = Enum.Font.Gotham,
-    CornerRadius = UDim.new(0, 12),
-    Padding = 14,
-    Shadow = true,
-    TabHeight = 40,
-    TopBarHeight = 46,
-    TabFontSize = 20,
-    TitleFontSize = 28,
-    LabelFontSize = 20,
-    DescFontSize = 15,
-    ToggleHeight = 44,
-    LabelHeight = 32,
-    WindowWidth = 540,
-    WindowHeight = 440,
-    LoadingWidth = 420,
-    LoadingHeight = 160,
+
+-- Multi-theme system (Rayfield-inspired)
+local Themes = {
+    Default = {
+        Name = "Default",
+        Background = Color3.fromRGB(24, 26, 32),
+        Accent = Color3.fromRGB(0, 140, 255),
+        Accent2 = Color3.fromRGB(36, 38, 48),
+        Accent3 = Color3.fromRGB(18, 20, 26),
+        Text = Color3.fromRGB(235, 240, 255),
+        Border = Color3.fromRGB(60, 70, 90),
+        Font = Enum.Font.Gotham,
+        CornerRadius = UDim.new(0, 12),
+        Padding = 14,
+        Shadow = true,
+        TabHeight = 40,
+        TopBarHeight = 46,
+        TabFontSize = 20,
+        TitleFontSize = 28,
+        LabelFontSize = 20,
+        DescFontSize = 15,
+        ToggleHeight = 44,
+        LabelHeight = 32,
+        WindowWidth = 540,
+        WindowHeight = 440,
+        LoadingWidth = 420,
+        LoadingHeight = 160,
+    },
+    Light = {
+        Name = "Light",
+        Background = Color3.fromRGB(240, 240, 245),
+        Accent = Color3.fromRGB(0, 140, 255),
+        Accent2 = Color3.fromRGB(220, 220, 230),
+        Accent3 = Color3.fromRGB(200, 200, 210),
+        Text = Color3.fromRGB(24, 26, 32),
+        Border = Color3.fromRGB(180, 180, 200),
+        Font = Enum.Font.Gotham,
+        CornerRadius = UDim.new(0, 12),
+        Padding = 14,
+        Shadow = true,
+        TabHeight = 40,
+        TopBarHeight = 46,
+        TabFontSize = 20,
+        TitleFontSize = 28,
+        LabelFontSize = 20,
+        DescFontSize = 15,
+        ToggleHeight = 44,
+        LabelHeight = 32,
+        WindowWidth = 540,
+        WindowHeight = 440,
+        LoadingWidth = 420,
+        LoadingHeight = 160,
+    },
+    -- Add more themes here as needed
 }
 
-local function createCorner(radius)
+local Theme = Themes.Default
+
+-- Theme switcher
+function Overflow.SetTheme(name)
+    if Themes[name] then
+        Theme = Themes[name]
+    end
+end
+
+
+-- Component templates (Rayfield-inspired)
+local Templates = {}
+
+function Templates.Corner(parent, radius)
     local c = Instance.new("UICorner")
     c.CornerRadius = radius or Theme.CornerRadius
+    c.Parent = parent
     return c
 end
 
-local function createShadow(parent)
+function Templates.Shadow(parent)
     if not Theme.Shadow then return end
     local shadow = Instance.new("ImageLabel")
     shadow.Name = "Shadow"
@@ -54,7 +114,38 @@ local function createShadow(parent)
     shadow.Position = UDim2.new(0,-12,0,-12)
     shadow.ZIndex = 0
     shadow.Parent = parent
+    return shadow
 end
+
+function Templates.Label(text, size, color, parent, font, align, rich)
+    local label = Instance.new("TextLabel")
+    label.Size = size or UDim2.new(1, 0, 0, Theme.LabelHeight)
+    label.BackgroundTransparency = 1
+    label.Text = text or "Label"
+    label.Font = font or Theme.Font
+    label.TextColor3 = color or Theme.Text
+    label.TextSize = Theme.LabelFontSize
+    label.TextXAlignment = align or Enum.TextXAlignment.Left
+    label.RichText = rich or false
+    label.Parent = parent
+    return label
+end
+
+function Templates.Button(text, size, color, parent, font)
+    local btn = Instance.new("TextButton")
+    btn.Size = size or UDim2.new(0, 120, 1, 0)
+    btn.BackgroundColor3 = color or Theme.Accent3
+    btn.Text = text or "Button"
+    btn.Font = font or Theme.Font
+    btn.TextColor3 = Theme.Text
+    btn.TextSize = Theme.TabFontSize
+    btn.AutoButtonColor = false
+    btn.Parent = parent
+    Templates.Corner(btn, UDim.new(0, 10))
+    return btn
+end
+
+-- Replace all createCorner/createShadow calls below with Templates.Corner/Templates.Shadow as you expand components
 
 local function tween(obj, props, time, style, dir)
     local t = TweenService:Create(obj, TweenInfo.new(time or 0.3, style or Enum.EasingStyle.Quad, dir or Enum.EasingDirection.Out), props)
@@ -112,8 +203,8 @@ loadingFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 loadingFrame.BackgroundColor3 = Theme.Accent3
 loadingFrame.BorderSizePixel = 0
 loadingFrame.Parent = screenGui
-createCorner(Theme.CornerRadius).Parent = loadingFrame
-createShadow(loadingFrame)
+Templates.Corner(loadingFrame, Theme.CornerRadius)
+Templates.Shadow(loadingFrame)
 
 local loadingLabel = Instance.new("TextLabel")
 loadingLabel.Size = UDim2.new(1, 0, 0, 60)
@@ -187,8 +278,8 @@ mainFrame.BackgroundColor3 = Theme.Background
 mainFrame.BorderSizePixel = 0
 mainFrame.Visible = false
 mainFrame.Parent = screenGui
-createCorner(Theme.CornerRadius).Parent = mainFrame
-createShadow(mainFrame)
+Templates.Corner(mainFrame, Theme.CornerRadius)
+Templates.Shadow(mainFrame)
 
 
 -- Top Bar (Polished)
@@ -198,7 +289,7 @@ topBar.Size = UDim2.new(1, 0, 0, Theme.TopBarHeight)
 topBar.BackgroundColor3 = Theme.Accent2
 topBar.BorderSizePixel = 0
 topBar.Parent = mainFrame
-createCorner(Theme.CornerRadius).Parent = topBar
+Templates.Corner(topBar, Theme.CornerRadius)
 
 local titleLabel = Instance.new("TextLabel")
 titleLabel.Size = UDim2.new(1, -60, 1, 0)
@@ -222,7 +313,7 @@ closeButton.TextColor3 = Theme.Text
 closeButton.TextSize = 22
 closeButton.AutoButtonColor = false
 closeButton.Parent = topBar
-createCorner(UDim.new(0, 10)).Parent = closeButton
+Templates.Corner(closeButton, UDim.new(0, 10))
 
 closeButton.MouseEnter:Connect(function()
     tween(closeButton, {BackgroundColor3=Theme.Accent}, 0.18)
@@ -307,7 +398,7 @@ function Window:CreateTab(tabName)
     tabBtn.TextSize = Theme.TabFontSize
     tabBtn.AutoButtonColor = false
     tabBtn.Parent = tabBar
-    createCorner(UDim.new(0, 10)).Parent = tabBtn
+    Templates.Corner(tabBtn, UDim.new(0, 10))
 
 
     local tabFrame = Instance.new("Frame")
@@ -389,14 +480,14 @@ function Window:CreateTab(tabName)
         toggleBtn.Text = ""
         toggleBtn.AutoButtonColor = false
         toggleBtn.Parent = toggleFrame
-        createCorner(UDim.new(0, 14)).Parent = toggleBtn
+        Templates.Corner(toggleBtn, UDim.new(0, 14))
 
         local knob = Instance.new("Frame")
         knob.Size = UDim2.new(0, 22, 1, -10)
         knob.Position = UDim2.new(0, 5, 0, 5)
         knob.BackgroundColor3 = Theme.Border
         knob.Parent = toggleBtn
-        createCorner(UDim.new(0, 11)).Parent = knob
+        Templates.Corner(knob, UDim.new(0, 11))
 
         local enabled = false
         local function setToggle(state)
@@ -441,9 +532,15 @@ function Window:CreateTab(tabName)
 end
 
 -- Theme customization
-function Library:SetTheme(tbl)
-    for k,v in pairs(tbl) do
-        if Theme[k] ~= nil then Theme[k] = v end
+
+-- New: SetTheme supports both table and named theme
+function Library:SetTheme(theme)
+    if type(theme) == "string" and Themes[theme] then
+        Theme = Themes[theme]
+    elseif type(theme) == "table" then
+        for k,v in pairs(theme) do
+            if Theme[k] ~= nil then Theme[k] = v end
+        end
     end
 end
 
