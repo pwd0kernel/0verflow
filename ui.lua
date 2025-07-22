@@ -1,3 +1,4 @@
+
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
@@ -302,8 +303,18 @@ mainFrame.BackgroundColor3 = Theme.Background -- flat premium dark
 mainFrame.BorderSizePixel = 0
 mainFrame.Visible = false
 mainFrame.Parent = screenGui
-Templates.Corner(mainFrame, Theme.CornerRadius)
--- (Removed white drop shadow from main window for cleaner look)
+-- MacOS floating window look: more rounded, subtle border
+local mainCorner = Instance.new("UICorner")
+mainCorner.CornerRadius = UDim.new(0, 16)
+mainCorner.Parent = mainFrame
+local mainBorder = Instance.new("Frame")
+mainBorder.Name = "MainBorder"
+mainBorder.Size = UDim2.new(1, 0, 1, 0)
+mainBorder.Position = UDim2.new(0, 0, 0, 0)
+mainBorder.BackgroundTransparency = 1
+mainBorder.BorderSizePixel = 1
+mainBorder.BorderColor3 = Theme.Border
+mainBorder.Parent = mainFrame
 
 
 -- Top Bar (Polished)
@@ -312,13 +323,12 @@ Templates.Corner(mainFrame, Theme.CornerRadius)
 
 local topBar = Instance.new("Frame")
 topBar.Name = "TopBar"
-topBar.Size = UDim2.new(1, 0, 0, Theme.TopBarHeight)
+topBar.Size = UDim2.new(1, 0, 0, 32) -- thinner, more MacOS-like
 topBar.BackgroundColor3 = Theme.Accent2
 topBar.BorderSizePixel = 0
 topBar.Parent = mainFrame
--- Only round top corners for topBar
 local topBarCorner = Instance.new("UICorner")
-topBarCorner.CornerRadius = Theme.CornerRadius
+topBarCorner.CornerRadius = UDim.new(0, 16)
 topBarCorner.TopLeft = true
 topBarCorner.TopRight = true
 topBarCorner.BottomLeft = false
@@ -329,25 +339,23 @@ topBarCorner.Parent = topBar
 
 local titleLabel = Instance.new("TextLabel")
 titleLabel.Size = UDim2.new(1, -60, 1, 0)
-titleLabel.Position = UDim2.new(0, Theme.Padding, 0, 0)
+titleLabel.Position = UDim2.new(0, 44, 0, 0)
 titleLabel.BackgroundTransparency = 1
 titleLabel.Text = "<b>Overflow Hub</b>"
 titleLabel.Font = Theme.Font
 titleLabel.TextColor3 = Theme.Text
-titleLabel.TextSize = Theme.TitleFontSize
+titleLabel.TextSize = 20
 titleLabel.TextXAlignment = Enum.TextXAlignment.Left
 titleLabel.RichText = true
 titleLabel.Parent = topBar
 
 
-
--- MacOS-style close button (red circle with white X, always top left)
-local closeButton = Instance.new("ImageButton")
+-- MacOS-style close button (red circle with white X), always at far left
+local closeButton = Instance.new("Frame")
 closeButton.Size = UDim2.new(0, 16, 0, 16)
-closeButton.Position = UDim2.new(0, 14, 0, 9)
+closeButton.Position = UDim2.new(0, 12, 0.5, -8)
 closeButton.BackgroundColor3 = Color3.fromRGB(255, 95, 86)
 closeButton.BorderSizePixel = 0
-closeButton.Image = ""
 closeButton.Parent = topBar
 local closeCorner = Instance.new("UICorner")
 closeCorner.CornerRadius = UDim.new(1, 0)
@@ -365,10 +373,12 @@ end)
 closeButton.MouseLeave:Connect(function()
     closeButton.BackgroundColor3 = Color3.fromRGB(255, 95, 86)
 end)
-closeButton.MouseButton1Click:Connect(function()
-    tween(mainFrame, {BackgroundTransparency=1}, 0.3)
-    wait(0.3)
-    mainFrame.Visible = false
+closeButton.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        tween(mainFrame, {BackgroundTransparency=1}, 0.3)
+        wait(0.3)
+        mainFrame.Visible = false
+    end
 end)
 
 -- Draggable
