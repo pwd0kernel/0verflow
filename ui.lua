@@ -1,4 +1,5 @@
 
+
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
@@ -27,7 +28,6 @@ local Themes = {
         CornerRadius = UDim.new(0, 12),
         Padding = 16,
         Shadow = false,
-        TabHeight = 40,
         TopBarHeight = 46,
         TabFontSize = 20,
         TitleFontSize = 28,
@@ -41,7 +41,6 @@ local Themes = {
         LoadingHeight = 160,
         TabSpacing = 12,
         TabTopSpacing = 10,
-    },
     Light = {
         Name = "Light",
         Background = Color3.fromRGB(240, 240, 245),
@@ -53,10 +52,8 @@ local Themes = {
         Font = Enum.Font.Gotham,
         CornerRadius = UDim.new(0, 12),
         Padding = 14,
-        Shadow = false,
         TabHeight = 40,
         TopBarHeight = 46,
-        TabFontSize = 20,
         TitleFontSize = 28,
         LabelFontSize = 20,
         DescFontSize = 15,
@@ -73,21 +70,18 @@ local Themes = {
 local Theme = Themes.Default
 
 -- Theme switcher
-function Overflow.SetTheme(name)
     if Themes[name] then
         Theme = Themes[name]
     end
 end
 
 
--- Component templates (Rayfield-inspired)
 local Templates = {}
 
 function Templates.Corner(parent, radius)
     local c = Instance.new("UICorner")
     c.CornerRadius = radius or Theme.CornerRadius
     c.Parent = parent
-    return c
 end
 
 function Templates.Shadow(parent)
