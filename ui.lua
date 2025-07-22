@@ -299,22 +299,25 @@ mainFrame.Name = "MainFrame"
 mainFrame.Size = UDim2.new(0, Theme.WindowWidth, 0, Theme.WindowHeight)
 mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
 mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-mainFrame.BackgroundColor3 = Theme.Background -- flat premium dark
-mainFrame.BorderSizePixel = 0
+mainFrame.BackgroundColor3 = Theme.Background
+mainFrame.BorderColor3 = Theme.Border
+mainFrame.BorderSizePixel = 1
 mainFrame.Visible = false
 mainFrame.Parent = screenGui
--- MacOS floating window look: more rounded, subtle border
-local mainCorner = Instance.new("UICorner")
-mainCorner.CornerRadius = UDim.new(0, 16)
-mainCorner.Parent = mainFrame
-local mainBorder = Instance.new("Frame")
-mainBorder.Name = "MainBorder"
-mainBorder.Size = UDim2.new(1, 0, 1, 0)
-mainBorder.Position = UDim2.new(0, 0, 0, 0)
-mainBorder.BackgroundTransparency = 1
-mainBorder.BorderSizePixel = 1
-mainBorder.BorderColor3 = Theme.Border
-mainBorder.Parent = mainFrame
+Templates.Corner(mainFrame, Theme.CornerRadius)
+-- MacOS-style subtle shadow
+local macShadow = Instance.new("ImageLabel")
+macShadow.Name = "MacShadow"
+macShadow.BackgroundTransparency = 1
+macShadow.Image = "rbxassetid://1316045217"
+macShadow.ImageTransparency = 0.92
+macShadow.ScaleType = Enum.ScaleType.Slice
+macShadow.SliceCenter = Rect.new(10,10,118,118)
+macShadow.Size = UDim2.new(1, 32, 1, 32)
+macShadow.Position = UDim2.new(0, -16, 0, -16)
+macShadow.ZIndex = 0
+macShadow.Parent = mainFrame
+-- (Removed white drop shadow from main window for cleaner look)
 
 
 -- Top Bar (Polished)
@@ -323,12 +326,12 @@ mainBorder.Parent = mainFrame
 
 local topBar = Instance.new("Frame")
 topBar.Name = "TopBar"
-topBar.Size = UDim2.new(1, 0, 0, 32) -- thinner, more MacOS-like
+topBar.Size = UDim2.new(1, 0, 0, 54) -- MacOS style, slightly taller
 topBar.BackgroundColor3 = Theme.Accent2
 topBar.BorderSizePixel = 0
 topBar.Parent = mainFrame
 local topBarCorner = Instance.new("UICorner")
-topBarCorner.CornerRadius = UDim.new(0, 16)
+topBarCorner.CornerRadius = Theme.CornerRadius
 topBarCorner.TopLeft = true
 topBarCorner.TopRight = true
 topBarCorner.BottomLeft = false
@@ -339,30 +342,31 @@ topBarCorner.Parent = topBar
 
 local titleLabel = Instance.new("TextLabel")
 titleLabel.Size = UDim2.new(1, -60, 1, 0)
-titleLabel.Position = UDim2.new(0, 44, 0, 0)
+titleLabel.Position = UDim2.new(0, Theme.Padding, 0, 0)
 titleLabel.BackgroundTransparency = 1
 titleLabel.Text = "<b>Overflow Hub</b>"
 titleLabel.Font = Theme.Font
 titleLabel.TextColor3 = Theme.Text
-titleLabel.TextSize = 20
+titleLabel.TextSize = Theme.TitleFontSize
 titleLabel.TextXAlignment = Enum.TextXAlignment.Left
 titleLabel.RichText = true
 titleLabel.Parent = topBar
 
 
--- MacOS-style close button (red circle with white X), always at far left
+-- Modern Exit button (icon, only hides UI)
+-- MacOS-style close button (red circle with white X)
 local closeButton = Instance.new("Frame")
-closeButton.Size = UDim2.new(0, 16, 0, 16)
-closeButton.Position = UDim2.new(0, 12, 0.5, -8)
-closeButton.BackgroundColor3 = Color3.fromRGB(255, 95, 86)
+closeButton.Size = UDim2.new(0, 22, 0, 22)
+closeButton.Position = UDim2.new(0, 16, 0.5, -11)
+closeButton.BackgroundColor3 = Color3.fromRGB(255, 95, 86) -- MacOS red
 closeButton.BorderSizePixel = 0
 closeButton.Parent = topBar
 local closeCorner = Instance.new("UICorner")
 closeCorner.CornerRadius = UDim.new(1, 0)
 closeCorner.Parent = closeButton
 local xIcon = Instance.new("ImageLabel")
-xIcon.Size = UDim2.new(0, 8, 0, 8)
-xIcon.Position = UDim2.new(0.5, -4, 0.5, -4)
+xIcon.Size = UDim2.new(0, 12, 0, 12)
+xIcon.Position = UDim2.new(0.5, -6, 0.5, -6)
 xIcon.BackgroundTransparency = 1
 xIcon.Image = "rbxassetid://7072719332" -- Simple white X icon
 xIcon.ImageColor3 = Color3.fromRGB(255,255,255)
