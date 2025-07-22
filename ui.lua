@@ -182,11 +182,11 @@ loadingFrame.Name = "LoadingFrame"
 loadingFrame.Size = UDim2.new(0, 374, 0, 114)
 loadingFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
 loadingFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-loadingFrame.BackgroundColor3 = Color3.fromRGB(18, 20, 28)
+loadingFrame.BackgroundColor3 = Theme.Background -- flat premium dark
 loadingFrame.BorderSizePixel = 0
 loadingFrame.Parent = screenGui
 
--- (Removed gradient for flat premium dark look)
+
 
 -- (Removed white drop shadow for cleaner look)
 
@@ -298,14 +298,12 @@ mainFrame.Name = "MainFrame"
 mainFrame.Size = UDim2.new(0, Theme.WindowWidth, 0, Theme.WindowHeight)
 mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
 mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-mainFrame.BackgroundColor3 = Theme.Background
+mainFrame.BackgroundColor3 = Theme.Background -- flat premium dark
 mainFrame.BorderSizePixel = 0
 mainFrame.Visible = false
 mainFrame.Parent = screenGui
 Templates.Corner(mainFrame, Theme.CornerRadius)
 -- (Removed white drop shadow from main window for cleaner look)
-
--- (Removed gradient for flat premium dark look)
 
 
 -- Top Bar (Polished)
