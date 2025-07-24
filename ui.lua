@@ -1,3 +1,16 @@
+--[[
+
+	0verflow Hub Interface Suite
+	Modified from Rayfield by Sirius
+	Rebranded as 0verflow Hub
+
+	Original Authors:
+	shlex  | Designing + Programming
+	iRay   | Programming
+	Max    | Programming
+	Damian | Programming
+
+]]
 
 if debugX then
 	warn('Initialising 0verflow Hub')
@@ -1645,7 +1658,7 @@ function OverflowLibrary:CreateWindow(Settings)
 		if string.find(Settings.Name:lower(), "0verflow") then
 			-- Enable RichText and create colored title
 			Topbar.Title.RichText = true
-			local modifiedName = Settings.Name:gsub("0verflow", '<font color="rgba(111,10,214,255)">0ver</font>flow')
+			local modifiedName = Settings.Name:gsub("0verflow", '<font color="rgb(111,10,214)">0ver</font>flow')
 			Topbar.Title.Text = modifiedName
 		else
 			Topbar.Title.Text = Settings.Name
@@ -1653,7 +1666,7 @@ function OverflowLibrary:CreateWindow(Settings)
 	else
 		-- Default 0verflow Hub branding
 		Topbar.Title.RichText = true
-		Topbar.Title.Text = '<font color="rgba(111,10,214,255)">0ver</font>flow Hub'
+		Topbar.Title.Text = '<font color="rgb(111,10,214)">0ver</font>flow Hub'
 	end
 
 	Main.Size = UDim2.new(0, 420, 0, 100)
