@@ -140,6 +140,7 @@ local function CreateScreenGui()
 	ScreenGui.Parent = game:GetService("CoreGui")
 	ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 	ScreenGui.ResetOnSpawn = false
+	ScreenGui.IgnoreGuiInset = true
 	
 	return ScreenGui
 end
@@ -183,7 +184,7 @@ local function CreateMainFrame(parent)
 	ShadowCorner.CornerRadius = UDim.new(0, 12)
 	ShadowCorner.Parent = Shadow
 	
-	return Main
+	return Main, Shadow
 end
 
 -- Create topbar
@@ -526,11 +527,14 @@ function OverflowHub:CreateWindow(Settings)
 	Settings = Settings or {}
 	
 	local ScreenGui = CreateScreenGui()
-	local Main = CreateMainFrame(ScreenGui)
+	local Main, Shadow = CreateMainFrame(ScreenGui)
 	local Topbar = CreateTopbar(Main, Settings.Name)
 	local Sidebar, TabList = CreateSidebar(Main)
 	local Elements = CreateContent(Main)
 	local ElementTemplates = CreateElementTemplates(ScreenGui)
+	
+	-- Store shadow in ScreenGui for easy access
+	ScreenGui.Shadow = Shadow
 	
 	-- Make window draggable
 	local dragging = false
@@ -545,6 +549,7 @@ function OverflowHub:CreateWindow(Settings)
 	DragArea.Position = UDim2.new(0, 0, 0, 0)
 	DragArea.BackgroundTransparency = 1
 	DragArea.ZIndex = Topbar.ZIndex + 1
+	DragArea.Active = true
 	
 	DragArea.InputBegan:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -554,14 +559,15 @@ function OverflowHub:CreateWindow(Settings)
 		end
 	end)
 	
-	DragArea.InputChanged:Connect(function(input)
+	UserInputService.InputChanged:Connect(function(input)
 		if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
 			local delta = input.Position - dragStart
 			Main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+			ScreenGui.Shadow.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X + 2, startPos.Y.Scale, startPos.Y.Offset + delta.Y + 2)
 		end
 	end)
 	
-	DragArea.InputEnded:Connect(function(input)
+	UserInputService.InputEnded:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.MouseButton1 then
 			dragging = false
 		end
@@ -577,7 +583,7 @@ function OverflowHub:CreateWindow(Settings)
 			TweenService:Create(Main, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {
 				Size = UDim2.new(0, 700, 0, 50)
 			}):Play()
-			TweenService:Create(ScreenGui.Shadow, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {
+			TweenService:Create(Shadow, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {
 				Size = UDim2.new(0, 700, 0, 50)
 			}):Play()
 			Minimised = true
@@ -585,7 +591,7 @@ function OverflowHub:CreateWindow(Settings)
 			TweenService:Create(Main, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {
 				Size = UDim2.new(0, 700, 0, 500)
 			}):Play()
-			TweenService:Create(ScreenGui.Shadow, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {
+			TweenService:Create(Shadow, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {
 				Size = UDim2.new(0, 700, 0, 500)
 			}):Play()
 			Minimised = false
@@ -597,7 +603,9 @@ function OverflowHub:CreateWindow(Settings)
 		Elements = Elements,
 		TabList = TabList,
 		ElementTemplates = ElementTemplates,
-		ScreenGui = ScreenGui
+		ScreenGui = ScreenGui,
+		Main = Main,
+		Shadow = Shadow
 	}
 	
 	function Window:CreateTab(Name, Image, Ext)
@@ -842,6 +850,104 @@ function OverflowHub:CreateWindow(Settings)
 				end
 			}
 		end
+
+		-- Create Label (for Rayfield compatibility)
+		function Tab:CreateLabel(LabelSettings)
+			local Label = Instance.new("TextLabel")
+			Label.Name = LabelSettings.Name or "Label"
+			Label.Parent = TabPage
+			Label.Size = UDim2.new(1, 0, 0, 30)
+			Label.BackgroundTransparency = 1
+			Label.Text = LabelSettings.Text or LabelSettings.Name or "Label"
+			Label.TextColor3 = SelectedTheme.TextPrimary
+			Label.TextSize = 14
+			Label.TextXAlignment = Enum.TextXAlignment.Left
+			Label.Font = Enum.Font.Gotham
+			Label.TextWrapped = true
+			
+			local Padding = Instance.new("UIPadding")
+			Padding.Parent = Label
+			Padding.PaddingLeft = UDim.new(0, 20)
+			Padding.PaddingRight = UDim.new(0, 20)
+			
+			-- Animation
+			Label.TextTransparency = 1
+			TweenService:Create(Label, TweenInfo.new(0.4, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()
+			
+			return {
+				Set = function(self, NewText)
+					Label.Text = NewText
+				end
+			}
+		end
+
+		-- Create Section (for Rayfield compatibility)
+		function Tab:CreateSection(SectionName)
+			local Section = Instance.new("TextLabel")
+			Section.Name = "Section_" .. SectionName
+			Section.Parent = TabPage
+			Section.Size = UDim2.new(1, 0, 0, 35)
+			Section.BackgroundTransparency = 1
+			Section.Text = SectionName
+			Section.TextColor3 = SelectedTheme.Primary
+			Section.TextSize = 16
+			Section.TextXAlignment = Enum.TextXAlignment.Left
+			Section.Font = Enum.Font.GothamBold
+			
+			local Padding = Instance.new("UIPadding")
+			Padding.Parent = Section
+			Padding.PaddingLeft = UDim.new(0, 20)
+			Padding.PaddingTop = UDim.new(0, 10)
+			
+			-- Add separator line
+			local Line = Instance.new("Frame")
+			Line.Name = "Line"
+			Line.Parent = Section
+			Line.Size = UDim2.new(1, -40, 0, 1)
+			Line.Position = UDim2.new(0, 20, 1, -5)
+			Line.BackgroundColor3 = SelectedTheme.Primary
+			Line.BorderSizePixel = 0
+			Line.BackgroundTransparency = 0.5
+			
+			-- Animation
+			Section.TextTransparency = 1
+			Line.BackgroundTransparency = 1
+			TweenService:Create(Section, TweenInfo.new(0.4, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()
+			TweenService:Create(Line, TweenInfo.new(0.4, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0.5}):Play()
+		end
+
+		-- Create Paragraph (for Rayfield compatibility)
+		function Tab:CreateParagraph(ParagraphSettings)
+			local Paragraph = Instance.new("TextLabel")
+			Paragraph.Name = ParagraphSettings.Title or "Paragraph"
+			Paragraph.Parent = TabPage
+			Paragraph.Size = UDim2.new(1, 0, 0, 60)
+			Paragraph.BackgroundTransparency = 1
+			Paragraph.Text = (ParagraphSettings.Title or "") .. "\n" .. (ParagraphSettings.Content or "")
+			Paragraph.TextColor3 = SelectedTheme.TextPrimary
+			Paragraph.TextSize = 13
+			Paragraph.TextXAlignment = Enum.TextXAlignment.Left
+			Paragraph.TextYAlignment = Enum.TextYAlignment.Top
+			Paragraph.Font = Enum.Font.Gotham
+			Paragraph.TextWrapped = true
+			
+			local Padding = Instance.new("UIPadding")
+			Padding.Parent = Paragraph
+			Padding.PaddingLeft = UDim.new(0, 20)
+			Padding.PaddingRight = UDim.new(0, 20)
+			Padding.PaddingTop = UDim.new(0, 5)
+			Padding.PaddingBottom = UDim.new(0, 5)
+			
+			-- Animation
+			Paragraph.TextTransparency = 1
+			TweenService:Create(Paragraph, TweenInfo.new(0.4, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()
+			
+			return {
+				Set = function(self, NewTitle, NewContent)
+					Paragraph.Text = NewTitle .. "\n" .. NewContent
+				end
+			}
+		end
 		
 		return Tab
 	end
@@ -852,7 +958,11 @@ end
 -- Notification system (for compatibility)
 function OverflowHub:Notify(NotificationSettings)
 	-- Simple notification implementation
-	warn("Notification:", NotificationSettings.Title, "-", NotificationSettings.Content)
+	print("📢 " .. (NotificationSettings.Title or "Notification"))
+	print("   " .. (NotificationSettings.Content or "No content"))
+	if NotificationSettings.Duration then
+		print("   Duration: " .. NotificationSettings.Duration .. "s")
+	end
 end
 
 -- Destroy function
@@ -863,33 +973,97 @@ function OverflowHub:Destroy()
 	end
 end
 
+-- Configuration saving functions (for compatibility)
+function OverflowHub:LoadConfiguration(ConfigName)
+	-- Placeholder for configuration loading
+	return {}
+end
+
+function OverflowHub:SaveConfiguration(ConfigName)
+	-- Placeholder for configuration saving
+	print("Configuration saved:", ConfigName)
+end
+
 -- Make it compatible with Rayfield naming
-local RayfieldLibrary = OverflowHub
+local RayfieldLibrary = {
+	CreateWindow = function(self, Settings)
+		return OverflowHub:CreateWindow(Settings)
+	end,
+	Notify = function(self, NotificationSettings)
+		return OverflowHub:Notify(NotificationSettings)
+	end,
+	Destroy = function(self)
+		return OverflowHub:Destroy()
+	end,
+	LoadConfiguration = function(self, ConfigName)
+		return OverflowHub:LoadConfiguration(ConfigName)
+	end,
+	SaveConfiguration = function(self, ConfigName)
+		return OverflowHub:SaveConfiguration(ConfigName)
+	end,
+	Flags = OverflowHub.Flags,
+	Theme = OverflowHub.Theme
+}
 
-return OverflowHub
-
---[[
--- Example usage:
-local Library = require(script)
-
-local Window = Library:CreateWindow({
-    Name = "0verflow Hub Test"
+-- Set metatable for compatibility
+setmetatable(RayfieldLibrary, {
+	__index = OverflowHub
 })
 
-local Tab = Window:CreateTab("Main")
+return RayfieldLibrary
 
-Tab:CreateButton({
+--[[
+-- 0verflow Hub Test Example:
+local Library = loadstring(game:HttpGet("path_to_your_script"))()
+
+local Window = Library:CreateWindow({
+    Name = "0verflow Hub"
+})
+
+local MainTab = Window:CreateTab("Main")
+
+MainTab:CreateSection("Testing Section")
+
+MainTab:CreateLabel({
+    Name = "Welcome to 0verflow Hub!",
+    Text = "This is a modern UI library"
+})
+
+MainTab:CreateButton({
     Name = "Test Button",
     Callback = function()
         print("Button clicked!")
+        Library:Notify({
+            Title = "Success!",
+            Content = "Button was clicked successfully",
+            Duration = 3
+        })
     end
 })
 
-Tab:CreateToggle({
-    Name = "Test Toggle",
+MainTab:CreateToggle({
+    Name = "Enable Feature",
     CurrentValue = false,
     Callback = function(Value)
-        print("Toggle:", Value)
+        print("Toggle state:", Value)
+    end
+})
+
+MainTab:CreateParagraph({
+    Title = "About",
+    Content = "This is 0verflow Hub - a modern, minimal UI library based on Rayfield with left-side tabs and a dark purple theme."
+})
+
+-- Additional tabs
+local SettingsTab = Window:CreateTab("Settings")
+
+SettingsTab:CreateSection("Configuration")
+
+SettingsTab:CreateToggle({
+    Name = "Dark Mode",
+    CurrentValue = true,
+    Callback = function(Value)
+        print("Dark mode:", Value)
     end
 })
 --]]
