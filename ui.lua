@@ -455,7 +455,16 @@ function OverflowHub:CreateWindow(WindowSettings)
 		TabButton.TextColor3 = SelectedTheme.TabTextColor
 		TabButton.TextSize = 14
 		TabButton.ZIndex = 4
-		TabButton.LayoutOrder = #TabButtonsFrame:GetChildren()
+		TabButton.Active = true
+		
+		-- Get proper layout order
+		local tabCount = 0
+		for _, child in ipairs(TabButtonsFrame:GetChildren()) do
+			if child:IsA("TextButton") then
+				tabCount = tabCount + 1
+			end
+		end
+		TabButton.LayoutOrder = tabCount
 		
 		local TabButtonCorner = Instance.new("UICorner")
 		TabButtonCorner.CornerRadius = UDim.new(0, 8)
@@ -472,7 +481,16 @@ function OverflowHub:CreateWindow(WindowSettings)
 		TabPage.ScrollBarImageColor3 = SelectedTheme.Primary
 		TabPage.CanvasSize = UDim2.new(0, 0, 0, 0)
 		TabPage.ZIndex = 2
-		TabPage.LayoutOrder = #Elements:GetChildren()
+		TabPage.Visible = false
+		
+		-- Get proper layout order for page
+		local pageCount = 0
+		for _, child in ipairs(Elements:GetChildren()) do
+			if child:IsA("ScrollingFrame") and child.Name ~= "Template" then
+				pageCount = pageCount + 1
+			end
+		end
+		TabPage.LayoutOrder = pageCount
 		
 		local TabPageLayout = Instance.new("UIListLayout")
 		TabPageLayout.Parent = TabPage
@@ -498,12 +516,20 @@ function OverflowHub:CreateWindow(WindowSettings)
 		if not FirstTab then
 			FirstTab = TabName
 			ElementsPageLayout:JumpTo(TabPage)
+			TabPage.Visible = true
 			TabButton.BackgroundColor3 = SelectedTheme.TabBackgroundSelected
 			TabButton.TextColor3 = SelectedTheme.SelectedTabTextColor
 		end
 		
 		-- Tab button click handler
 		TabButton.MouseButton1Click:Connect(function()
+			-- Hide all tab pages first
+			for _, page in ipairs(Elements:GetChildren()) do
+				if page:IsA("ScrollingFrame") then
+					page.Visible = false
+				end
+			end
+			
 			-- Reset all tab buttons
 			for _, button in ipairs(TabButtonsFrame:GetChildren()) do
 				if button:IsA("TextButton") then
@@ -516,7 +542,8 @@ function OverflowHub:CreateWindow(WindowSettings)
 			TabButton.BackgroundColor3 = SelectedTheme.TabBackgroundSelected
 			TabButton.TextColor3 = SelectedTheme.SelectedTabTextColor
 			
-			-- Switch to this tab page
+			-- Show this tab page
+			TabPage.Visible = true
 			ElementsPageLayout:JumpTo(TabPage)
 		end)
 		
@@ -701,7 +728,7 @@ function OverflowHub:CreateWindow(WindowSettings)
 		-- CreateLabel function (like Rayfield)
 		function Tab:CreateLabel(LabelSettings)
 			local Settings = LabelSettings or {}
-			local LabelText = Settings.Text or "Label"
+			local LabelText = Settings.Text or Settings.Name or "Label"
 			
 			local LabelFrame = Instance.new("Frame")
 			LabelFrame.Name = "Label"
@@ -731,6 +758,8 @@ function OverflowHub:CreateWindow(WindowSettings)
 			Label.TextColor3 = SelectedTheme.TextColor
 			Label.TextSize = 14
 			Label.TextXAlignment = Enum.TextXAlignment.Left
+			Label.TextYAlignment = Enum.TextYAlignment.Center
+			Label.TextWrapped = true
 			Label.ZIndex = 4
 			
 			updateCanvasSize()
@@ -846,6 +875,458 @@ function OverflowHub:CreateWindow(WindowSettings)
 			}
 			
 			return ParagraphObject
+		end
+		
+		-- CreateSlider function (like Rayfield)
+		function Tab:CreateSlider(SliderSettings)
+			local Settings = SliderSettings or {}
+			local SliderName = Settings.Name or "Slider"
+			local SliderMin = Settings.Min or 0
+			local SliderMax = Settings.Max or 100
+			local SliderDefault = Settings.CurrentValue or SliderMin
+			local SliderCallback = Settings.Callback or function() end
+			local SliderFlag = Settings.Flag or SliderName
+			local SliderSuffix = Settings.Suffix or ""
+			
+			local SliderFrame = Instance.new("Frame")
+			SliderFrame.Name = SliderName
+			SliderFrame.Parent = TabPage
+			SliderFrame.BackgroundColor3 = SelectedTheme.ElementBackground
+			SliderFrame.BorderSizePixel = 0
+			SliderFrame.Size = UDim2.new(1, 0, 0, 60)
+			SliderFrame.ZIndex = 3
+			
+			local SliderCorner = Instance.new("UICorner")
+			SliderCorner.CornerRadius = UDim.new(0, 8)
+			SliderCorner.Parent = SliderFrame
+			
+			local SliderStroke = Instance.new("UIStroke")
+			SliderStroke.Color = SelectedTheme.ElementStroke
+			SliderStroke.Thickness = 1
+			SliderStroke.Parent = SliderFrame
+			
+			local SliderLabel = Instance.new("TextLabel")
+			SliderLabel.Name = "Label"
+			SliderLabel.Parent = SliderFrame
+			SliderLabel.BackgroundTransparency = 1
+			SliderLabel.Position = UDim2.new(0, 15, 0, 5)
+			SliderLabel.Size = UDim2.new(1, -60, 0, 20)
+			SliderLabel.Font = Enum.Font.Gotham
+			SliderLabel.Text = SliderName
+			SliderLabel.TextColor3 = SelectedTheme.TextColor
+			SliderLabel.TextSize = 14
+			SliderLabel.TextXAlignment = Enum.TextXAlignment.Left
+			SliderLabel.ZIndex = 4
+			
+			local SliderValue = Instance.new("TextLabel")
+			SliderValue.Name = "Value"
+			SliderValue.Parent = SliderFrame
+			SliderValue.BackgroundTransparency = 1
+			SliderValue.Position = UDim2.new(1, -50, 0, 5)
+			SliderValue.Size = UDim2.new(0, 45, 0, 20)
+			SliderValue.Font = Enum.Font.Gotham
+			SliderValue.Text = tostring(SliderDefault) .. SliderSuffix
+			SliderValue.TextColor3 = SelectedTheme.Primary
+			SliderValue.TextSize = 14
+			SliderValue.TextXAlignment = Enum.TextXAlignment.Right
+			SliderValue.ZIndex = 4
+			
+			local SliderTrack = Instance.new("Frame")
+			SliderTrack.Name = "Track"
+			SliderTrack.Parent = SliderFrame
+			SliderTrack.BackgroundColor3 = SelectedTheme.SecondaryElementBackground
+			SliderTrack.BorderSizePixel = 0
+			SliderTrack.Position = UDim2.new(0, 15, 0, 35)
+			SliderTrack.Size = UDim2.new(1, -30, 0, 6)
+			SliderTrack.ZIndex = 4
+			
+			local SliderTrackCorner = Instance.new("UICorner")
+			SliderTrackCorner.CornerRadius = UDim.new(0, 3)
+			SliderTrackCorner.Parent = SliderTrack
+			
+			local SliderFill = Instance.new("Frame")
+			SliderFill.Name = "Fill"
+			SliderFill.Parent = SliderTrack
+			SliderFill.BackgroundColor3 = SelectedTheme.Primary
+			SliderFill.BorderSizePixel = 0
+			SliderFill.Size = UDim2.new((SliderDefault - SliderMin) / (SliderMax - SliderMin), 0, 1, 0)
+			SliderFill.ZIndex = 5
+			
+			local SliderFillCorner = Instance.new("UICorner")
+			SliderFillCorner.CornerRadius = UDim.new(0, 3)
+			SliderFillCorner.Parent = SliderFill
+			
+			local SliderKnob = Instance.new("Frame")
+			SliderKnob.Name = "Knob"
+			SliderKnob.Parent = SliderTrack
+			SliderKnob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			SliderKnob.BorderSizePixel = 0
+			SliderKnob.Position = UDim2.new((SliderDefault - SliderMin) / (SliderMax - SliderMin), -6, 0.5, -6)
+			SliderKnob.Size = UDim2.new(0, 12, 0, 12)
+			SliderKnob.ZIndex = 6
+			
+			local SliderKnobCorner = Instance.new("UICorner")
+			SliderKnobCorner.CornerRadius = UDim.new(0, 6)
+			SliderKnobCorner.Parent = SliderKnob
+			
+			local CurrentValue = SliderDefault
+			local Dragging = false
+			
+			-- Store in flags
+			OverflowHub.Flags[SliderFlag] = {
+				Value = CurrentValue,
+				Type = "Slider",
+				Set = function(value)
+					CurrentValue = math.clamp(value, SliderMin, SliderMax)
+					local percent = (CurrentValue - SliderMin) / (SliderMax - SliderMin)
+					
+					SliderValue.Text = tostring(CurrentValue) .. SliderSuffix
+					TweenService:Create(SliderFill, TweenInfo.new(0.2, Enum.EasingStyle.Quint), {
+						Size = UDim2.new(percent, 0, 1, 0)
+					}):Play()
+					TweenService:Create(SliderKnob, TweenInfo.new(0.2, Enum.EasingStyle.Quint), {
+						Position = UDim2.new(percent, -6, 0.5, -6)
+					}):Play()
+					
+					SliderCallback(CurrentValue)
+				end
+			}
+			
+			-- Slider interactions
+			SliderTrack.InputBegan:Connect(function(input)
+				if input.UserInputType == Enum.UserInputType.MouseButton1 then
+					Dragging = true
+					local percent = math.clamp((input.Position.X - SliderTrack.AbsolutePosition.X) / SliderTrack.AbsoluteSize.X, 0, 1)
+					CurrentValue = math.floor(SliderMin + (SliderMax - SliderMin) * percent)
+					OverflowHub.Flags[SliderFlag].Set(CurrentValue)
+				end
+			end)
+			
+			UserInputService.InputChanged:Connect(function(input)
+				if Dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+					local percent = math.clamp((input.Position.X - SliderTrack.AbsolutePosition.X) / SliderTrack.AbsoluteSize.X, 0, 1)
+					CurrentValue = math.floor(SliderMin + (SliderMax - SliderMin) * percent)
+					OverflowHub.Flags[SliderFlag].Set(CurrentValue)
+				end
+			end)
+			
+			UserInputService.InputEnded:Connect(function(input)
+				if input.UserInputType == Enum.UserInputType.MouseButton1 then
+					Dragging = false
+				end
+			end)
+			
+			updateCanvasSize()
+			
+			local SliderObject = {
+				Frame = SliderFrame,
+				Track = SliderTrack,
+				Fill = SliderFill,
+				Knob = SliderKnob,
+				CurrentValue = CurrentValue,
+				Set = OverflowHub.Flags[SliderFlag].Set
+			}
+			
+			return SliderObject
+		end
+		
+		-- CreateDropdown function (like Rayfield)
+		function Tab:CreateDropdown(DropdownSettings)
+			local Settings = DropdownSettings or {}
+			local DropdownName = Settings.Name or "Dropdown"
+			local DropdownOptions = Settings.Options or {"Option 1", "Option 2"}
+			local DropdownDefault = Settings.CurrentOption or DropdownOptions[1]
+			local DropdownCallback = Settings.Callback or function() end
+			local DropdownFlag = Settings.Flag or DropdownName
+			
+			local DropdownFrame = Instance.new("Frame")
+			DropdownFrame.Name = DropdownName
+			DropdownFrame.Parent = TabPage
+			DropdownFrame.BackgroundColor3 = SelectedTheme.ElementBackground
+			DropdownFrame.BorderSizePixel = 0
+			DropdownFrame.Size = UDim2.new(1, 0, 0, 45)
+			DropdownFrame.ZIndex = 3
+			
+			local DropdownCorner = Instance.new("UICorner")
+			DropdownCorner.CornerRadius = UDim.new(0, 8)
+			DropdownCorner.Parent = DropdownFrame
+			
+			local DropdownStroke = Instance.new("UIStroke")
+			DropdownStroke.Color = SelectedTheme.ElementStroke
+			DropdownStroke.Thickness = 1
+			DropdownStroke.Parent = DropdownFrame
+			
+			local DropdownLabel = Instance.new("TextLabel")
+			DropdownLabel.Name = "Label"
+			DropdownLabel.Parent = DropdownFrame
+			DropdownLabel.BackgroundTransparency = 1
+			DropdownLabel.Position = UDim2.new(0, 15, 0, 0)
+			DropdownLabel.Size = UDim2.new(0.5, -10, 1, 0)
+			DropdownLabel.Font = Enum.Font.Gotham
+			DropdownLabel.Text = DropdownName
+			DropdownLabel.TextColor3 = SelectedTheme.TextColor
+			DropdownLabel.TextSize = 14
+			DropdownLabel.TextXAlignment = Enum.TextXAlignment.Left
+			DropdownLabel.ZIndex = 4
+			
+			local DropdownButton = Instance.new("TextButton")
+			DropdownButton.Name = "Button"
+			DropdownButton.Parent = DropdownFrame
+			DropdownButton.BackgroundColor3 = SelectedTheme.SecondaryElementBackground
+			DropdownButton.BorderSizePixel = 0
+			DropdownButton.Position = UDim2.new(0.5, 5, 0, 8)
+			DropdownButton.Size = UDim2.new(0.5, -20, 0, 29)
+			DropdownButton.Font = Enum.Font.Gotham
+			DropdownButton.Text = DropdownDefault
+			DropdownButton.TextColor3 = SelectedTheme.TextColor
+			DropdownButton.TextSize = 13
+			DropdownButton.ZIndex = 4
+			
+			local DropdownButtonCorner = Instance.new("UICorner")
+			DropdownButtonCorner.CornerRadius = UDim.new(0, 6)
+			DropdownButtonCorner.Parent = DropdownButton
+			
+			local CurrentOption = DropdownDefault
+			local IsOpen = false
+			
+			-- Store in flags
+			OverflowHub.Flags[DropdownFlag] = {
+				Value = CurrentOption,
+				Type = "Dropdown",
+				Set = function(option)
+					CurrentOption = option
+					DropdownButton.Text = CurrentOption
+					DropdownCallback(CurrentOption)
+				end
+			}
+			
+			-- Dropdown interactions (simplified)
+			DropdownButton.MouseButton1Click:Connect(function()
+				-- Cycle through options for simplicity
+				local currentIndex = 1
+				for i, option in ipairs(DropdownOptions) do
+					if option == CurrentOption then
+						currentIndex = i
+						break
+					end
+				end
+				
+				local nextIndex = currentIndex + 1
+				if nextIndex > #DropdownOptions then
+					nextIndex = 1
+				end
+				
+				OverflowHub.Flags[DropdownFlag].Set(DropdownOptions[nextIndex])
+			end)
+			
+			updateCanvasSize()
+			
+			local DropdownObject = {
+				Frame = DropdownFrame,
+				Button = DropdownButton,
+				CurrentOption = CurrentOption,
+				Set = OverflowHub.Flags[DropdownFlag].Set
+			}
+			
+			return DropdownObject
+		end
+		
+		-- CreateInput function (like Rayfield)
+		function Tab:CreateInput(InputSettings)
+			local Settings = InputSettings or {}
+			local InputName = Settings.Name or "Input"
+			local InputPlaceholder = Settings.PlaceholderText or "Enter text..."
+			local InputDefault = Settings.Text or ""
+			local InputCallback = Settings.Callback or function() end
+			local InputFlag = Settings.Flag or InputName
+			
+			local InputFrame = Instance.new("Frame")
+			InputFrame.Name = InputName
+			InputFrame.Parent = TabPage
+			InputFrame.BackgroundColor3 = SelectedTheme.ElementBackground
+			InputFrame.BorderSizePixel = 0
+			InputFrame.Size = UDim2.new(1, 0, 0, 45)
+			InputFrame.ZIndex = 3
+			
+			local InputCorner = Instance.new("UICorner")
+			InputCorner.CornerRadius = UDim.new(0, 8)
+			InputCorner.Parent = InputFrame
+			
+			local InputStroke = Instance.new("UIStroke")
+			InputStroke.Color = SelectedTheme.ElementStroke
+			InputStroke.Thickness = 1
+			InputStroke.Parent = InputFrame
+			
+			local InputLabel = Instance.new("TextLabel")
+			InputLabel.Name = "Label"
+			InputLabel.Parent = InputFrame
+			InputLabel.BackgroundTransparency = 1
+			InputLabel.Position = UDim2.new(0, 15, 0, 0)
+			InputLabel.Size = UDim2.new(0.4, -10, 1, 0)
+			InputLabel.Font = Enum.Font.Gotham
+			InputLabel.Text = InputName
+			InputLabel.TextColor3 = SelectedTheme.TextColor
+			InputLabel.TextSize = 14
+			InputLabel.TextXAlignment = Enum.TextXAlignment.Left
+			InputLabel.ZIndex = 4
+			
+			local InputBox = Instance.new("TextBox")
+			InputBox.Name = "Input"
+			InputBox.Parent = InputFrame
+			InputBox.BackgroundColor3 = SelectedTheme.InputBackground
+			InputBox.BorderSizePixel = 0
+			InputBox.Position = UDim2.new(0.4, 5, 0, 8)
+			InputBox.Size = UDim2.new(0.6, -20, 0, 29)
+			InputBox.Font = Enum.Font.Gotham
+			InputBox.PlaceholderText = InputPlaceholder
+			InputBox.PlaceholderColor3 = SelectedTheme.PlaceholderColor
+			InputBox.Text = InputDefault
+			InputBox.TextColor3 = SelectedTheme.TextColor
+			InputBox.TextSize = 13
+			InputBox.ZIndex = 4
+			
+			local InputBoxCorner = Instance.new("UICorner")
+			InputBoxCorner.CornerRadius = UDim.new(0, 6)
+			InputBoxCorner.Parent = InputBox
+			
+			local InputBoxStroke = Instance.new("UIStroke")
+			InputBoxStroke.Color = SelectedTheme.InputStroke
+			InputBoxStroke.Thickness = 1
+			InputBoxStroke.Parent = InputBox
+			
+			local CurrentText = InputDefault
+			
+			-- Store in flags
+			OverflowHub.Flags[InputFlag] = {
+				Value = CurrentText,
+				Type = "Input",
+				Set = function(text)
+					CurrentText = text
+					InputBox.Text = CurrentText
+					InputCallback(CurrentText)
+				end
+			}
+			
+			-- Input interactions
+			InputBox.FocusLost:Connect(function(enterPressed)
+				CurrentText = InputBox.Text
+				OverflowHub.Flags[InputFlag].Value = CurrentText
+				InputCallback(CurrentText)
+			end)
+			
+			updateCanvasSize()
+			
+			local InputObject = {
+				Frame = InputFrame,
+				Input = InputBox,
+				CurrentText = CurrentText,
+				Set = OverflowHub.Flags[InputFlag].Set
+			}
+			
+			return InputObject
+		end
+		
+		-- CreateKeybind function (like Rayfield)
+		function Tab:CreateKeybind(KeybindSettings)
+			local Settings = KeybindSettings or {}
+			local KeybindName = Settings.Name or "Keybind"
+			local KeybindDefault = Settings.CurrentKeybind or "None"
+			local KeybindCallback = Settings.Callback or function() end
+			local KeybindFlag = Settings.Flag or KeybindName
+			local HoldToInteract = Settings.HoldToInteract or false
+			
+			local KeybindFrame = Instance.new("Frame")
+			KeybindFrame.Name = KeybindName
+			KeybindFrame.Parent = TabPage
+			KeybindFrame.BackgroundColor3 = SelectedTheme.ElementBackground
+			KeybindFrame.BorderSizePixel = 0
+			KeybindFrame.Size = UDim2.new(1, 0, 0, 45)
+			KeybindFrame.ZIndex = 3
+			
+			local KeybindCorner = Instance.new("UICorner")
+			KeybindCorner.CornerRadius = UDim.new(0, 8)
+			KeybindCorner.Parent = KeybindFrame
+			
+			local KeybindStroke = Instance.new("UIStroke")
+			KeybindStroke.Color = SelectedTheme.ElementStroke
+			KeybindStroke.Thickness = 1
+			KeybindStroke.Parent = KeybindFrame
+			
+			local KeybindLabel = Instance.new("TextLabel")
+			KeybindLabel.Name = "Label"
+			KeybindLabel.Parent = KeybindFrame
+			KeybindLabel.BackgroundTransparency = 1
+			KeybindLabel.Position = UDim2.new(0, 15, 0, 0)
+			KeybindLabel.Size = UDim2.new(0.6, -10, 1, 0)
+			KeybindLabel.Font = Enum.Font.Gotham
+			KeybindLabel.Text = KeybindName
+			KeybindLabel.TextColor3 = SelectedTheme.TextColor
+			KeybindLabel.TextSize = 14
+			KeybindLabel.TextXAlignment = Enum.TextXAlignment.Left
+			KeybindLabel.ZIndex = 4
+			
+			local KeybindButton = Instance.new("TextButton")
+			KeybindButton.Name = "Button"
+			KeybindButton.Parent = KeybindFrame
+			KeybindButton.BackgroundColor3 = SelectedTheme.SecondaryElementBackground
+			KeybindButton.BorderSizePixel = 0
+			KeybindButton.Position = UDim2.new(0.6, 5, 0, 8)
+			KeybindButton.Size = UDim2.new(0.4, -20, 0, 29)
+			KeybindButton.Font = Enum.Font.Gotham
+			KeybindButton.Text = KeybindDefault
+			KeybindButton.TextColor3 = SelectedTheme.TextColor
+			KeybindButton.TextSize = 13
+			KeybindButton.ZIndex = 4
+			
+			local KeybindButtonCorner = Instance.new("UICorner")
+			KeybindButtonCorner.CornerRadius = UDim.new(0, 6)
+			KeybindButtonCorner.Parent = KeybindButton
+			
+			local CurrentKeybind = KeybindDefault
+			local Listening = false
+			
+			-- Store in flags
+			OverflowHub.Flags[KeybindFlag] = {
+				Value = CurrentKeybind,
+				Type = "Keybind",
+				Set = function(keybind)
+					CurrentKeybind = keybind
+					KeybindButton.Text = CurrentKeybind
+				end
+			}
+			
+			-- Keybind interactions (simplified)
+			KeybindButton.MouseButton1Click:Connect(function()
+				if not Listening then
+					Listening = true
+					KeybindButton.Text = "Press a key..."
+					
+					local connection
+					connection = UserInputService.InputBegan:Connect(function(input, gameProcessed)
+						if not gameProcessed then
+							local keyName = input.KeyCode.Name
+							if keyName ~= "Unknown" then
+								CurrentKeybind = keyName
+								OverflowHub.Flags[KeybindFlag].Value = CurrentKeybind
+								KeybindButton.Text = CurrentKeybind
+								Listening = false
+								connection:Disconnect()
+							end
+						end
+					end)
+				end
+			end)
+			
+			updateCanvasSize()
+			
+			local KeybindObject = {
+				Frame = KeybindFrame,
+				Button = KeybindButton,
+				CurrentKeybind = CurrentKeybind,
+				Set = OverflowHub.Flags[KeybindFlag].Set
+			}
+			
+			return KeybindObject
 		end
 		
 		return Tab
