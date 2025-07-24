@@ -849,8 +849,8 @@ end
 local function ModifyLayoutForSidebar()
 	-- Move TabList to the left side
 	if TabList then
-		TabList.Size = UDim2.new(0, 150, 1, -45) -- Make tabs take up left 150px, full height minus topbar
-		TabList.Position = UDim2.new(0, 0, 0, 45) -- Position at top-left under the topbar
+		TabList.Size = UDim2.new(0, 150, 1, -50) -- Make tabs take up left 150px, full height minus topbar
+		TabList.Position = UDim2.new(0, 5, 0, 50) -- Position at top-left under the topbar with padding
 		
 		-- Make sure tabs stack vertically
 		local tabLayout = TabList:FindFirstChildOfClass("UIListLayout")
@@ -871,8 +871,8 @@ local function ModifyLayoutForSidebar()
 	
 	-- Adjust Elements (content area) to account for sidebar
 	if Elements then
-		Elements.Size = UDim2.new(1, -160, 1, -45) -- Full width minus sidebar and some padding, full height minus topbar
-		Elements.Position = UDim2.new(0, 160, 0, 45) -- Position to the right of the sidebar
+		Elements.Size = UDim2.new(1, -170, 1, -50) -- Full width minus sidebar and padding, full height minus topbar
+		Elements.Position = UDim2.new(0, 165, 0, 50) -- Position to the right of the sidebar with padding
 	end
 end
 
