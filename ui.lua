@@ -1653,11 +1653,19 @@ function OverflowLibrary:CreateWindow(Settings)
 		sendReport("window_created", Settings.Name or "Unknown")
 	end
 	local Passthrough = false
+	
+	-- Clean up any existing colored prefix labels
+	local existingLabel = Topbar:FindFirstChild("ColoredPrefix")
+	if existingLabel then
+		existingLabel:Destroy()
+	end
+	
 	-- Handle 0verflow Hub branding with colored "0ver" text
 	if Settings.Name then
 		if string.find(Settings.Name:lower(), "0verflow") then
 			-- Set the main title to just "flow Hub" and create a colored "0ver" label
 			Topbar.Title.Text = "flow Hub"
+			Topbar.Title.RichText = false -- Ensure RichText is disabled
 			
 			-- Create a colored "0ver" label
 			local coloredLabel = Instance.new("TextLabel")
@@ -1679,10 +1687,12 @@ function OverflowLibrary:CreateWindow(Settings)
 			Topbar.Title.TextXAlignment = Enum.TextXAlignment.Left
 		else
 			Topbar.Title.Text = Settings.Name
+			Topbar.Title.RichText = false -- Ensure RichText is disabled
 		end
 	else
 		-- Default 0verflow Hub branding
 		Topbar.Title.Text = "flow Hub"
+		Topbar.Title.RichText = false -- Ensure RichText is disabled
 		
 		-- Create a colored "0ver" label
 		local coloredLabel = Instance.new("TextLabel")
