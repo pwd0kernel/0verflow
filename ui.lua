@@ -1676,14 +1676,14 @@ function OverflowLibrary:CreateWindow(Settings)
 			coloredLabel.Font = Topbar.Title.Font
 			coloredLabel.TextSize = Topbar.Title.TextSize
 			coloredLabel.TextScaled = Topbar.Title.TextScaled
-			coloredLabel.Size = UDim2.new(0, 35, 1, 0) -- Adjust width as needed
-			coloredLabel.Position = UDim2.new(0, Topbar.Title.Position.X.Offset - 35, 0, 0)
-			coloredLabel.AnchorPoint = Vector2.new(0, 0.5)
+			coloredLabel.Size = UDim2.new(0, 35, 1, 0)
+			coloredLabel.Position = Topbar.Title.Position - UDim2.new(0, 35, 0, 0) -- Position it right before the main title
+			coloredLabel.AnchorPoint = Topbar.Title.AnchorPoint
 			coloredLabel.TextXAlignment = Enum.TextXAlignment.Right
+			coloredLabel.TextYAlignment = Topbar.Title.TextYAlignment
 			coloredLabel.Parent = Topbar
 			
-			-- Adjust main title position
-			Topbar.Title.Position = UDim2.new(Topbar.Title.Position.X.Scale, Topbar.Title.Position.X.Offset, Topbar.Title.Position.Y.Scale, Topbar.Title.Position.Y.Offset)
+			-- Adjust main title to align left from its current position
 			Topbar.Title.TextXAlignment = Enum.TextXAlignment.Left
 		else
 			Topbar.Title.Text = Settings.Name
@@ -1704,10 +1704,14 @@ function OverflowLibrary:CreateWindow(Settings)
 		coloredLabel.TextSize = Topbar.Title.TextSize
 		coloredLabel.TextScaled = Topbar.Title.TextScaled
 		coloredLabel.Size = UDim2.new(0, 35, 1, 0)
-		coloredLabel.Position = UDim2.new(0, Topbar.Title.Position.X.Offset - 35, 0, 0)
-		coloredLabel.AnchorPoint = Vector2.new(0, 0.5)
+		coloredLabel.Position = Topbar.Title.Position - UDim2.new(0, 35, 0, 0) -- Position it right before the main title
+		coloredLabel.AnchorPoint = Topbar.Title.AnchorPoint
 		coloredLabel.TextXAlignment = Enum.TextXAlignment.Right
+		coloredLabel.TextYAlignment = Topbar.Title.TextYAlignment
 		coloredLabel.Parent = Topbar
+		
+		-- Adjust main title to align left from its current position
+		Topbar.Title.TextXAlignment = Enum.TextXAlignment.Left
 		
 		-- Adjust main title position  
 		Topbar.Title.TextXAlignment = Enum.TextXAlignment.Left
