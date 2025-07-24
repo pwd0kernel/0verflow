@@ -269,6 +269,15 @@ local function CreateSidebar(parent)
 	Sidebar.BackgroundColor3 = SelectedTheme.SecondaryBackground
 	Sidebar.BorderSizePixel = 0
 	
+	-- Add right border to separate from content
+	local RightBorder = Instance.new("Frame")
+	RightBorder.Name = "RightBorder"
+	RightBorder.Parent = Sidebar
+	RightBorder.Size = UDim2.new(0, 1, 1, 0)
+	RightBorder.Position = UDim2.new(1, -1, 0, 0)
+	RightBorder.BackgroundColor3 = SelectedTheme.Border
+	RightBorder.BorderSizePixel = 0
+	
 	-- Tab list container
 	local TabList = Instance.new("ScrollingFrame")
 	TabList.Name = "TabList"
@@ -280,12 +289,15 @@ local function CreateSidebar(parent)
 	TabList.ScrollBarThickness = 4
 	TabList.ScrollBarImageColor3 = SelectedTheme.Primary
 	TabList.CanvasSize = UDim2.new(0, 0, 0, 0)
+	TabList.ScrollingDirection = Enum.ScrollingDirection.Y
 	
 	-- List layout for tabs
 	local ListLayout = Instance.new("UIListLayout")
 	ListLayout.Parent = TabList
 	ListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 	ListLayout.Padding = UDim.new(0, 5)
+	ListLayout.FillDirection = Enum.FillDirection.Vertical
+	ListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
 	
 	-- Auto-resize canvas
 	ListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
@@ -296,7 +308,7 @@ local function CreateSidebar(parent)
 	local Template = Instance.new("Frame")
 	Template.Name = "Template"
 	Template.Parent = TabList
-	Template.Size = UDim2.new(1, 0, 0, 40)
+	Template.Size = UDim2.new(1, -5, 0, 40)
 	Template.BackgroundColor3 = SelectedTheme.TabBackground
 	Template.BorderSizePixel = 0
 	Template.Visible = false
@@ -306,6 +318,7 @@ local function CreateSidebar(parent)
 	TemplateCorner.Parent = Template
 	
 	local TemplateStroke = Instance.new("UIStroke")
+	TemplateStroke.Name = "UIStroke"
 	TemplateStroke.Color = SelectedTheme.TabStroke
 	TemplateStroke.Thickness = 1
 	TemplateStroke.Parent = Template
@@ -321,6 +334,7 @@ local function CreateSidebar(parent)
 	TemplateTitle.TextSize = 14
 	TemplateTitle.TextXAlignment = Enum.TextXAlignment.Left
 	TemplateTitle.Font = Enum.Font.Gotham
+	TemplateTitle.TextWrapped = true
 	
 	local TemplateButton = Instance.new("TextButton")
 	TemplateButton.Name = "Interact"
@@ -328,6 +342,7 @@ local function CreateSidebar(parent)
 	TemplateButton.Size = UDim2.new(1, 0, 1, 0)
 	TemplateButton.BackgroundTransparency = 1
 	TemplateButton.Text = ""
+	TemplateButton.ZIndex = Template.ZIndex + 1
 	
 	return Sidebar, TabList
 end
@@ -522,7 +537,16 @@ function OverflowHub:CreateWindow(Settings)
 	local dragStart = nil
 	local startPos = nil
 	
-	Topbar.InputBegan:Connect(function(input)
+	-- Add draggable area
+	local DragArea = Instance.new("Frame")
+	DragArea.Name = "DragArea"
+	DragArea.Parent = Topbar
+	DragArea.Size = UDim2.new(1, -100, 1, 0)
+	DragArea.Position = UDim2.new(0, 0, 0, 0)
+	DragArea.BackgroundTransparency = 1
+	DragArea.ZIndex = Topbar.ZIndex + 1
+	
+	DragArea.InputBegan:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.MouseButton1 then
 			dragging = true
 			dragStart = input.Position
@@ -530,14 +554,14 @@ function OverflowHub:CreateWindow(Settings)
 		end
 	end)
 	
-	UserInputService.InputChanged:Connect(function(input)
+	DragArea.InputChanged:Connect(function(input)
 		if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
 			local delta = input.Position - dragStart
 			Main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
 		end
 	end)
 	
-	UserInputService.InputEnded:Connect(function(input)
+	DragArea.InputEnded:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.MouseButton1 then
 			dragging = false
 		end
@@ -553,9 +577,15 @@ function OverflowHub:CreateWindow(Settings)
 			TweenService:Create(Main, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {
 				Size = UDim2.new(0, 700, 0, 50)
 			}):Play()
+			TweenService:Create(ScreenGui.Shadow, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {
+				Size = UDim2.new(0, 700, 0, 50)
+			}):Play()
 			Minimised = true
 		else
 			TweenService:Create(Main, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {
+				Size = UDim2.new(0, 700, 0, 500)
+			}):Play()
+			TweenService:Create(ScreenGui.Shadow, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {
 				Size = UDim2.new(0, 700, 0, 500)
 			}):Play()
 			Minimised = false
@@ -563,22 +593,27 @@ function OverflowHub:CreateWindow(Settings)
 	end)
 	
 	-- Window object
-	local Window = {}
+	local Window = {
+		Elements = Elements,
+		TabList = TabList,
+		ElementTemplates = ElementTemplates,
+		ScreenGui = ScreenGui
+	}
 	
 	function Window:CreateTab(Name, Image, Ext)
-		local TabButton = TabList.Template:Clone()
+		local TabButton = Window.TabList.Template:Clone()
 		TabButton.Name = Name
 		TabButton.Title.Text = Name
-		TabButton.Parent = TabList
+		TabButton.Parent = Window.TabList
 		TabButton.Visible = true
 		
 		-- Create tab page
-		local TabPage = Elements.Template:Clone()
+		local TabPage = Window.Elements.Template:Clone()
 		TabPage.Name = Name
 		TabPage.Visible = true
-		TabPage.Parent = Elements
+		TabPage.Parent = Window.Elements
 		
-		-- Remove template elements
+		-- Remove template elements from the page
 		for _, child in ipairs(TabPage:GetChildren()) do
 			if child.ClassName == "Frame" and child.Name ~= "Placeholder" then
 				child:Destroy()
@@ -588,7 +623,7 @@ function OverflowHub:CreateWindow(Settings)
 		-- Set as first tab if none exists
 		if not FirstTab then
 			FirstTab = Name
-			Elements.UIPageLayout:JumpTo(TabPage)
+			Window.Elements.UIPageLayout:JumpTo(TabPage)
 			
 			-- Style as selected tab
 			TabButton.BackgroundColor3 = SelectedTheme.TabBackgroundSelected
@@ -618,7 +653,7 @@ function OverflowHub:CreateWindow(Settings)
 			}):Play()
 			
 			-- Update other tabs appearance
-			for _, otherTab in ipairs(TabList:GetChildren()) do
+			for _, otherTab in ipairs(Window.TabList:GetChildren()) do
 				if otherTab.Name ~= "Template" and otherTab ~= TabButton and otherTab.ClassName == "Frame" then
 					TweenService:Create(otherTab, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {
 						BackgroundColor3 = SelectedTheme.TabBackground,
@@ -632,7 +667,7 @@ function OverflowHub:CreateWindow(Settings)
 			end
 			
 			-- Switch to tab page
-			Elements.UIPageLayout:JumpTo(TabPage)
+			Window.Elements.UIPageLayout:JumpTo(TabPage)
 		end)
 		
 		-- Tab object
@@ -640,7 +675,7 @@ function OverflowHub:CreateWindow(Settings)
 		
 		-- Create Button
 		function Tab:CreateButton(ButtonSettings)
-			local Button = ElementTemplates.Button:Clone()
+			local Button = Window.ElementTemplates.Button:Clone()
 			Button.Name = ButtonSettings.Name
 			Button.Title.Text = ButtonSettings.Name
 			Button.Parent = TabPage
@@ -703,7 +738,7 @@ function OverflowHub:CreateWindow(Settings)
 		
 		-- Create Toggle
 		function Tab:CreateToggle(ToggleSettings)
-			local Toggle = ElementTemplates.Toggle:Clone()
+			local Toggle = Window.ElementTemplates.Toggle:Clone()
 			Toggle.Name = ToggleSettings.Name
 			Toggle.Title.Text = ToggleSettings.Name
 			Toggle.Parent = TabPage
@@ -785,6 +820,9 @@ function OverflowHub:CreateWindow(Settings)
 						TweenService:Create(Toggle.Switch, TweenInfo.new(0.2, Enum.EasingStyle.Exponential), {
 							BackgroundColor3 = SelectedTheme.ToggleEnabled
 						}):Play()
+						TweenService:Create(Toggle.Switch.SwitchStroke, TweenInfo.new(0.2, Enum.EasingStyle.Exponential), {
+							Color = SelectedTheme.ToggleEnabledStroke
+						}):Play()
 						TweenService:Create(Toggle.Switch.Knob, TweenInfo.new(0.2, Enum.EasingStyle.Exponential), {
 							Position = UDim2.new(0, 23, 0.5, -9.5),
 							BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -792,6 +830,9 @@ function OverflowHub:CreateWindow(Settings)
 					else
 						TweenService:Create(Toggle.Switch, TweenInfo.new(0.2, Enum.EasingStyle.Exponential), {
 							BackgroundColor3 = SelectedTheme.ToggleBackground
+						}):Play()
+						TweenService:Create(Toggle.Switch.SwitchStroke, TweenInfo.new(0.2, Enum.EasingStyle.Exponential), {
+							Color = SelectedTheme.ToggleDisabledStroke
 						}):Play()
 						TweenService:Create(Toggle.Switch.Knob, TweenInfo.new(0.2, Enum.EasingStyle.Exponential), {
 							Position = UDim2.new(0, 3, 0.5, -9.5),
@@ -826,3 +867,29 @@ end
 local RayfieldLibrary = OverflowHub
 
 return OverflowHub
+
+--[[
+-- Example usage:
+local Library = require(script)
+
+local Window = Library:CreateWindow({
+    Name = "0verflow Hub Test"
+})
+
+local Tab = Window:CreateTab("Main")
+
+Tab:CreateButton({
+    Name = "Test Button",
+    Callback = function()
+        print("Button clicked!")
+    end
+})
+
+Tab:CreateToggle({
+    Name = "Test Toggle",
+    CurrentValue = false,
+    Callback = function(Value)
+        print("Toggle:", Value)
+    end
+})
+--]]
