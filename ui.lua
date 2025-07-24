@@ -1,14 +1,21 @@
 --[[
 
-	0verflow Hub Interface Suite
-	Modified from Rayfield by Sirius
-	Rebranded as 0verflow Hub
-
-	Original Authors:
-	shlex  | Designing + Programming
-	iRay   | Programming
-	Max    | Programming
-	Damian | Programming
+	0verflow Hub
+	Advanced UI Suite
+	
+	Rebranded and Redesigned for Maximum Impact
+	Built on Rayfield Framework with Custom Modifications
+	
+	FEATURES:
+	- Left-side vertical tab layout
+	- Custom "Overflow" theme with purple accents
+	- Larger window size (700x500)
+	- Completely rebranded interface
+	- Modern dark design
+	
+	USAGE:
+	local OverflowLib = loadstring(readfile('0verflow.lua'))()
+	local Window = OverflowLib:CreateWindow({...})
 
 ]]
 
@@ -71,9 +78,9 @@ local function loadWithTimeout(url: string, timeout: number?): ...any
 	return if success then result else nil
 end
 
-local requestsDisabled = true --getgenv and getgenv().DISABLE_0VERFLOW_REQUESTS
-local InterfaceBuild = '3K3W'
-local Release = "Build 1.68 - 0verflow Hub"
+local requestsDisabled = true --getgenv and getgenv().DISABLE_RAYFIELD_REQUESTS
+local InterfaceBuild = '0VR'
+local Release = "0verflow Hub v2.0"
 local RayfieldFolder = "0verflow"
 local ConfigurationFolder = RayfieldFolder.."/Configurations"
 local ConfigurationExtension = ".rfld"
@@ -186,7 +193,7 @@ local function loadSettings()
 
 	if not success then 
 		if writefile then
-			warn('0verflow Hub had an issue accessing configuration saving capability.')
+			warn('Rayfield had an issue accessing configuration saving capability.')
 		end
 	end
 end
@@ -262,12 +269,53 @@ if promptUser == 1 and prompt and type(prompt.create) == "function" then
 end
 
 if debugX then
-	warn('Moving on to continue initialisation')
+	warn('Moving on to continue 0verflow initialisation')
 end
 
-local OverflowLibrary = {
+local RayfieldLibrary = {
 	Flags = {},
 	Theme = {
+		Overflow = {
+			TextColor = Color3.fromRGB(255, 255, 255),
+
+			Background = Color3.fromRGB(15, 15, 20),
+			Topbar = Color3.fromRGB(20, 25, 35),
+			Shadow = Color3.fromRGB(0, 0, 0),
+
+			NotificationBackground = Color3.fromRGB(18, 18, 25),
+			NotificationActionsBackground = Color3.fromRGB(240, 240, 240),
+
+			TabBackground = Color3.fromRGB(25, 30, 40),
+			TabStroke = Color3.fromRGB(45, 55, 70),
+			TabBackgroundSelected = Color3.fromRGB(138, 43, 226),
+			TabTextColor = Color3.fromRGB(180, 180, 180),
+			SelectedTabTextColor = Color3.fromRGB(255, 255, 255),
+
+			ElementBackground = Color3.fromRGB(22, 27, 35),
+			ElementBackgroundHover = Color3.fromRGB(30, 35, 45),
+			SecondaryElementBackground = Color3.fromRGB(18, 23, 30),
+			ElementStroke = Color3.fromRGB(65, 75, 95),
+			SecondaryElementStroke = Color3.fromRGB(55, 65, 85),
+
+			SliderBackground = Color3.fromRGB(138, 43, 226),
+			SliderProgress = Color3.fromRGB(171, 71, 188),
+			SliderStroke = Color3.fromRGB(147, 112, 219),
+
+			ToggleBackground = Color3.fromRGB(25, 25, 35),
+			ToggleEnabled = Color3.fromRGB(138, 43, 226),
+			ToggleDisabled = Color3.fromRGB(80, 80, 90),
+			ToggleEnabledStroke = Color3.fromRGB(171, 71, 188),
+			ToggleDisabledStroke = Color3.fromRGB(100, 100, 110),
+			ToggleEnabledOuterStroke = Color3.fromRGB(90, 90, 100),
+			ToggleDisabledOuterStroke = Color3.fromRGB(70, 70, 80),
+
+			DropdownSelected = Color3.fromRGB(138, 43, 226),
+			DropdownUnselected = Color3.fromRGB(40, 45, 55),
+
+			InputBackground = Color3.fromRGB(25, 30, 40),
+			InputStroke = Color3.fromRGB(75, 85, 105),
+			PlaceholderColor = Color3.fromRGB(120, 120, 130)
+		},
 		Default = {
 			TextColor = Color3.fromRGB(240, 240, 240),
 
@@ -308,48 +356,6 @@ local OverflowLibrary = {
 			InputBackground = Color3.fromRGB(30, 30, 30),
 			InputStroke = Color3.fromRGB(65, 65, 65),
 			PlaceholderColor = Color3.fromRGB(178, 178, 178)
-		},
-
-		Overflow = {
-			TextColor = Color3.fromRGB(240, 240, 240),
-
-			Background = Color3.fromRGB(20, 20, 25),
-			Topbar = Color3.fromRGB(25, 25, 35),
-			Shadow = Color3.fromRGB(15, 15, 20),
-
-			NotificationBackground = Color3.fromRGB(20, 20, 25),
-			NotificationActionsBackground = Color3.fromRGB(230, 230, 240),
-
-			TabBackground = Color3.fromRGB(70, 70, 80),
-			TabStroke = Color3.fromRGB(75, 75, 85),
-			TabBackgroundSelected = Color3.fromRGB(111, 10, 214),
-			TabTextColor = Color3.fromRGB(240, 240, 240),
-			SelectedTabTextColor = Color3.fromRGB(255, 255, 255),
-
-			ElementBackground = Color3.fromRGB(30, 30, 40),
-			ElementBackgroundHover = Color3.fromRGB(35, 35, 45),
-			SecondaryElementBackground = Color3.fromRGB(20, 20, 30),
-			ElementStroke = Color3.fromRGB(111, 10, 214),
-			SecondaryElementStroke = Color3.fromRGB(80, 8, 160),
-
-			SliderBackground = Color3.fromRGB(111, 10, 214),
-			SliderProgress = Color3.fromRGB(111, 10, 214),
-			SliderStroke = Color3.fromRGB(140, 40, 255),
-
-			ToggleBackground = Color3.fromRGB(25, 25, 35),
-			ToggleEnabled = Color3.fromRGB(111, 10, 214),
-			ToggleDisabled = Color3.fromRGB(80, 80, 90),
-			ToggleEnabledStroke = Color3.fromRGB(140, 40, 255),
-			ToggleDisabledStroke = Color3.fromRGB(100, 100, 110),
-			ToggleEnabledOuterStroke = Color3.fromRGB(90, 90, 100),
-			ToggleDisabledOuterStroke = Color3.fromRGB(55, 55, 65),
-
-			DropdownSelected = Color3.fromRGB(35, 35, 45),
-			DropdownUnselected = Color3.fromRGB(25, 25, 35),
-
-			InputBackground = Color3.fromRGB(25, 25, 35),
-			InputStroke = Color3.fromRGB(111, 10, 214),
-			PlaceholderColor = Color3.fromRGB(170, 170, 180)
 		},
 
 		Ocean = {
@@ -703,7 +709,7 @@ local buildAttempts = 0
 local correctBuild = false
 local warned
 local globalLoaded
-local rayfieldDestroyed = false -- True when OverflowLibrary:Destroy() is called
+local rayfieldDestroyed = false -- True when RayfieldLibrary:Destroy() is called
 
 repeat
 	if Rayfield:FindFirstChild('Build') and Rayfield.Build.Value == InterfaceBuild then
@@ -714,8 +720,8 @@ repeat
 	correctBuild = false
 
 	if not warned then
-		warn('0verflow Hub | Build Mismatch')
-		print('0verflow Hub may encounter issues as you are running an incompatible interface version ('.. ((Rayfield:FindFirstChild('Build') and Rayfield.Build.Value) or 'No Build') ..').\n\nThis version of 0verflow Hub is intended for interface build '..InterfaceBuild..'.')
+		warn('0verflow | Build Mismatch')
+		print('0verflow Hub may encounter issues as you are running an incompatible interface version ('.. ((Rayfield:FindFirstChild('Build') and Rayfield.Build.Value) or 'No Build') ..').\n\nThis version of 0verflow is intended for interface build '..InterfaceBuild..'.')
 		warned = true
 	end
 
@@ -742,14 +748,14 @@ if gethui then
 	for _, Interface in ipairs(gethui():GetChildren()) do
 		if Interface.Name == Rayfield.Name and Interface ~= Rayfield then
 			Interface.Enabled = false
-			Interface.Name = "0verflow-Old"
+			Interface.Name = "Rayfield-Old"
 		end
 	end
 elseif not useStudio then
 	for _, Interface in ipairs(CoreGui:GetChildren()) do
 		if Interface.Name == Rayfield.Name and Interface ~= Rayfield then
 			Interface.Enabled = false
-			Interface.Name = "0verflow-Old"
+			Interface.Name = "Rayfield-Old"
 		end
 	end
 end
@@ -797,11 +803,11 @@ local Debounce = false
 local searchOpen = false
 local Notifications = Rayfield.Notifications
 
-local SelectedTheme = OverflowLibrary.Theme.Overflow
+local SelectedTheme = RayfieldLibrary.Theme.Overflow
 
 local function ChangeTheme(Theme)
 	if typeof(Theme) == 'string' then
-		SelectedTheme = OverflowLibrary.Theme[Theme]
+		SelectedTheme = RayfieldLibrary.Theme[Theme]
 	elseif typeof(Theme) == 'table' then
 		SelectedTheme = Theme
 	end
@@ -845,37 +851,6 @@ local function ChangeTheme(Theme)
 	end
 end
 
--- Custom function to modify UI layout for left sidebar tabs
-local function ModifyLayoutForSidebar()
-	-- Move TabList to the left side
-	if TabList then
-		TabList.Size = UDim2.new(0, 150, 1, -50) -- Make tabs take up left 150px, full height minus topbar
-		TabList.Position = UDim2.new(0, 5, 0, 50) -- Position at top-left under the topbar with padding
-		
-		-- Make sure tabs stack vertically
-		local tabLayout = TabList:FindFirstChildOfClass("UIListLayout")
-		if tabLayout then
-			tabLayout.FillDirection = Enum.FillDirection.Vertical
-			tabLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
-			tabLayout.VerticalAlignment = Enum.VerticalAlignment.Top
-			tabLayout.Padding = UDim.new(0, 2)
-		end
-		
-		-- Adjust individual tab button sizes for vertical layout
-		for _, tabButton in ipairs(TabList:GetChildren()) do
-			if tabButton.ClassName == "Frame" and tabButton.Name ~= "Placeholder" and tabButton.Name ~= "Template" then
-				tabButton.Size = UDim2.new(1, -10, 0, 35) -- Full width minus padding, fixed height
-			end
-		end
-	end
-	
-	-- Adjust Elements (content area) to account for sidebar
-	if Elements then
-		Elements.Size = UDim2.new(1, -170, 1, -50) -- Full width minus sidebar and padding, full height minus topbar
-		Elements.Position = UDim2.new(0, 165, 0, 50) -- Position to the right of the sidebar with padding
-	end
-end
-
 local function getIcon(name : string): {id: number, imageRectSize: Vector2, imageRectOffset: Vector2}
 	if not Icons then
 		warn("Lucide Icons: Cannot use icons as icons library is not loaded")
@@ -912,9 +887,9 @@ local function getAssetUri(id: any): string
 	if type(id) == "number" then
 		assetUri = "rbxassetid://" .. id
 	elseif type(id) == "string" and not Icons then
-		warn("0verflow Hub | Cannot use Lucide icons as icons library is not loaded")
+		warn("Rayfield | Cannot use Lucide icons as icons library is not loaded")
 	else
-		warn("0verflow Hub | The icon argument must either be an icon ID (number) or a Lucide icon name (string)")
+		warn("Rayfield | The icon argument must either be an icon ID (number) or a Lucide icon name (string)")
 	end
 	return assetUri
 end
@@ -1010,10 +985,10 @@ local function LoadConfiguration(Configuration)
 	local success, Data = pcall(function() return HttpService:JSONDecode(Configuration) end)
 	local changed
 
-	if not success then warn('0verflow Hub had an issue decoding the configuration file, please try delete the file and reopen 0verflow Hub.') return end
+	if not success then warn('0verflow had an issue decoding the configuration file, please try delete the file and reopen 0verflow.') return end
 
 	-- Iterate through current UI elements' flags
-	for FlagName, Flag in pairs(OverflowLibrary.Flags) do
+	for FlagName, Flag in pairs(RayfieldLibrary.Flags) do
 		local FlagValue = Data[FlagName]
 
 		if (typeof(FlagValue) == 'boolean' and FlagValue == false) or FlagValue then
@@ -1029,9 +1004,9 @@ local function LoadConfiguration(Configuration)
 				end
 			end)
 		else
-			warn("0verflow Hub | Unable to find '"..FlagName.. "' in the save file.")
+			warn("0verflow | Unable to find '"..FlagName.. "' in the save file.")
 			print("The error above may not be an issue if new elements have been added or not been set values.")
-			--OverflowLibrary:Notify({Title = "Rayfield Flags", Content = "Rayfield was unable to find '"..FlagName.. "' in the save file. Check sirius.menu/discord for help.", Image = 3944688398})
+			--RayfieldLibrary:Notify({Title = "Rayfield Flags", Content = "Rayfield was unable to find '"..FlagName.. "' in the save file. Check sirius.menu/discord for help.", Image = 3944688398})
 		end
 	end
 
@@ -1046,7 +1021,7 @@ local function SaveConfiguration()
 	end
 
 	local Data = {}
-	for i, v in pairs(OverflowLibrary.Flags) do
+	for i, v in pairs(RayfieldLibrary.Flags) do
 		if v.Type == "ColorPicker" then
 			Data[i] = PackColor(v.Color)
 		else
@@ -1087,7 +1062,7 @@ local function SaveConfiguration()
 	end
 end
 
-function OverflowLibrary:Notify(data) -- action e.g open messages
+function RayfieldLibrary:Notify(data) -- action e.g open messages
 	task.spawn(function()
 
 		-- Notification Object Creation
@@ -1137,7 +1112,7 @@ function OverflowLibrary:Notify(data) -- action e.g open messages
 		newNotification.Visible = true
 
 		if data.Actions then
-			warn('0verflow Hub | Not seeing your actions in notifications?')
+			warn('Rayfield | Not seeing your actions in notifications?')
 			print("Notification Actions are being sunset for now, keep up to date on when they're back in the discord. (sirius.menu/discord)")
 		end
 
@@ -1263,14 +1238,14 @@ local function Hide(notify: boolean?)
 	Debounce = true
 	if notify then
 		if useMobilePrompt then 
-			OverflowLibrary:Notify({Title = "Interface Hidden", Content = "The interface has been hidden, you can unhide the interface by tapping 'Show'.", Duration = 7, Image = 4400697855})
+			RayfieldLibrary:Notify({Title = "Interface Hidden", Content = "The interface has been hidden, you can unhide the interface by tapping 'Show'.", Duration = 7, Image = 4400697855})
 		else
-			OverflowLibrary:Notify({Title = "Interface Hidden", Content = `The interface has been hidden, you can unhide the interface by tapping {getSetting("General", "rayfieldOpen")}.`, Duration = 7, Image = 4400697855})
+			RayfieldLibrary:Notify({Title = "Interface Hidden", Content = `The interface has been hidden, you can unhide the interface by tapping {getSetting("General", "rayfieldOpen")}.`, Duration = 7, Image = 4400697855})
 		end
 	end
 
-	TweenService:Create(Main, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = UDim2.new(0, 590, 0, 0)}):Play()
-	TweenService:Create(Main.Topbar, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = UDim2.new(0, 590, 0, 45)}):Play()
+	TweenService:Create(Main, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = UDim2.new(0, 570, 0, 0)}):Play()
+	TweenService:Create(Main.Topbar, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = UDim2.new(0, 570, 0, 45)}):Play()
 	TweenService:Create(Main, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {BackgroundTransparency = 1}):Play()
 	TweenService:Create(Main.Topbar, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {BackgroundTransparency = 1}):Play()
 	TweenService:Create(Main.Topbar.Divider, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {BackgroundTransparency = 1}):Play()
@@ -1341,15 +1316,32 @@ local function Maximise()
 	TweenService:Create(Topbar.CornerRepair, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
 	TweenService:Create(Topbar.Divider, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
 	TweenService:Create(dragBarCosmetic, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {BackgroundTransparency = 0.7}):Play()
-	TweenService:Create(Main, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = useMobileSizing and UDim2.new(0, 620, 0, 275) or UDim2.new(0, 620, 0, 475)}):Play()
-	TweenService:Create(Topbar, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = UDim2.new(0, 620, 0, 45)}):Play()
+	TweenService:Create(Main, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = useMobileSizing and UDim2.new(0, 600, 0, 350) or UDim2.new(0, 700, 0, 500)}):Play()
+	TweenService:Create(Topbar, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = UDim2.new(0, 700, 0, 45)}):Play()
 	TabList.Visible = true
+	
+	-- 0verflow Hub Modification: Reposition elements for left sidebar layout
+	task.spawn(function()
+		-- Position TabList on the left side
+		TabList.Position = UDim2.new(0, 5, 0, 50)
+		TabList.Size = UDim2.new(0, 150, 1, -55)
+		
+		-- Adjust Elements to make room for left sidebar
+		Elements.Position = UDim2.new(0, 160, 0, 50) 
+		Elements.Size = UDim2.new(1, -165, 1, -55)
+		
+		-- Change TabList layout to vertical if it has a UIListLayout
+		local layout = TabList:FindFirstChild("UIListLayout")
+		if layout then
+			layout.FillDirection = Enum.FillDirection.Vertical
+			layout.SortOrder = Enum.SortOrder.LayoutOrder
+			layout.Padding = UDim.new(0, 5)
+		end
+	end)
+	
 	task.wait(0.2)
 
 	Elements.Visible = true
-	
-	-- Apply custom sidebar layout
-	ModifyLayoutForSidebar()
 
 	for _, tab in ipairs(Elements:GetChildren()) do
 		if tab.Name ~= "Template" and tab.ClassName == "ScrollingFrame" and tab.Name ~= "Placeholder" then
@@ -1404,8 +1396,8 @@ local function Unhide()
 	Debounce = true
 	Main.Position = UDim2.new(0.5, 0, 0.5, 0)
 	Main.Visible = true
-	TweenService:Create(Main, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = useMobileSizing and UDim2.new(0, 620, 0, 275) or UDim2.new(0, 620, 0, 475)}):Play()
-	TweenService:Create(Main.Topbar, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = UDim2.new(0, 620, 0, 45)}):Play()
+	TweenService:Create(Main, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = useMobileSizing and UDim2.new(0, 500, 0, 275) or UDim2.new(0, 500, 0, 475)}):Play()
+	TweenService:Create(Main.Topbar, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = UDim2.new(0, 500, 0, 45)}):Play()
 	TweenService:Create(Main.Shadow.Image, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {ImageTransparency = 0.6}):Play()
 	TweenService:Create(Main, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
 	TweenService:Create(Main.Topbar, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
@@ -1537,7 +1529,7 @@ local function Minimise()
 	TweenService:Create(Main.Shadow.Image, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {ImageTransparency = 1}):Play()
 	TweenService:Create(Topbar.CornerRepair, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {BackgroundTransparency = 1}):Play()
 	TweenService:Create(Topbar.Divider, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {BackgroundTransparency = 1}):Play()
-	TweenService:Create(Main, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = UDim2.new(0, 615, 0, 45)}):Play()
+	TweenService:Create(Main, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = UDim2.new(0, 495, 0, 45)}):Play()
 	TweenService:Create(Topbar, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = UDim2.new(0, 495, 0, 45)}):Play()
 
 	task.wait(0.3)
@@ -1584,7 +1576,7 @@ local function createSettings(window)
 		return
 	end
 
-	local newTab = window:CreateTab('Rayfield Settings', 0, true)
+	local newTab = window:CreateTab('0verflow Settings', 0, true)
 
 	if TabList['Rayfield Settings'] then
 		TabList['Rayfield Settings'].LayoutOrder = 1000
@@ -1641,7 +1633,7 @@ end
 
 
 
-function OverflowLibrary:CreateWindow(Settings)
+function RayfieldLibrary:CreateWindow(Settings)
 	print('creating window')
 	if Rayfield:FindFirstChild('Loading') then
 		if getgenv and not getgenv().rayfieldCached then
@@ -1658,7 +1650,7 @@ function OverflowLibrary:CreateWindow(Settings)
 	if not correctBuild and not Settings.DisableBuildWarnings then
 		task.delay(3, 
 			function() 
-				OverflowLibrary:Notify({Title = 'Build Mismatch', Content = '0verflow Hub may encounter issues as you are running an incompatible interface version ('.. ((Rayfield:FindFirstChild('Build') and Rayfield.Build.Value) or 'No Build') ..').\n\nThis version of 0verflow Hub is intended for interface build '..InterfaceBuild..'.\n\nTry rejoining and then run the script twice.', Image = 4335487866, Duration = 15})		
+				RayfieldLibrary:Notify({Title = 'Build Notice', Content = '0verflow Hub may encounter issues as you are running interface version ('.. ((Rayfield:FindFirstChild('Build') and Rayfield.Build.Value) or 'No Build') ..').\n\nThis version of 0verflow is optimized for interface build '..InterfaceBuild..'.\n\nTry rejoining if you experience issues.', Image = 4335487866, Duration = 15})		
 			end)
 	end
 
@@ -1687,10 +1679,9 @@ function OverflowLibrary:CreateWindow(Settings)
 		sendReport("window_created", Settings.Name or "Unknown")
 	end
 	local Passthrough = false
-	-- Set the window title to either the provided name or default "0verflow Hub"
-	Topbar.Title.Text = Settings.Name or "0verflow Hub"
+	Topbar.Title.Text = Settings.Name
 
-	Main.Size = UDim2.new(0, 540, 0, 100)
+	Main.Size = UDim2.new(0, 520, 0, 100)
 	Main.Visible = true
 	Main.BackgroundTransparency = 1
 	if Main:FindFirstChild('Notice') then Main.Notice.Visible = false end
@@ -1705,10 +1696,10 @@ function OverflowLibrary:CreateWindow(Settings)
 
 	LoadingFrame.Version.TextTransparency = 1
 	LoadingFrame.Title.Text = Settings.LoadingTitle or "0verflow Hub"
-	LoadingFrame.Subtitle.Text = Settings.LoadingSubtitle or "Interface Suite"
+	LoadingFrame.Subtitle.Text = Settings.LoadingSubtitle or "Advanced Interface Suite"
 
-	if Settings.LoadingTitle ~= "0verflow Hub Interface Suite" then
-		LoadingFrame.Version.Text = "0verflow Hub UI"
+	if Settings.LoadingTitle ~= "0verflow Hub" then
+		LoadingFrame.Version.Text = "0verflow UI"
 	end
 
 	if Settings.Icon and Settings.Icon ~= 0 and Topbar:FindFirstChild('Icon') then
@@ -1757,9 +1748,9 @@ function OverflowLibrary:CreateWindow(Settings)
 		task.spawn(function()
 			while true do
 				task.wait(math.random(180, 600))
-				OverflowLibrary:Notify({
-					Title = "0verflow Hub Interface",
-					Content = "Enjoying this UI library? Modified from Rayfield by Sirius",
+				RayfieldLibrary:Notify({
+					Title = "0verflow Hub",
+					Content = "Enjoying this powerful interface? Welcome to the future of UI design!",
 					Duration = 7,
 					Image = 4370033185,
 				})
@@ -1849,7 +1840,7 @@ function OverflowLibrary:CreateWindow(Settings)
 					Settings.KeySettings.Key[i] = string.gsub(Settings.KeySettings.Key[i], " ", "")
 				end)
 				if not Success then
-					print("0verflow Hub | "..Key.." Error " ..tostring(Response))
+					print("Rayfield | "..Key.." Error " ..tostring(Response))
 					warn('Check docs.sirius.menu for help with Rayfield specific development.')
 				end
 			end
@@ -1974,7 +1965,7 @@ function OverflowLibrary:CreateWindow(Settings)
 						if writefile then
 							writefile(RayfieldFolder.."/Key System".."/"..Settings.KeySettings.FileName..ConfigurationExtension, FoundKey)
 						end
-						OverflowLibrary:Notify({Title = "Key System", Content = "The key for this script has been saved successfully.", Image = 3605522284})
+						RayfieldLibrary:Notify({Title = "Key System", Content = "The key for this script has been saved successfully.", Image = 3605522284})
 					end
 				else
 					if AttemptsRemaining == 0 then
@@ -2020,7 +2011,7 @@ function OverflowLibrary:CreateWindow(Settings)
 				TweenService:Create(KeyMain.NoteMessage, TweenInfo.new(0.4, Enum.EasingStyle.Exponential), {TextTransparency = 1}):Play()
 				TweenService:Create(KeyMain.Hide, TweenInfo.new(0.4, Enum.EasingStyle.Exponential), {ImageTransparency = 1}):Play()
 				task.wait(0.51)
-				OverflowLibrary:Destroy()
+				RayfieldLibrary:Destroy()
 				KeyUI:Destroy()
 			end)
 		else
@@ -2062,8 +2053,9 @@ function OverflowLibrary:CreateWindow(Settings)
 		TabButton.Title.Text = Name
 		TabButton.Parent = TabList
 		TabButton.Title.TextWrapped = false
-		-- Set size for sidebar layout instead of horizontal
-		TabButton.Size = UDim2.new(1, -10, 0, 35) -- Full width minus padding, fixed height
+		-- Make tab buttons vertical and wider for left sidebar
+		TabButton.Size = UDim2.new(1, -10, 0, 45)
+		TabButton.Title.TextXAlignment = Enum.TextXAlignment.Left
 
 		if Image and Image ~= 0 then
 			if typeof(Image) == 'string' and Icons then
@@ -2077,10 +2069,13 @@ function OverflowLibrary:CreateWindow(Settings)
 			end
 
 			TabButton.Title.AnchorPoint = Vector2.new(0, 0.5)
-			TabButton.Title.Position = UDim2.new(0, 37, 0.5, 0)
+			TabButton.Title.Position = UDim2.new(0, 45, 0.5, 0)
 			TabButton.Image.Visible = true
-			TabButton.Title.TextXAlignment = Enum.TextXAlignment.Left
-			TabButton.Size = UDim2.new(0, TabButton.Title.TextBounds.X + 52, 0, 30)
+			TabButton.Image.Position = UDim2.new(0, 10, 0.5, 0)
+			TabButton.Image.Size = UDim2.new(0, 24, 0, 24)
+			TabButton.Size = UDim2.new(1, -10, 0, 45)
+		else
+			TabButton.Title.Position = UDim2.new(0, 15, 0.5, 0)
 		end
 
 
@@ -2196,7 +2191,7 @@ function OverflowLibrary:CreateWindow(Settings)
 
 			Button.Interact.MouseButton1Click:Connect(function()
 				local Success, Response = pcall(ButtonSettings.Callback)
-				-- Prevents animation from trying to play if the button's callback called OverflowLibrary:Destroy()
+				-- Prevents animation from trying to play if the button's callback called RayfieldLibrary:Destroy()
 				if rayfieldDestroyed then
 					return
 				end
@@ -2205,8 +2200,8 @@ function OverflowLibrary:CreateWindow(Settings)
 					TweenService:Create(Button.ElementIndicator, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {TextTransparency = 1}):Play()
 					TweenService:Create(Button.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
 					Button.Title.Text = "Callback Error"
-					print("0verflow Hub | "..ButtonSettings.Name.." Callback Error " ..tostring(Response))
-					warn('Check docs.sirius.menu for help with Rayfield specific development.')
+					print("0verflow | "..ButtonSettings.Name.." Callback Error " ..tostring(Response))
+					warn('Check 0verflow documentation for help with development.')
 					task.wait(0.5)
 					Button.Title.Text = ButtonSettings.Name
 					TweenService:Create(Button, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackground}):Play()
@@ -2304,7 +2299,7 @@ function OverflowLibrary:CreateWindow(Settings)
 					TweenService:Create(ColorPicker.HexInput, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Position = UDim2.new(0, 17, 0, 73)}):Play()
 					TweenService:Create(ColorPicker.Interact, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Size = UDim2.new(0.574, 0, 1, 0)}):Play()
 					TweenService:Create(Main.MainPoint, TweenInfo.new(0.2, Enum.EasingStyle.Exponential), {ImageTransparency = 0}):Play()
-					TweenService:Create(Main, TweenInfo.new(0.2, Enum.EasingStyle.Exponential), {ImageTransparency = SelectedTheme ~= OverflowLibrary.Theme.Default and 0.25 or 0.1}):Play()
+					TweenService:Create(Main, TweenInfo.new(0.2, Enum.EasingStyle.Exponential), {ImageTransparency = SelectedTheme ~= RayfieldLibrary.Theme.Default and 0.25 or 0.1}):Play()
 					TweenService:Create(Background, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
 				else
 					opened = false
@@ -2464,7 +2459,7 @@ function OverflowLibrary:CreateWindow(Settings)
 
 			if Settings.ConfigurationSaving then
 				if Settings.ConfigurationSaving.Enabled and ColorPickerSettings.Flag then
-					OverflowLibrary.Flags[ColorPickerSettings.Flag] = ColorPickerSettings
+					RayfieldLibrary.Flags[ColorPickerSettings.Flag] = ColorPickerSettings
 				end
 			end
 
@@ -2709,7 +2704,7 @@ function OverflowLibrary:CreateWindow(Settings)
 					TweenService:Create(Input, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = Color3.fromRGB(85, 0, 0)}):Play()
 					TweenService:Create(Input.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
 					Input.Title.Text = "Callback Error"
-					print("0verflow Hub | "..InputSettings.Name.." Callback Error " ..tostring(Response))
+					print("Rayfield | "..InputSettings.Name.." Callback Error " ..tostring(Response))
 					warn('Check docs.sirius.menu for help with Rayfield specific development.')
 					task.wait(0.5)
 					Input.Title.Text = InputSettings.Name
@@ -2753,7 +2748,7 @@ function OverflowLibrary:CreateWindow(Settings)
 
 			if Settings.ConfigurationSaving then
 				if Settings.ConfigurationSaving.Enabled and InputSettings.Flag then
-					OverflowLibrary.Flags[InputSettings.Flag] = InputSettings
+					RayfieldLibrary.Flags[InputSettings.Flag] = InputSettings
 				end
 			end
 
@@ -2949,7 +2944,7 @@ function OverflowLibrary:CreateWindow(Settings)
 							TweenService:Create(Dropdown, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = Color3.fromRGB(85, 0, 0)}):Play()
 							TweenService:Create(Dropdown.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
 							Dropdown.Title.Text = "Callback Error"
-							print("0verflow Hub | "..DropdownSettings.Name.." Callback Error " ..tostring(Response))
+							print("Rayfield | "..DropdownSettings.Name.." Callback Error " ..tostring(Response))
 							warn('Check docs.sirius.menu for help with Rayfield specific development.')
 							task.wait(0.5)
 							Dropdown.Title.Text = DropdownSettings.Name
@@ -3039,7 +3034,7 @@ function OverflowLibrary:CreateWindow(Settings)
 					TweenService:Create(Dropdown, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = Color3.fromRGB(85, 0, 0)}):Play()
 					TweenService:Create(Dropdown.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
 					Dropdown.Title.Text = "Callback Error"
-					print("0verflow Hub | "..DropdownSettings.Name.." Callback Error " ..tostring(Response))
+					print("Rayfield | "..DropdownSettings.Name.." Callback Error " ..tostring(Response))
 					warn('Check docs.sirius.menu for help with Rayfield specific development.')
 					task.wait(0.5)
 					Dropdown.Title.Text = DropdownSettings.Name
@@ -3071,7 +3066,7 @@ function OverflowLibrary:CreateWindow(Settings)
 
 			if Settings.ConfigurationSaving then
 				if Settings.ConfigurationSaving.Enabled and DropdownSettings.Flag then
-					OverflowLibrary.Flags[DropdownSettings.Flag] = DropdownSettings
+					RayfieldLibrary.Flags[DropdownSettings.Flag] = DropdownSettings
 				end
 			end
 
@@ -3160,7 +3155,7 @@ function OverflowLibrary:CreateWindow(Settings)
 							TweenService:Create(Keybind, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = Color3.fromRGB(85, 0, 0)}):Play()
 							TweenService:Create(Keybind.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
 							Keybind.Title.Text = "Callback Error"
-							print("0verflow Hub | "..KeybindSettings.Name.." Callback Error " ..tostring(Response))
+							print("Rayfield | "..KeybindSettings.Name.." Callback Error " ..tostring(Response))
 							warn('Check docs.sirius.menu for help with Rayfield specific development.')
 							task.wait(0.5)
 							Keybind.Title.Text = KeybindSettings.Name
@@ -3202,7 +3197,7 @@ function OverflowLibrary:CreateWindow(Settings)
 
 			if Settings.ConfigurationSaving then
 				if Settings.ConfigurationSaving.Enabled and KeybindSettings.Flag then
-					OverflowLibrary.Flags[KeybindSettings.Flag] = KeybindSettings
+					RayfieldLibrary.Flags[KeybindSettings.Flag] = KeybindSettings
 				end
 			end
 
@@ -3229,7 +3224,7 @@ function OverflowLibrary:CreateWindow(Settings)
 			Toggle.Title.TextTransparency = 1
 			Toggle.Switch.BackgroundColor3 = SelectedTheme.ToggleBackground
 
-			if SelectedTheme ~= OverflowLibrary.Theme.Default then
+			if SelectedTheme ~= RayfieldLibrary.Theme.Default then
 				Toggle.Switch.Shadow.Visible = false
 			end
 
@@ -3290,7 +3285,7 @@ function OverflowLibrary:CreateWindow(Settings)
 					TweenService:Create(Toggle, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = Color3.fromRGB(85, 0, 0)}):Play()
 					TweenService:Create(Toggle.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
 					Toggle.Title.Text = "Callback Error"
-					print("0verflow Hub | "..ToggleSettings.Name.." Callback Error " ..tostring(Response))
+					print("Rayfield | "..ToggleSettings.Name.." Callback Error " ..tostring(Response))
 					warn('Check docs.sirius.menu for help with Rayfield specific development.')
 					task.wait(0.5)
 					Toggle.Title.Text = ToggleSettings.Name
@@ -3340,7 +3335,7 @@ function OverflowLibrary:CreateWindow(Settings)
 					TweenService:Create(Toggle, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = Color3.fromRGB(85, 0, 0)}):Play()
 					TweenService:Create(Toggle.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
 					Toggle.Title.Text = "Callback Error"
-					print("0verflow Hub | "..ToggleSettings.Name.." Callback Error " ..tostring(Response))
+					print("Rayfield | "..ToggleSettings.Name.." Callback Error " ..tostring(Response))
 					warn('Check docs.sirius.menu for help with Rayfield specific development.')
 					task.wait(0.5)
 					Toggle.Title.Text = ToggleSettings.Name
@@ -3356,7 +3351,7 @@ function OverflowLibrary:CreateWindow(Settings)
 			if not ToggleSettings.Ext then
 				if Settings.ConfigurationSaving then
 					if Settings.ConfigurationSaving.Enabled and ToggleSettings.Flag then
-						OverflowLibrary.Flags[ToggleSettings.Flag] = ToggleSettings
+						RayfieldLibrary.Flags[ToggleSettings.Flag] = ToggleSettings
 					end
 				end
 			end
@@ -3365,7 +3360,7 @@ function OverflowLibrary:CreateWindow(Settings)
 			Rayfield.Main:GetPropertyChangedSignal('BackgroundColor3'):Connect(function()
 				Toggle.Switch.BackgroundColor3 = SelectedTheme.ToggleBackground
 
-				if SelectedTheme ~= OverflowLibrary.Theme.Default then
+				if SelectedTheme ~= RayfieldLibrary.Theme.Default then
 					Toggle.Switch.Shadow.Visible = false
 				end
 
@@ -3398,7 +3393,7 @@ function OverflowLibrary:CreateWindow(Settings)
 			Slider.UIStroke.Transparency = 1
 			Slider.Title.TextTransparency = 1
 
-			if SelectedTheme ~= OverflowLibrary.Theme.Default then
+			if SelectedTheme ~= RayfieldLibrary.Theme.Default then
 				Slider.Main.Shadow.Visible = false
 			end
 
@@ -3489,7 +3484,7 @@ function OverflowLibrary:CreateWindow(Settings)
 								TweenService:Create(Slider, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = Color3.fromRGB(85, 0, 0)}):Play()
 								TweenService:Create(Slider.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
 								Slider.Title.Text = "Callback Error"
-								print("0verflow Hub | "..SliderSettings.Name.." Callback Error " ..tostring(Response))
+								print("Rayfield | "..SliderSettings.Name.." Callback Error " ..tostring(Response))
 								warn('Check docs.sirius.menu for help with Rayfield specific development.')
 								task.wait(0.5)
 								Slider.Title.Text = SliderSettings.Name
@@ -3523,7 +3518,7 @@ function OverflowLibrary:CreateWindow(Settings)
 					TweenService:Create(Slider, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = Color3.fromRGB(85, 0, 0)}):Play()
 					TweenService:Create(Slider.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
 					Slider.Title.Text = "Callback Error"
-					print("0verflow Hub | "..SliderSettings.Name.." Callback Error " ..tostring(Response))
+					print("Rayfield | "..SliderSettings.Name.." Callback Error " ..tostring(Response))
 					warn('Check docs.sirius.menu for help with Rayfield specific development.')
 					task.wait(0.5)
 					Slider.Title.Text = SliderSettings.Name
@@ -3539,12 +3534,12 @@ function OverflowLibrary:CreateWindow(Settings)
 
 			if Settings.ConfigurationSaving then
 				if Settings.ConfigurationSaving.Enabled and SliderSettings.Flag then
-					OverflowLibrary.Flags[SliderSettings.Flag] = SliderSettings
+					RayfieldLibrary.Flags[SliderSettings.Flag] = SliderSettings
 				end
 			end
 
 			Rayfield.Main:GetPropertyChangedSignal('BackgroundColor3'):Connect(function()
-				if SelectedTheme ~= OverflowLibrary.Theme.Default then
+				if SelectedTheme ~= RayfieldLibrary.Theme.Default then
 					Slider.Main.Shadow.Visible = false
 				end
 
@@ -3571,16 +3566,11 @@ function OverflowLibrary:CreateWindow(Settings)
 			end
 		end)
 
-		-- Apply sidebar layout after creating new tab
-		ModifyLayoutForSidebar()
-
 		return Tab
 	end
 
 	Elements.Visible = true
 
-	-- Apply sidebar layout when showing UI
-	ModifyLayoutForSidebar()
 
 	task.wait(1.1)
 	TweenService:Create(Main, TweenInfo.new(0.7, Enum.EasingStyle.Exponential, Enum.EasingDirection.InOut), {Size = UDim2.new(0, 390, 0, 90)}):Play()
@@ -3589,7 +3579,7 @@ function OverflowLibrary:CreateWindow(Settings)
 	TweenService:Create(LoadingFrame.Subtitle, TweenInfo.new(0.2, Enum.EasingStyle.Exponential), {TextTransparency = 1}):Play()
 	TweenService:Create(LoadingFrame.Version, TweenInfo.new(0.2, Enum.EasingStyle.Exponential), {TextTransparency = 1}):Play()
 	task.wait(0.1)
-	TweenService:Create(Main, TweenInfo.new(0.6, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Size = useMobileSizing and UDim2.new(0, 620, 0, 275) or UDim2.new(0, 620, 0, 475)}):Play()
+	TweenService:Create(Main, TweenInfo.new(0.6, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Size = useMobileSizing and UDim2.new(0, 500, 0, 275) or UDim2.new(0, 500, 0, 475)}):Play()
 	TweenService:Create(Main.Shadow.Image, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {ImageTransparency = 0.6}):Play()
 
 	Topbar.BackgroundTransparency = 1
@@ -3631,9 +3621,9 @@ function OverflowLibrary:CreateWindow(Settings)
 	function Window.ModifyTheme(NewTheme)
 		local success = pcall(ChangeTheme, NewTheme)
 		if not success then
-			OverflowLibrary:Notify({Title = 'Unable to Change Theme', Content = 'We are unable find a theme on file.', Image = 4400704299})
+			RayfieldLibrary:Notify({Title = 'Unable to Change Theme', Content = 'We are unable find a theme on file.', Image = 4400704299})
 		else
-			OverflowLibrary:Notify({Title = 'Theme Changed', Content = 'Successfully changed theme to '..(typeof(NewTheme) == 'string' and NewTheme or 'Custom Theme')..'.', Image = 4483362748})
+			RayfieldLibrary:Notify({Title = 'Theme Changed', Content = 'Successfully changed theme to '..(typeof(NewTheme) == 'string' and NewTheme or 'Custom Theme')..'.', Image = 4483362748})
 		end
 	end
 
@@ -3641,7 +3631,7 @@ function OverflowLibrary:CreateWindow(Settings)
 		createSettings(Window)
 	end)
 
-	if not success then warn('0verflow Hub had an issue creating settings.') end
+	if not success then warn('Rayfield had an issue creating settings.') end
 
 	return Window
 end
@@ -3657,16 +3647,16 @@ local function setVisibility(visibility: boolean, notify: boolean?)
 	end
 end
 
-function OverflowLibrary:SetVisibility(visibility: boolean)
+function RayfieldLibrary:SetVisibility(visibility: boolean)
 	setVisibility(visibility, false)
 end
 
-function OverflowLibrary:IsVisible(): boolean
+function RayfieldLibrary:IsVisible(): boolean
 	return not Hidden
 end
 
 local hideHotkeyConnection -- Has to be initialized here since the connection is made later in the script
-function OverflowLibrary:Destroy()
+function RayfieldLibrary:Destroy()
 	rayfieldDestroyed = true
 	hideHotkeyConnection:Disconnect()
 	Rayfield:Destroy()
@@ -3799,7 +3789,7 @@ for _, TopbarButton in ipairs(Topbar:GetChildren()) do
 end
 
 
-function OverflowLibrary:LoadConfiguration()
+function RayfieldLibrary:LoadConfiguration()
 	local config
 
 	if debugX then
@@ -3826,15 +3816,15 @@ function OverflowLibrary:LoadConfiguration()
 				end
 			else
 				notified = true
-				OverflowLibrary:Notify({Title = "0verflow Configurations", Content = "We couldn't enable Configuration Saving as you are not using software with filesystem support.", Image = 4384402990})
+				RayfieldLibrary:Notify({Title = "Rayfield Configurations", Content = "We couldn't enable Configuration Saving as you are not using software with filesystem support.", Image = 4384402990})
 			end
 		end)
 
 		if success and loaded and not notified then
-			OverflowLibrary:Notify({Title = "0verflow Configurations", Content = "The configuration file for this script has been loaded from a previous session.", Image = 4384403532})
+			RayfieldLibrary:Notify({Title = "Rayfield Configurations", Content = "The configuration file for this script has been loaded from a previous session.", Image = 4384403532})
 		elseif not success and not notified then
-			warn('0verflow Configurations Error | '..tostring(result))
-			OverflowLibrary:Notify({Title = "0verflow Configurations", Content = "We've encountered an issue loading your configuration correctly.\n\nCheck the Developer Console for more information.", Image = 4384402990})
+			warn('Rayfield Configurations Error | '..tostring(result))
+			RayfieldLibrary:Notify({Title = "Rayfield Configurations", Content = "We've encountered an issue loading your configuration correctly.\n\nCheck the Developer Console for more information.", Image = 4384402990})
 		end
 	end
 
@@ -3848,7 +3838,7 @@ if useStudio then
 	-- Feel free to place your own script here to see how it'd work in Roblox Studio before running it on your execution software.
 
 
-	--local Window = OverflowLibrary:CreateWindow({
+	--local Window = RayfieldLibrary:CreateWindow({
 	--	Name = "Rayfield Example Window",
 	--	LoadingTitle = "Rayfield Interface Suite",
 	--	Theme = 'Default',
@@ -3918,7 +3908,7 @@ if useStudio then
 	--})
 
 
-	----OverflowLibrary:Notify({Title = "Rayfield Interface", Content = "Welcome to Rayfield. These - are the brand new notification design for Rayfield, with custom sizing and Rayfield calculated wait times.", Image = 4483362458})
+	----RayfieldLibrary:Notify({Title = "Rayfield Interface", Content = "Welcome to Rayfield. These - are the brand new notification design for Rayfield, with custom sizing and Rayfield calculated wait times.", Image = 4483362458})
 
 	--local Section = Tab:CreateSection("Section Example")
 
@@ -3976,7 +3966,7 @@ if useStudio then
 	--})
 
 	--local thoptions = {}
-	--for themename, theme in pairs(OverflowLibrary.Theme) do
+	--for themename, theme in pairs(RayfieldLibrary.Theme) do
 	--	table.insert(thoptions, themename)
 	--end
 
@@ -4051,25 +4041,6 @@ if useStudio then
 	--local Label2 = Tab:CreateLabel("Warning", 4483362458, Color3.fromRGB(255, 159, 49),  true)
 
 	--local Paragraph = Tab:CreateParagraph({Title = "Paragraph Example", Content = "Paragraph ExampleParagraph ExampleParagraph ExampleParagraph ExampleParagraph ExampleParagraph ExampleParagraph ExampleParagraph ExampleParagraph ExampleParagraph ExampleParagraph ExampleParagraph ExampleParagraph ExampleParagraph Example"})
-
-	-- 0verflow Hub Example Usage:
-	--local Window = OverflowLibrary:CreateWindow({
-	--	Name = "0verflow Hub",
-	--	LoadingTitle = "0verflow Hub",
-	--	LoadingSubtitle = "by 0verflow Team",
-	--	Theme = "Overflow", -- Uses the custom purple theme
-	--	ConfigurationSaving = {
-	--		Enabled = true,
-	--		FolderName = "0verflow Hub",
-	--		FileName = "config"
-	--	},
-	--	Discord = {
-	--		Enabled = false,
-	--		Invite = "noinvitelink",
-	--		RememberJoins = true
-	--	},
-	--	KeySystem = false
-	--})
 end
 
 if CEnabled and Main:FindFirstChild('Notice') then
@@ -4089,7 +4060,7 @@ if not useStudio then
 end
 
 task.delay(4, function()
-	OverflowLibrary.LoadConfiguration()
+	RayfieldLibrary.LoadConfiguration()
 	if Main:FindFirstChild('Notice') and Main.Notice.Visible then
 		TweenService:Create(Main.Notice, TweenInfo.new(0.5, Enum.EasingStyle.Exponential, Enum.EasingDirection.InOut), {Size = UDim2.new(0, 100, 0, 25), Position = UDim2.new(0.5, 0, 0, -100), BackgroundTransparency = 1}):Play()
 		TweenService:Create(Main.Notice.Title, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {TextTransparency = 1}):Play()
@@ -4099,4 +4070,4 @@ task.delay(4, function()
 	end
 end)
 
-return OverflowLibrary
+return RayfieldLibrary
