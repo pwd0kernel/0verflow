@@ -801,17 +801,17 @@ local SelectedTheme = OverflowLibrary.Theme.Overflow
 
 -- Helper function to animate both original title and custom overflow title
 local function animateTitle(tweenInfo, properties)
-	-- Animate original title
+	-- Animate original title (though it should be hidden)
 	TweenService:Create(Main.Topbar.Title, tweenInfo, properties):Play()
 	
 	-- Animate custom overflow title if it exists
 	if Topbar:FindFirstChild("OverflowTitleContainer") then
 		local container = Topbar.OverflowTitleContainer
-		if container:FindFirstChild("OverPart") then
-			TweenService:Create(container.OverPart, tweenInfo, properties):Play()
-		end
-		if container:FindFirstChild("FlowPart") then
-			TweenService:Create(container.FlowPart, tweenInfo, properties):Play()
+		-- Animate all text labels in the container
+		for _, child in pairs(container:GetChildren()) do
+			if child:IsA("TextLabel") then
+				TweenService:Create(child, tweenInfo, properties):Play()
+			end
 		end
 	end
 end
@@ -855,12 +855,15 @@ local function ChangeTheme(Theme)
 	-- Update custom overflow title colors
 	if Topbar:FindFirstChild("OverflowTitleContainer") then
 		local container = Topbar.OverflowTitleContainer
-		if container:FindFirstChild("FlowPart") then
-			container.FlowPart.TextColor3 = SelectedTheme.TextColor
-		end
-		-- Keep OverPart purple regardless of theme
-		if container:FindFirstChild("OverPart") then
-			container.OverPart.TextColor3 = Color3.fromRGB(111, 10, 214)
+		-- Update FlowPart to use theme color, keep OverPart purple, and handle SinglePart
+		for _, child in pairs(container:GetChildren()) do
+			if child:IsA("TextLabel") then
+				if child.Name == "OverPart" then
+					child.TextColor3 = Color3.fromRGB(111, 10, 214) -- Keep purple
+				else
+					child.TextColor3 = SelectedTheme.TextColor -- Use theme color
+				end
+			end
 		end
 	end
 
@@ -1686,101 +1689,85 @@ function OverflowLibrary:CreateWindow(Settings)
 	-- Function to create split-colored title for 0verflow branding
 	local function setupOverflowTitle(titleText)
 		local originalTitle = Topbar.Title
+		titleText = titleText or "0verflow Hub"
 		
-		-- Check if we need to create split title for 0verflow branding
-		if titleText and string.find(titleText:lower(), "0verflow") then
-			-- Hide the original title
-			originalTitle.Text = ""
-			originalTitle.TextTransparency = 1
+		print("Setting up title:", titleText)
+		
+		-- Always hide the original title and create split title for any text containing "0verflow"
+		originalTitle.Text = ""
+		originalTitle.TextTransparency = 1
+		
+		-- Remove existing container if present
+		if Topbar:FindFirstChild("OverflowTitleContainer") then
+			Topbar.OverflowTitleContainer:Destroy()
+		end
+		
+		-- Create container for split title
+		local titleContainer = Instance.new("Frame")
+		titleContainer.Name = "OverflowTitleContainer"
+		titleContainer.Size = originalTitle.Size
+		titleContainer.Position = originalTitle.Position
+		titleContainer.AnchorPoint = originalTitle.AnchorPoint
+		titleContainer.BackgroundTransparency = 1
+		titleContainer.Parent = Topbar
+		
+		-- Check if we need split coloring
+		if string.find(titleText:lower(), "0verflow") then
+			-- Split the text at "0verflow"
+			local lowerTitle = titleText:lower()
+			local overflowPos = string.find(lowerTitle, "0verflow")
+			local beforeText = titleText:sub(1, overflowPos - 1)
+			local afterText = titleText:sub(overflowPos + 8) -- 8 = length of "0verflow"
 			
-			-- Create container for split title if it doesn't exist
-			if not Topbar:FindFirstChild("OverflowTitleContainer") then
-				local titleContainer = Instance.new("Frame")
-				titleContainer.Name = "OverflowTitleContainer"
-				titleContainer.Size = originalTitle.Size
-				titleContainer.Position = originalTitle.Position
-				titleContainer.BackgroundTransparency = 1
-				titleContainer.Parent = Topbar
-				
-				-- Create "0ver" part (purple)
-				local overPart = Instance.new("TextLabel")
-				overPart.Name = "OverPart"
-				overPart.Size = UDim2.new(0, 0, 1, 0)
-				overPart.Position = UDim2.new(0, 0, 0, 0)
-				overPart.BackgroundTransparency = 1
-				overPart.Text = "0ver"
-				overPart.TextColor3 = Color3.fromRGB(111, 10, 214)
-				overPart.TextScaled = originalTitle.TextScaled
-				overPart.Font = originalTitle.Font
-				overPart.TextSize = originalTitle.TextSize
-				overPart.TextXAlignment = Enum.TextXAlignment.Left
-				overPart.TextYAlignment = originalTitle.TextYAlignment
-				overPart.Parent = titleContainer
-				
-				-- Create "flow Hub" part (normal color)
-				local flowPart = Instance.new("TextLabel")
-				flowPart.Name = "FlowPart"
-				flowPart.Size = UDim2.new(0, 0, 1, 0)
-				flowPart.Position = UDim2.new(0, 0, 0, 0)
-				flowPart.BackgroundTransparency = 1
-				flowPart.Text = "flow Hub"
-				flowPart.TextColor3 = SelectedTheme.TextColor
-				flowPart.TextScaled = originalTitle.TextScaled
-				flowPart.Font = originalTitle.Font
-				flowPart.TextSize = originalTitle.TextSize
-				flowPart.TextXAlignment = Enum.TextXAlignment.Left
-				flowPart.TextYAlignment = originalTitle.TextYAlignment
-				flowPart.Parent = titleContainer
-				
-				-- Calculate text bounds and position elements
-				local tempLabel = Instance.new("TextLabel")
-				tempLabel.Text = "0ver"
-				tempLabel.Font = originalTitle.Font
-				tempLabel.TextSize = originalTitle.TextSize
-				tempLabel.TextScaled = false
-				tempLabel.Parent = game.Workspace
-				
-				local overWidth = tempLabel.TextBounds.X
-				tempLabel:Destroy()
-				
-				-- Position the parts
-				overPart.Size = UDim2.new(0, overWidth, 1, 0)
-				flowPart.Size = UDim2.new(1, -overWidth, 1, 0)
-				flowPart.Position = UDim2.new(0, overWidth, 0, 0)
-			else
-				-- Update existing split title
-				local container = Topbar.OverflowTitleContainer
-				local overPart = container.OverPart
-				local flowPart = container.FlowPart
-				
-				-- Extract the parts from the title text
-				local lowerTitle = titleText:lower()
-				local overflowPos = string.find(lowerTitle, "0verflow")
-				
-				if overflowPos then
-					local beforeText = titleText:sub(1, overflowPos - 1)
-					local afterText = titleText:sub(overflowPos + 8) -- 8 = length of "0verflow"
-					
-					overPart.Text = beforeText .. "0ver"
-					flowPart.Text = "flow" .. afterText
-				end
-			end
+			-- Create "before + 0ver" part (purple for 0ver)
+			local overPart = Instance.new("TextLabel")
+			overPart.Name = "OverPart"
+			overPart.Size = UDim2.new(0.5, -10, 1, 0)
+			overPart.Position = UDim2.new(0, 0, 0, 0)
+			overPart.BackgroundTransparency = 1
+			overPart.Text = beforeText .. "0ver"
+			overPart.TextColor3 = Color3.fromRGB(111, 10, 214)
+			overPart.TextScaled = true
+			overPart.Font = originalTitle.Font
+			overPart.TextXAlignment = Enum.TextXAlignment.Left
+			overPart.TextYAlignment = Enum.TextYAlignment.Center
+			overPart.TextTransparency = 0
+			overPart.Parent = titleContainer
+			
+			-- Create "flow + after" part (normal color)
+			local flowPart = Instance.new("TextLabel")
+			flowPart.Name = "FlowPart"
+			flowPart.Size = UDim2.new(0.5, 10, 1, 0)
+			flowPart.Position = UDim2.new(0.5, -10, 0, 0)
+			flowPart.BackgroundTransparency = 1
+			flowPart.Text = "flow" .. afterText
+			flowPart.TextColor3 = SelectedTheme.TextColor
+			flowPart.TextScaled = true
+			flowPart.Font = originalTitle.Font
+			flowPart.TextXAlignment = Enum.TextXAlignment.Left
+			flowPart.TextYAlignment = Enum.TextYAlignment.Center
+			flowPart.TextTransparency = 0
+			flowPart.Parent = titleContainer
 		else
 			-- Regular title without special coloring
-			if Topbar:FindFirstChild("OverflowTitleContainer") then
-				Topbar.OverflowTitleContainer:Destroy()
-			end
-			originalTitle.Text = titleText or "0verflow Hub"
-			originalTitle.TextTransparency = 0
+			local singlePart = Instance.new("TextLabel")
+			singlePart.Name = "SinglePart"
+			singlePart.Size = UDim2.new(1, 0, 1, 0)
+			singlePart.Position = UDim2.new(0, 0, 0, 0)
+			singlePart.BackgroundTransparency = 1
+			singlePart.Text = titleText
+			singlePart.TextColor3 = SelectedTheme.TextColor
+			singlePart.TextScaled = true
+			singlePart.Font = originalTitle.Font
+			singlePart.TextXAlignment = originalTitle.TextXAlignment
+			singlePart.TextYAlignment = Enum.TextYAlignment.Center
+			singlePart.TextTransparency = 0
+			singlePart.Parent = titleContainer
 		end
 	end
 	
-	-- Handle title setting
-	if Settings.Name then
-		setupOverflowTitle(Settings.Name)
-	else
-		setupOverflowTitle("0verflow Hub")
-	end
+	-- Handle title setting - always use setupOverflowTitle now
+	setupOverflowTitle(Settings.Name)
 
 	Main.Size = UDim2.new(0, 420, 0, 100)
 	Main.Visible = true
@@ -3690,11 +3677,10 @@ function OverflowLibrary:CreateWindow(Settings)
 	-- Set initial title transparency
 	if Main.Topbar:FindFirstChild("OverflowTitleContainer") then
 		local container = Main.Topbar.OverflowTitleContainer
-		if container:FindFirstChild("OverPart") then
-			container.OverPart.TextTransparency = 1
-		end
-		if container:FindFirstChild("FlowPart") then
-			container.FlowPart.TextTransparency = 1
+		for _, child in pairs(container:GetChildren()) do
+			if child:IsA("TextLabel") then
+				child.TextTransparency = 1
+			end
 		end
 	end
 	Topbar.Title.TextTransparency = 1
@@ -3717,11 +3703,10 @@ function OverflowLibrary:CreateWindow(Settings)
 	-- Also animate custom overflow title if it exists
 	if Topbar:FindFirstChild("OverflowTitleContainer") then
 		local container = Topbar.OverflowTitleContainer
-		if container:FindFirstChild("OverPart") then
-			TweenService:Create(container.OverPart, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()
-		end
-		if container:FindFirstChild("FlowPart") then
-			TweenService:Create(container.FlowPart, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()
+		for _, child in pairs(container:GetChildren()) do
+			if child:IsA("TextLabel") then
+				TweenService:Create(child, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()
+			end
 		end
 	end
 	task.wait(0.05)
