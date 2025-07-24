@@ -1656,25 +1656,51 @@ function OverflowLibrary:CreateWindow(Settings)
 	-- Handle 0verflow Hub branding with colored "0ver" text
 	if Settings.Name then
 		if string.find(Settings.Name:lower(), "0verflow") then
-			-- Create colored title using separate elements
-			Topbar.Title.Text = Settings.Name:gsub("0verflow", "0verflow") -- Keep original for now
-			-- Try to enable RichText and apply colored formatting
-			pcall(function()
-				Topbar.Title.RichText = true
-				local modifiedName = Settings.Name:gsub("0verflow", '<font color="#6F0AD6">0ver</font>flow')
-				Topbar.Title.Text = modifiedName
-			end)
+			-- Set the main title to just "flow Hub" and create a colored "0ver" label
+			Topbar.Title.Text = "flow Hub"
+			
+			-- Create a colored "0ver" label
+			local coloredLabel = Instance.new("TextLabel")
+			coloredLabel.Name = "ColoredPrefix"
+			coloredLabel.Text = "0ver"
+			coloredLabel.TextColor3 = Color3.fromRGB(111, 10, 214)
+			coloredLabel.BackgroundTransparency = 1
+			coloredLabel.Font = Topbar.Title.Font
+			coloredLabel.TextSize = Topbar.Title.TextSize
+			coloredLabel.TextScaled = Topbar.Title.TextScaled
+			coloredLabel.Size = UDim2.new(0, 35, 1, 0) -- Adjust width as needed
+			coloredLabel.Position = UDim2.new(0, Topbar.Title.Position.X.Offset - 35, 0, 0)
+			coloredLabel.AnchorPoint = Vector2.new(0, 0.5)
+			coloredLabel.TextXAlignment = Enum.TextXAlignment.Right
+			coloredLabel.Parent = Topbar
+			
+			-- Adjust main title position
+			Topbar.Title.Position = UDim2.new(Topbar.Title.Position.X.Scale, Topbar.Title.Position.X.Offset, Topbar.Title.Position.Y.Scale, Topbar.Title.Position.Y.Offset)
+			Topbar.Title.TextXAlignment = Enum.TextXAlignment.Left
 		else
 			Topbar.Title.Text = Settings.Name
 		end
 	else
 		-- Default 0verflow Hub branding
-		Topbar.Title.Text = "0verflow Hub" -- Fallback text
-		-- Try to enable RichText and apply colored formatting
-		pcall(function()
-			Topbar.Title.RichText = true
-			Topbar.Title.Text = '<font color="#6F0AD6">0ver</font>flow Hub'
-		end)
+		Topbar.Title.Text = "flow Hub"
+		
+		-- Create a colored "0ver" label
+		local coloredLabel = Instance.new("TextLabel")
+		coloredLabel.Name = "ColoredPrefix"
+		coloredLabel.Text = "0ver"
+		coloredLabel.TextColor3 = Color3.fromRGB(111, 10, 214)
+		coloredLabel.BackgroundTransparency = 1
+		coloredLabel.Font = Topbar.Title.Font
+		coloredLabel.TextSize = Topbar.Title.TextSize
+		coloredLabel.TextScaled = Topbar.Title.TextScaled
+		coloredLabel.Size = UDim2.new(0, 35, 1, 0)
+		coloredLabel.Position = UDim2.new(0, Topbar.Title.Position.X.Offset - 35, 0, 0)
+		coloredLabel.AnchorPoint = Vector2.new(0, 0.5)
+		coloredLabel.TextXAlignment = Enum.TextXAlignment.Right
+		coloredLabel.Parent = Topbar
+		
+		-- Adjust main title position  
+		Topbar.Title.TextXAlignment = Enum.TextXAlignment.Left
 	end
 
 	Main.Size = UDim2.new(0, 420, 0, 100)
