@@ -85,7 +85,6 @@ local OverflowHub = {
 }
 
 local SelectedTheme = OverflowHub.Theme.Modern
-local FirstTab = nil
 local Minimised = false
 local Hidden = false
 local Debounce = false
@@ -197,6 +196,7 @@ end
 function OverflowHub:CreateWindow(WindowSettings)
 	local Settings = WindowSettings or {}
 	local windowName = Settings.Name or "0verflow Hub"
+	local FirstTab = nil
 	
 	-- Create ScreenGui similar to Rayfield
 	local ScreenGui = Instance.new("ScreenGui")
@@ -458,7 +458,7 @@ function OverflowHub:CreateWindow(WindowSettings)
 		TabButton.Active = true
 		
 		-- Get proper layout order
-		local tabCount = 0
+		local tabCount = 1
 		for _, child in ipairs(TabButtonsFrame:GetChildren()) do
 			if child:IsA("TextButton") then
 				tabCount = tabCount + 1
@@ -484,7 +484,7 @@ function OverflowHub:CreateWindow(WindowSettings)
 		TabPage.Visible = false
 		
 		-- Get proper layout order for page
-		local pageCount = 0
+		local pageCount = 1
 		for _, child in ipairs(Elements:GetChildren()) do
 			if child:IsA("ScrollingFrame") and child.Name ~= "Template" then
 				pageCount = pageCount + 1
@@ -515,8 +515,8 @@ function OverflowHub:CreateWindow(WindowSettings)
 		-- Set as first tab if none exists
 		if not FirstTab then
 			FirstTab = TabName
-			ElementsPageLayout:JumpTo(TabPage)
 			TabPage.Visible = true
+			ElementsPageLayout:JumpTo(TabPage)
 			TabButton.BackgroundColor3 = SelectedTheme.TabBackgroundSelected
 			TabButton.TextColor3 = SelectedTheme.SelectedTabTextColor
 		end
@@ -567,6 +567,15 @@ function OverflowHub:CreateWindow(WindowSettings)
 			ButtonFrame.BorderSizePixel = 0
 			ButtonFrame.Size = UDim2.new(1, 0, 0, 45)
 			ButtonFrame.ZIndex = 3
+			
+			-- Set layout order
+			local elementCount = 0
+			for _, child in ipairs(TabPage:GetChildren()) do
+				if child:IsA("Frame") or child:IsA("ScrollingFrame") then
+					elementCount = elementCount + 1
+				end
+			end
+			ButtonFrame.LayoutOrder = elementCount
 			
 			local ButtonCorner = Instance.new("UICorner")
 			ButtonCorner.CornerRadius = UDim.new(0, 8)
@@ -630,6 +639,15 @@ function OverflowHub:CreateWindow(WindowSettings)
 			ToggleFrame.BorderSizePixel = 0
 			ToggleFrame.Size = UDim2.new(1, 0, 0, 45)
 			ToggleFrame.ZIndex = 3
+			
+			-- Set layout order
+			local elementCount = 0
+			for _, child in ipairs(TabPage:GetChildren()) do
+				if child:IsA("Frame") or child:IsA("ScrollingFrame") then
+					elementCount = elementCount + 1
+				end
+			end
+			ToggleFrame.LayoutOrder = elementCount
 			
 			local ToggleCorner = Instance.new("UICorner")
 			ToggleCorner.CornerRadius = UDim.new(0, 8)
@@ -738,6 +756,15 @@ function OverflowHub:CreateWindow(WindowSettings)
 			LabelFrame.Size = UDim2.new(1, 0, 0, 35)
 			LabelFrame.ZIndex = 3
 			
+			-- Set layout order
+			local elementCount = 0
+			for _, child in ipairs(TabPage:GetChildren()) do
+				if child:IsA("Frame") or child:IsA("ScrollingFrame") then
+					elementCount = elementCount + 1
+				end
+			end
+			LabelFrame.LayoutOrder = elementCount
+			
 			local LabelCorner = Instance.new("UICorner")
 			LabelCorner.CornerRadius = UDim.new(0, 8)
 			LabelCorner.Parent = LabelFrame
@@ -788,6 +815,15 @@ function OverflowHub:CreateWindow(WindowSettings)
 			SectionFrame.Size = UDim2.new(1, 0, 0, 30)
 			SectionFrame.ZIndex = 3
 			
+			-- Set layout order
+			local elementCount = 0
+			for _, child in ipairs(TabPage:GetChildren()) do
+				if child:IsA("Frame") or child:IsA("ScrollingFrame") then
+					elementCount = elementCount + 1
+				end
+			end
+			SectionFrame.LayoutOrder = elementCount
+			
 			local SectionLabel = Instance.new("TextLabel")
 			SectionLabel.Name = "Label"
 			SectionLabel.Parent = SectionFrame
@@ -824,6 +860,15 @@ function OverflowHub:CreateWindow(WindowSettings)
 			ParagraphFrame.BorderSizePixel = 0
 			ParagraphFrame.Size = UDim2.new(1, 0, 0, 80)
 			ParagraphFrame.ZIndex = 3
+			
+			-- Set layout order
+			local elementCount = 0
+			for _, child in ipairs(TabPage:GetChildren()) do
+				if child:IsA("Frame") or child:IsA("ScrollingFrame") then
+					elementCount = elementCount + 1
+				end
+			end
+			ParagraphFrame.LayoutOrder = elementCount
 			
 			local ParagraphCorner = Instance.new("UICorner")
 			ParagraphCorner.CornerRadius = UDim.new(0, 8)
@@ -895,6 +940,15 @@ function OverflowHub:CreateWindow(WindowSettings)
 			SliderFrame.BorderSizePixel = 0
 			SliderFrame.Size = UDim2.new(1, 0, 0, 60)
 			SliderFrame.ZIndex = 3
+			
+			-- Set layout order
+			local elementCount = 0
+			for _, child in ipairs(TabPage:GetChildren()) do
+				if child:IsA("Frame") or child:IsA("ScrollingFrame") then
+					elementCount = elementCount + 1
+				end
+			end
+			SliderFrame.LayoutOrder = elementCount
 			
 			local SliderCorner = Instance.new("UICorner")
 			SliderCorner.CornerRadius = UDim.new(0, 8)
@@ -1047,6 +1101,15 @@ function OverflowHub:CreateWindow(WindowSettings)
 			DropdownFrame.Size = UDim2.new(1, 0, 0, 45)
 			DropdownFrame.ZIndex = 3
 			
+			-- Set layout order
+			local elementCount = 0
+			for _, child in ipairs(TabPage:GetChildren()) do
+				if child:IsA("Frame") or child:IsA("ScrollingFrame") then
+					elementCount = elementCount + 1
+				end
+			end
+			DropdownFrame.LayoutOrder = elementCount
+			
 			local DropdownCorner = Instance.new("UICorner")
 			DropdownCorner.CornerRadius = UDim.new(0, 8)
 			DropdownCorner.Parent = DropdownFrame
@@ -1148,6 +1211,15 @@ function OverflowHub:CreateWindow(WindowSettings)
 			InputFrame.Size = UDim2.new(1, 0, 0, 45)
 			InputFrame.ZIndex = 3
 			
+			-- Set layout order
+			local elementCount = 0
+			for _, child in ipairs(TabPage:GetChildren()) do
+				if child:IsA("Frame") or child:IsA("ScrollingFrame") then
+					elementCount = elementCount + 1
+				end
+			end
+			InputFrame.LayoutOrder = elementCount
+			
 			local InputCorner = Instance.new("UICorner")
 			InputCorner.CornerRadius = UDim.new(0, 8)
 			InputCorner.Parent = InputFrame
@@ -1242,6 +1314,15 @@ function OverflowHub:CreateWindow(WindowSettings)
 			KeybindFrame.BorderSizePixel = 0
 			KeybindFrame.Size = UDim2.new(1, 0, 0, 45)
 			KeybindFrame.ZIndex = 3
+			
+			-- Set layout order
+			local elementCount = 0
+			for _, child in ipairs(TabPage:GetChildren()) do
+				if child:IsA("Frame") or child:IsA("ScrollingFrame") then
+					elementCount = elementCount + 1
+				end
+			end
+			KeybindFrame.LayoutOrder = elementCount
 			
 			local KeybindCorner = Instance.new("UICorner")
 			KeybindCorner.CornerRadius = UDim.new(0, 8)
