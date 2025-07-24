@@ -1656,17 +1656,25 @@ function OverflowLibrary:CreateWindow(Settings)
 	-- Handle 0verflow Hub branding with colored "0ver" text
 	if Settings.Name then
 		if string.find(Settings.Name:lower(), "0verflow") then
-			-- Enable RichText and create colored title
-			Topbar.Title.RichText = true
-			local modifiedName = Settings.Name:gsub("0verflow", '<font color="rgb(111,10,214)">0ver</font>flow')
-			Topbar.Title.Text = modifiedName
+			-- Create colored title using separate elements
+			Topbar.Title.Text = Settings.Name:gsub("0verflow", "0verflow") -- Keep original for now
+			-- Try to enable RichText and apply colored formatting
+			pcall(function()
+				Topbar.Title.RichText = true
+				local modifiedName = Settings.Name:gsub("0verflow", '<font color="#6F0AD6">0ver</font>flow')
+				Topbar.Title.Text = modifiedName
+			end)
 		else
 			Topbar.Title.Text = Settings.Name
 		end
 	else
 		-- Default 0verflow Hub branding
-		Topbar.Title.RichText = true
-		Topbar.Title.Text = '<font color="rgb(111,10,214)">0ver</font>flow Hub'
+		Topbar.Title.Text = "0verflow Hub" -- Fallback text
+		-- Try to enable RichText and apply colored formatting
+		pcall(function()
+			Topbar.Title.RichText = true
+			Topbar.Title.Text = '<font color="#6F0AD6">0ver</font>flow Hub'
+		end)
 	end
 
 	Main.Size = UDim2.new(0, 420, 0, 100)
