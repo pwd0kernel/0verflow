@@ -1,5 +1,3 @@
--- 0verflow Hub Minimal UI - Minimal Bar Edition
--- Ultra-minimal floating bar with branded text
 -- Created for pwd0kernel
 
 local Players = game:GetService("Players")
