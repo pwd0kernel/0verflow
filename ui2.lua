@@ -582,7 +582,7 @@ function Library:CreateWindow(title)
             ElementPadding.Parent = Elements
             ElementPadding.PaddingBottom = UDim.new(0, 12)
             
-            -- Label (NEW)
+            -- Label
             function Section:Label(text)
                 local LabelFrame = Instance.new("Frame")
                 LabelFrame.Parent = Elements
@@ -616,7 +616,378 @@ function Library:CreateWindow(title)
                 }
             end
             
-            -- Slider (NEW)
+            -- Dropdown (NEW)
+            function Section:Dropdown(name, options, default, callback)
+                local selected = default or options[1] or ""
+                local opened = false
+                
+                local DropdownFrame = Instance.new("Frame")
+                DropdownFrame.Parent = Elements
+                DropdownFrame.BackgroundTransparency = 1
+                DropdownFrame.Size = UDim2.new(1, 0, 0, IsMobile and 36 or 32)
+                DropdownFrame.ClipsDescendants = false
+                
+                local DropdownBtn = Instance.new("TextButton")
+                DropdownBtn.Parent = DropdownFrame
+                DropdownBtn.BackgroundColor3 = Theme.Card
+                DropdownBtn.Size = UDim2.new(1, 0, 0, IsMobile and 36 or 32)
+                DropdownBtn.Text = ""
+                DropdownBtn.ClipsDescendants = true
+                
+                local DropdownCorner = Instance.new("UICorner")
+                DropdownCorner.CornerRadius = UDim.new(0, 6)
+                DropdownCorner.Parent = DropdownBtn
+                
+                local DropdownLabel = Instance.new("TextLabel")
+                DropdownLabel.Parent = DropdownBtn
+                DropdownLabel.BackgroundTransparency = 1
+                DropdownLabel.Position = UDim2.new(0, 10, 0, 0)
+                DropdownLabel.Size = UDim2.new(0.5, -10, 1, 0)
+                DropdownLabel.Font = Enum.Font.Gotham
+                DropdownLabel.Text = name
+                DropdownLabel.TextColor3 = Theme.Text
+                DropdownLabel.TextSize = IsMobile and 12 or 13
+                DropdownLabel.TextXAlignment = Enum.TextXAlignment.Left
+                
+                local SelectedLabel = Instance.new("TextLabel")
+                SelectedLabel.Parent = DropdownBtn
+                SelectedLabel.BackgroundTransparency = 1
+                SelectedLabel.Position = UDim2.new(0.5, 0, 0, 0)
+                SelectedLabel.Size = UDim2.new(0.5, -30, 1, 0)
+                SelectedLabel.Font = Enum.Font.Gotham
+                SelectedLabel.Text = selected
+                SelectedLabel.TextColor3 = Theme.Accent
+                SelectedLabel.TextSize = IsMobile and 11 or 12
+                SelectedLabel.TextXAlignment = Enum.TextXAlignment.Right
+                SelectedLabel.TextTruncate = Enum.TextTruncate.AtEnd
+                
+                local Arrow = Instance.new("TextLabel")
+                Arrow.Parent = DropdownBtn
+                Arrow.BackgroundTransparency = 1
+                Arrow.Position = UDim2.new(1, -25, 0.5, -8)
+                Arrow.Size = UDim2.new(0, 16, 0, 16)
+                Arrow.Font = Enum.Font.Gotham
+                Arrow.Text = "▼"
+                Arrow.TextColor3 = Theme.TextDim
+                Arrow.TextSize = 10
+                Arrow.Rotation = 0
+                
+                -- Dropdown List Container
+                local ListContainer = Instance.new("Frame")
+                ListContainer.Parent = DropdownFrame
+                ListContainer.BackgroundColor3 = Theme.Surface
+                ListContainer.Position = UDim2.new(0, 0, 0, IsMobile and 40 or 36)
+                ListContainer.Size = UDim2.new(1, 0, 0, 0)
+                ListContainer.ClipsDescendants = true
+                ListContainer.ZIndex = 10
+                ListContainer.Visible = false
+                
+                local ListCorner = Instance.new("UICorner")
+                ListCorner.CornerRadius = UDim.new(0, 6)
+                ListCorner.Parent = ListContainer
+                
+                local ListStroke = Instance.new("UIStroke")
+                ListStroke.Parent = ListContainer
+                ListStroke.Color = Theme.Accent
+                ListStroke.Thickness = 1
+                ListStroke.Transparency = 0.8
+                
+                local ListScroll = Instance.new("ScrollingFrame")
+                ListScroll.Parent = ListContainer
+                ListScroll.BackgroundTransparency = 1
+                ListScroll.BorderSizePixel = 0
+                ListScroll.Position = UDim2.new(0, 4, 0, 4)
+                ListScroll.Size = UDim2.new(1, -8, 1, -8)
+                ListScroll.ScrollBarThickness = 2
+                ListScroll.ScrollBarImageColor3 = Theme.Accent
+                ListScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+                
+                local ListLayout = Instance.new("UIListLayout")
+                ListLayout.Parent = ListScroll
+                ListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+                ListLayout.Padding = UDim.new(0, 2)
+                
+                -- Create option buttons
+                for _, option in ipairs(options) do
+                    local OptionBtn = Instance.new("TextButton")
+                    OptionBtn.Parent = ListScroll
+                    OptionBtn.BackgroundColor3 = Theme.Card
+                    OptionBtn.BackgroundTransparency = 1
+                    OptionBtn.Size = UDim2.new(1, 0, 0, IsMobile and 28 or 24)
+                    OptionBtn.Font = Enum.Font.Gotham
+                    OptionBtn.Text = option
+                    OptionBtn.TextColor3 = option == selected and Theme.Accent or Theme.TextDim
+                    OptionBtn.TextSize = IsMobile and 11 or 12
+                    
+                    OptionBtn.MouseEnter:Connect(function()
+                        if option ~= selected then
+                            Tween(OptionBtn, {BackgroundTransparency = 0.8})
+                        end
+                    end)
+                    
+                    OptionBtn.MouseLeave:Connect(function()
+                        Tween(OptionBtn, {BackgroundTransparency = 1})
+                    end)
+                    
+                    OptionBtn.MouseButton1Click:Connect(function()
+                        selected = option
+                        SelectedLabel.Text = option
+                        
+                        -- Update colors
+                        for _, child in ipairs(ListScroll:GetChildren()) do
+                            if child:IsA("TextButton") then
+                                child.TextColor3 = child.Text == selected and Theme.Accent or Theme.TextDim
+                            end
+                        end
+                        
+                        -- Close dropdown
+                        opened = false
+                        Tween(Arrow, {Rotation = 0}, 0.2)
+                        Tween(ListContainer, {Size = UDim2.new(1, 0, 0, 0)}, 0.2)
+                        wait(0.2)
+                        ListContainer.Visible = false
+                        DropdownFrame.Size = UDim2.new(1, 0, 0, IsMobile and 36 or 32)
+                        
+                        if callback then callback(selected) end
+                    end)
+                end
+                
+                -- Update canvas size
+                ListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+                    ListScroll.CanvasSize = UDim2.new(0, 0, 0, ListLayout.AbsoluteContentSize.Y)
+                end)
+                
+                -- Toggle dropdown
+                DropdownBtn.MouseButton1Click:Connect(function()
+                    opened = not opened
+                    
+                    if opened then
+                        ListContainer.Visible = true
+                        local listHeight = math.min(#options * (IsMobile and 28 or 24) + 8, 150)
+                        DropdownFrame.Size = UDim2.new(1, 0, 0, (IsMobile and 36 or 32) + listHeight + 4)
+                        Tween(ListContainer, {Size = UDim2.new(1, 0, 0, listHeight)}, 0.2)
+                        Tween(Arrow, {Rotation = 180}, 0.2)
+                    else
+                        Tween(Arrow, {Rotation = 0}, 0.2)
+                        Tween(ListContainer, {Size = UDim2.new(1, 0, 0, 0)}, 0.2)
+                        wait(0.2)
+                        ListContainer.Visible = false
+                        DropdownFrame.Size = UDim2.new(1, 0, 0, IsMobile and 36 or 32)
+                    end
+                end)
+                
+                if callback and default then
+                    callback(selected)
+                end
+                
+                return {
+                    Set = function(option)
+                        if table.find(options, option) then
+                            selected = option
+                            SelectedLabel.Text = option
+                            for _, child in ipairs(ListScroll:GetChildren()) do
+                                if child:IsA("TextButton") then
+                                    child.TextColor3 = child.Text == selected and Theme.Accent or Theme.TextDim
+                                end
+                            end
+                            if callback then callback(selected) end
+                        end
+                    end,
+                    Get = function()
+                        return selected
+                    end
+                }
+            end
+            
+            -- List/Table (NEW)
+            function Section:List(name, items, multiSelect, callback)
+                local selected = multiSelect and {} or nil
+                
+                local ListFrame = Instance.new("Frame")
+                ListFrame.Parent = Elements
+                ListFrame.BackgroundColor3 = Theme.Card
+                ListFrame.Size = UDim2.new(1, 0, 0, 150)
+                
+                local ListFrameCorner = Instance.new("UICorner")
+                ListFrameCorner.CornerRadius = UDim.new(0, 6)
+                ListFrameCorner.Parent = ListFrame
+                
+                local ListTitle = Instance.new("TextLabel")
+                ListTitle.Parent = ListFrame
+                ListTitle.BackgroundTransparency = 1
+                ListTitle.Position = UDim2.new(0, 10, 0, 5)
+                ListTitle.Size = UDim2.new(1, -20, 0, 20)
+                ListTitle.Font = Enum.Font.Gotham
+                ListTitle.Text = name
+                ListTitle.TextColor3 = Theme.Text
+                ListTitle.TextSize = IsMobile and 12 or 13
+                ListTitle.TextXAlignment = Enum.TextXAlignment.Left
+                
+                local ListDivider = Instance.new("Frame")
+                ListDivider.Parent = ListFrame
+                ListDivider.BackgroundColor3 = Theme.Accent
+                ListDivider.BackgroundTransparency = 0.8
+                ListDivider.BorderSizePixel = 0
+                ListDivider.Position = UDim2.new(0, 10, 0, 28)
+                ListDivider.Size = UDim2.new(1, -20, 0, 1)
+                
+                local ListScroll = Instance.new("ScrollingFrame")
+                ListScroll.Parent = ListFrame
+                ListScroll.BackgroundTransparency = 1
+                ListScroll.BorderSizePixel = 0
+                ListScroll.Position = UDim2.new(0, 5, 0, 32)
+                ListScroll.Size = UDim2.new(1, -10, 1, -37)
+                ListScroll.ScrollBarThickness = 2
+                ListScroll.ScrollBarImageColor3 = Theme.Accent
+                ListScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+                
+                local ListLayout = Instance.new("UIListLayout")
+                ListLayout.Parent = ListScroll
+                ListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+                ListLayout.Padding = UDim.new(0, 2)
+                
+                local function UpdateSelection(item, itemBtn)
+                    if multiSelect then
+                        if selected[item] then
+                            selected[item] = nil
+                            itemBtn.BackgroundColor3 = Theme.Surface
+                            itemBtn.TextColor3 = Theme.TextDim
+                        else
+                            selected[item] = true
+                            itemBtn.BackgroundColor3 = Theme.Accent
+                            itemBtn.BackgroundTransparency = 0.7
+                            itemBtn.TextColor3 = Theme.Text
+                        end
+                        
+                        if callback then
+                            local selectedItems = {}
+                            for k, v in pairs(selected) do
+                                if v then table.insert(selectedItems, k) end
+                            end
+                            callback(selectedItems)
+                        end
+                    else
+                        -- Single select
+                        for _, child in ipairs(ListScroll:GetChildren()) do
+                            if child:IsA("TextButton") then
+                                child.BackgroundColor3 = Theme.Surface
+                                child.TextColor3 = Theme.TextDim
+                                child.BackgroundTransparency = 0.5
+                            end
+                        end
+                        
+                        selected = item
+                        itemBtn.BackgroundColor3 = Theme.Accent
+                        itemBtn.BackgroundTransparency = 0.7
+                        itemBtn.TextColor3 = Theme.Text
+                        
+                        if callback then callback(item) end
+                    end
+                end
+                
+                -- Create item buttons
+                for _, item in ipairs(items) do
+                    local ItemBtn = Instance.new("TextButton")
+                    ItemBtn.Parent = ListScroll
+                    ItemBtn.BackgroundColor3 = Theme.Surface
+                    ItemBtn.BackgroundTransparency = 0.5
+                    ItemBtn.Size = UDim2.new(1, 0, 0, IsMobile and 28 or 24)
+                    ItemBtn.Font = Enum.Font.Gotham
+                    ItemBtn.Text = tostring(item)
+                    ItemBtn.TextColor3 = Theme.TextDim
+                    ItemBtn.TextSize = IsMobile and 11 or 12
+                    ItemBtn.TextTruncate = Enum.TextTruncate.AtEnd
+                    
+                    local ItemCorner = Instance.new("UICorner")
+                    ItemCorner.CornerRadius = UDim.new(0, 4)
+                    ItemCorner.Parent = ItemBtn
+                    
+                    ItemBtn.MouseButton1Click:Connect(function()
+                        UpdateSelection(item, ItemBtn)
+                    end)
+                    
+                    ItemBtn.MouseEnter:Connect(function()
+                        if (multiSelect and not selected[item]) or (not multiSelect and selected ~= item) then
+                            Tween(ItemBtn, {BackgroundTransparency = 0.3})
+                        end
+                    end)
+                    
+                    ItemBtn.MouseLeave:Connect(function()
+                        if (multiSelect and not selected[item]) or (not multiSelect and selected ~= item) then
+                            Tween(ItemBtn, {BackgroundTransparency = 0.5})
+                        end
+                    end)
+                end
+                
+                -- Update canvas size
+                ListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+                    ListScroll.CanvasSize = UDim2.new(0, 0, 0, ListLayout.AbsoluteContentSize.Y)
+                end)
+                
+                return {
+                    Add = function(item)
+                        table.insert(items, item)
+                        
+                        local ItemBtn = Instance.new("TextButton")
+                        ItemBtn.Parent = ListScroll
+                        ItemBtn.BackgroundColor3 = Theme.Surface
+                        ItemBtn.BackgroundTransparency = 0.5
+                        ItemBtn.Size = UDim2.new(1, 0, 0, IsMobile and 28 or 24)
+                        ItemBtn.Font = Enum.Font.Gotham
+                        ItemBtn.Text = tostring(item)
+                        ItemBtn.TextColor3 = Theme.TextDim
+                        ItemBtn.TextSize = IsMobile and 11 or 12
+                        ItemBtn.TextTruncate = Enum.TextTruncate.AtEnd
+                        
+                        local ItemCorner = Instance.new("UICorner")
+                        ItemCorner.CornerRadius = UDim.new(0, 4)
+                        ItemCorner.Parent = ItemBtn
+                        
+                        ItemBtn.MouseButton1Click:Connect(function()
+                            UpdateSelection(item, ItemBtn)
+                        end)
+                    end,
+                    
+                    Remove = function(item)
+                        local index = table.find(items, item)
+                        if index then
+                            table.remove(items, index)
+                            
+                            for _, child in ipairs(ListScroll:GetChildren()) do
+                                if child:IsA("TextButton") and child.Text == tostring(item) then
+                                    child:Destroy()
+                                    break
+                                end
+                            end
+                        end
+                    end,
+                    
+                    Clear = function()
+                        items = {}
+                        selected = multiSelect and {} or nil
+                        
+                        for _, child in ipairs(ListScroll:GetChildren()) do
+                            if child:IsA("TextButton") then
+                                child:Destroy()
+                            end
+                        end
+                    end,
+                    
+                    GetSelected = function()
+                        if multiSelect then
+                            local selectedItems = {}
+                            for k, v in pairs(selected) do
+                                if v then table.insert(selectedItems, k) end
+                            end
+                            return selectedItems
+                        else
+                            return selected
+                        end
+                    end
+                }
+            end
+            
+            -- Slider
             function Section:Slider(name, min, max, default, callback)
                 local value = default or min
                 local dragging = false
@@ -923,7 +1294,7 @@ function Library:CreateWindow(title)
         
         task.wait(duration)
         
-        Tween(Notif, {Position = UDim2.new(0.5, -100, 1, 0)}, 0.3)
+                Tween(Notif, {Position = UDim2.new(0.5, -100, 1, 0)}, 0.3)
         task.wait(0.3)
         Notif:Destroy()
     end
