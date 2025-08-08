@@ -1,6 +1,7 @@
--- 0verflow Hub Minimal UI - Improved Toggle API Edition
--- Ultra-minimal floating bar with simplified toggle system
+-- 0verflow Hub Minimal UI - Complete Fixed Edition
+-- Ultra-minimal floating bar with all components
 -- Created for pwd0kernel
+-- Fixed: 2025-01-08 16:45:03
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
@@ -354,8 +355,6 @@ function Library:CreateWindow(title)
     local windowWidth = IsMobile and math.min(screenSize.X - 40, 500) or 560
     local windowHeight = IsMobile and math.min(screenSize.Y - 100, 420) or 480
     
-    -- [Previous window creation code remains the same until Tab:Section function]
-    
     -- Minimal Floating Bar
     local ToggleBar = Instance.new("Frame")
     ToggleBar.Name = "ToggleBar"
@@ -516,6 +515,22 @@ function Library:CreateWindow(title)
     TitleHub.TextSize = IsMobile and 13 or 14
     TitleHub.TextXAlignment = Enum.TextXAlignment.Left
     TitleHub.ZIndex = 3
+    
+    -- Window title
+    if title then
+        local WindowTitle = Instance.new("TextLabel")
+        WindowTitle.Parent = TitleContainer
+        WindowTitle.BackgroundTransparency = 1
+        WindowTitle.Position = UDim2.new(0, IsMobile and 90 or 100, 0, 0)
+        WindowTitle.Size = UDim2.new(0, 0, 1, 0)
+        WindowTitle.AutomaticSize = Enum.AutomaticSize.X
+        WindowTitle.Font = Enum.Font.Gotham
+        WindowTitle.Text = " - " .. title
+        WindowTitle.TextColor3 = Theme.TextDim
+        WindowTitle.TextSize = IsMobile and 12 or 13
+        WindowTitle.TextXAlignment = Enum.TextXAlignment.Left
+        WindowTitle.ZIndex = 3
+    end
     
     local CloseBtn = Instance.new("TextButton")
     CloseBtn.Parent = Header
@@ -731,7 +746,7 @@ function Library:CreateWindow(title)
             Window.ActiveTab = Tab
         end)
         
-        -- IMPROVED SECTION WITH BETTER TOGGLE API
+        -- Section Function with ALL COMPONENTS
         function Tab:Section(title)
             local Section = {}
             Section.toggles = {}
@@ -786,7 +801,7 @@ function Library:CreateWindow(title)
             ElementPadding.Parent = Elements
             ElementPadding.PaddingBottom = UDim.new(0, 12)
             
-            -- SIMPLIFIED TOGGLE API - One line creation!
+            -- Toggle
             function Section:Toggle(name, callback, options)
                 options = options or {}
                 options.name = name
@@ -798,7 +813,7 @@ function Library:CreateWindow(title)
                 return toggle
             end
             
-            -- Quick toggle groups
+            -- Toggle Group
             function Section:ToggleGroup(groupName, toggles, callback)
                 for _, toggleConfig in ipairs(toggles) do
                     local name = toggleConfig.name or toggleConfig[1]
@@ -822,33 +837,7 @@ function Library:CreateWindow(title)
                 end
             end
             
-            -- Bulk toggle operations
-            function Section:GetAllToggles()
-                local states = {}
-                for name, toggle in pairs(Section.toggles) do
-                    states[name] = toggle:Get()
-                end
-                return states
-            end
-            
-            function Section:SetAllToggles(state)
-                for _, toggle in pairs(Section.toggles) do
-                    toggle:Set(state)
-                end
-            end
-            
-            function Section:ResetToggles()
-                for _, toggle in pairs(Section.toggles) do
-                    toggle:Set(toggle.default)
-                end
-            end
-            
-            -- Find toggle by name
-            function Section:GetToggle(name)
-                return Section.toggles[name]
-            end
-            
-            -- Previous elements remain the same
+            -- Label
             function Section:Label(text)
                 local LabelFrame = Instance.new("Frame")
                 LabelFrame.Parent = Elements
@@ -881,6 +870,7 @@ function Library:CreateWindow(title)
                 }
             end
             
+            -- Button
             function Section:Button(name, callback)
                 local BtnFrame = Instance.new("TextButton")
                 BtnFrame.Parent = Elements
@@ -909,6 +899,7 @@ function Library:CreateWindow(title)
                 end)
             end
             
+            -- Slider
             function Section:Slider(name, min, max, default, callback)
                 local value = default or min
                 local dragging = false
@@ -1046,6 +1037,232 @@ function Library:CreateWindow(title)
                 }
             end
             
+            -- Dropdown (FIXED)
+            function Section:Dropdown(name, options, default, callback)
+                local selected = default or options[1] or ""
+                local opened = false
+                
+                local DropdownFrame = Instance.new("Frame")
+                DropdownFrame.Parent = Elements
+                DropdownFrame.BackgroundTransparency = 1
+                DropdownFrame.Size = UDim2.new(1, 0, 0, IsMobile and 36 or 32)
+                DropdownFrame.ClipsDescendants = false
+                
+                local DropdownBtn = Instance.new("TextButton")
+                DropdownBtn.Parent = DropdownFrame
+                DropdownBtn.BackgroundColor3 = Theme.Card
+                DropdownBtn.Size = UDim2.new(1, 0, 0, IsMobile and 36 or 32)
+                DropdownBtn.Text = ""
+                DropdownBtn.ClipsDescendants = true
+                
+                local DropdownCorner = Instance.new("UICorner")
+                DropdownCorner.CornerRadius = UDim.new(0, 6)
+                DropdownCorner.Parent = DropdownBtn
+                
+                local DropdownLabel = Instance.new("TextLabel")
+                DropdownLabel.Parent = DropdownBtn
+                DropdownLabel.BackgroundTransparency = 1
+                DropdownLabel.Position = UDim2.new(0, 10, 0, 0)
+                DropdownLabel.Size = UDim2.new(0.5, -10, 1, 0)
+                DropdownLabel.Font = Enum.Font.Gotham
+                DropdownLabel.Text = name
+                DropdownLabel.TextColor3 = Theme.Text
+                DropdownLabel.TextSize = IsMobile and 12 or 13
+                DropdownLabel.TextXAlignment = Enum.TextXAlignment.Left
+                
+                local SelectedLabel = Instance.new("TextLabel")
+                SelectedLabel.Parent = DropdownBtn
+                SelectedLabel.BackgroundTransparency = 1
+                SelectedLabel.Position = UDim2.new(0.5, 0, 0, 0)
+                SelectedLabel.Size = UDim2.new(0.5, -30, 1, 0)
+                SelectedLabel.Font = Enum.Font.Gotham
+                SelectedLabel.Text = selected
+                SelectedLabel.TextColor3 = Theme.Accent
+                SelectedLabel.TextSize = IsMobile and 11 or 12
+                SelectedLabel.TextXAlignment = Enum.TextXAlignment.Right
+                SelectedLabel.TextTruncate = Enum.TextTruncate.AtEnd
+                
+                local Arrow = Instance.new("TextLabel")
+                Arrow.Parent = DropdownBtn
+                Arrow.BackgroundTransparency = 1
+                Arrow.Position = UDim2.new(1, -25, 0.5, -8)
+                Arrow.Size = UDim2.new(0, 16, 0, 16)
+                Arrow.Font = Enum.Font.Gotham
+                Arrow.Text = "▼"
+                Arrow.TextColor3 = Theme.TextDim
+                Arrow.TextSize = 10
+                Arrow.Rotation = 0
+                
+                -- Dropdown List Container
+                local ListContainer = Instance.new("Frame")
+                ListContainer.Parent = DropdownFrame
+                ListContainer.BackgroundColor3 = Theme.Surface
+                ListContainer.Position = UDim2.new(0, 0, 0, IsMobile and 40 or 36)
+                ListContainer.Size = UDim2.new(1, 0, 0, 0)
+                ListContainer.ClipsDescendants = true
+                ListContainer.ZIndex = 10
+                ListContainer.Visible = false
+                
+                local ListCorner = Instance.new("UICorner")
+                ListCorner.CornerRadius = UDim.new(0, 6)
+                ListCorner.Parent = ListContainer
+                
+                local ListStroke = Instance.new("UIStroke")
+                ListStroke.Parent = ListContainer
+                ListStroke.Color = Theme.Accent
+                ListStroke.Thickness = 1
+                ListStroke.Transparency = 0.8
+                
+                local ListScroll = Instance.new("ScrollingFrame")
+                ListScroll.Parent = ListContainer
+                ListScroll.BackgroundTransparency = 1
+                ListScroll.BorderSizePixel = 0
+                ListScroll.Position = UDim2.new(0, 4, 0, 4)
+                ListScroll.Size = UDim2.new(1, -8, 1, -8)
+                ListScroll.ScrollBarThickness = 2
+                ListScroll.ScrollBarImageColor3 = Theme.Accent
+                ListScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+                
+                local ListLayout = Instance.new("UIListLayout")
+                ListLayout.Parent = ListScroll
+                ListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+                ListLayout.Padding = UDim.new(0, 2)
+                
+                -- Create option buttons
+                for _, option in ipairs(options) do
+                    local OptionBtn = Instance.new("TextButton")
+                    OptionBtn.Parent = ListScroll
+                    OptionBtn.BackgroundColor3 = Theme.Card
+                    OptionBtn.BackgroundTransparency = 1
+                    OptionBtn.Size = UDim2.new(1, 0, 0, IsMobile and 28 or 24)
+                    OptionBtn.Font = Enum.Font.Gotham
+                    OptionBtn.Text = option
+                    OptionBtn.TextColor3 = option == selected and Theme.Accent or Theme.TextDim
+                    OptionBtn.TextSize = IsMobile and 11 or 12
+                    
+                    OptionBtn.MouseEnter:Connect(function()
+                        if option ~= selected then
+                            Tween(OptionBtn, {BackgroundTransparency = 0.8})
+                        end
+                    end)
+                    
+                    OptionBtn.MouseLeave:Connect(function()
+                        Tween(OptionBtn, {BackgroundTransparency = 1})
+                    end)
+                    
+                    OptionBtn.MouseButton1Click:Connect(function()
+                        selected = option
+                        SelectedLabel.Text = option
+                        
+                        -- Update colors
+                        for _, child in ipairs(ListScroll:GetChildren()) do
+                            if child:IsA("TextButton") then
+                                child.TextColor3 = child.Text == selected and Theme.Accent or Theme.TextDim
+                            end
+                        end
+                        
+                        -- Close dropdown
+                        opened = false
+                        Tween(Arrow, {Rotation = 0}, 0.2)
+                        Tween(ListContainer, {Size = UDim2.new(1, 0, 0, 0)}, 0.2)
+                        wait(0.2)
+                        ListContainer.Visible = false
+                        DropdownFrame.Size = UDim2.new(1, 0, 0, IsMobile and 36 or 32)
+                        
+                        if callback then callback(selected) end
+                    end)
+                end
+                
+                -- Update canvas size
+                ListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+                    ListScroll.CanvasSize = UDim2.new(0, 0, 0, ListLayout.AbsoluteContentSize.Y)
+                end)
+                
+                -- Toggle dropdown
+                DropdownBtn.MouseButton1Click:Connect(function()
+                    opened = not opened
+                    
+                    if opened then
+                        ListContainer.Visible = true
+                        local listHeight = math.min(#options * (IsMobile and 28 or 24) + 8, 150)
+                        DropdownFrame.Size = UDim2.new(1, 0, 0, (IsMobile and 36 or 32) + listHeight + 4)
+                        Tween(ListContainer, {Size = UDim2.new(1, 0, 0, listHeight)}, 0.2)
+                        Tween(Arrow, {Rotation = 180}, 0.2)
+                    else
+                        Tween(Arrow, {Rotation = 0}, 0.2)
+                        Tween(ListContainer, {Size = UDim2.new(1, 0, 0, 0)}, 0.2)
+                        wait(0.2)
+                        ListContainer.Visible = false
+                        DropdownFrame.Size = UDim2.new(1, 0, 0, IsMobile and 36 or 32)
+                    end
+                end)
+                
+                if callback and default then
+                    callback(selected)
+                end
+                
+                return {
+                    Set = function(option)
+                        if table.find(options, option) then
+                            selected = option
+                            SelectedLabel.Text = option
+                            for _, child in ipairs(ListScroll:GetChildren()) do
+                                if child:IsA("TextButton") then
+                                    child.TextColor3 = child.Text == selected and Theme.Accent or Theme.TextDim
+                                end
+                            end
+                            if callback then callback(selected) end
+                        end
+                    end,
+                    Get = function()
+                        return selected
+                    end,
+                    Refresh = function(newOptions)
+                        options = newOptions
+                        
+                        -- Clear existing options
+                        for _, child in ipairs(ListScroll:GetChildren()) do
+                            if child:IsA("TextButton") then
+                                child:Destroy()
+                            end
+                        end
+                        
+                        -- Add new options
+                        for _, option in ipairs(options) do
+                            local OptionBtn = Instance.new("TextButton")
+                            OptionBtn.Parent = ListScroll
+                            OptionBtn.BackgroundColor3 = Theme.Card
+                            OptionBtn.BackgroundTransparency = 1
+                            OptionBtn.Size = UDim2.new(1, 0, 0, IsMobile and 28 or 24)
+                            OptionBtn.Font = Enum.Font.Gotham
+                            OptionBtn.Text = option
+                            OptionBtn.TextColor3 = option == selected and Theme.Accent or Theme.TextDim
+                            OptionBtn.TextSize = IsMobile and 11 or 12
+                            
+                            OptionBtn.MouseButton1Click:Connect(function()
+                                selected = option
+                                SelectedLabel.Text = option
+                                
+                                for _, child in ipairs(ListScroll:GetChildren()) do
+                                    if child:IsA("TextButton") then
+                                        child.TextColor3 = child.Text == selected and Theme.Accent or Theme.TextDim
+                                    end
+                                end
+                                
+                                opened = false
+                                Tween(Arrow, {Rotation = 0}, 0.2)
+                                Tween(ListContainer, {Size = UDim2.new(1, 0, 0, 0)}, 0.2)
+                                wait(0.2)
+                                ListContainer.Visible = false
+                                DropdownFrame.Size = UDim2.new(1, 0, 0, IsMobile and 36 or 32)
+                                
+                                if callback then callback(selected) end
+                            end)
+                        end
+                    end
+                }
+            end
+            
             return Section
         end
         
@@ -1066,6 +1283,52 @@ function Library:CreateWindow(title)
         end)
         
         return Tab
+    end
+    
+    -- Notification Function (FIXED)
+    function Window:Notify(text, duration)
+        duration = duration or 2
+        
+        local Notif = Instance.new("Frame")
+        Notif.Parent = ScreenGui
+        Notif.BackgroundColor3 = Theme.Surface
+        Notif.BorderSizePixel = 0
+        Notif.Position = UDim2.new(0.5, -100, 1, 0)
+        Notif.Size = UDim2.new(0, 200, 0, 40)
+        Notif.ZIndex = 1000
+        Notif.ClipsDescendants = true
+        
+        local NotifCorner = Instance.new("UICorner")
+        NotifCorner.CornerRadius = UDim.new(0, 8)
+        NotifCorner.Parent = Notif
+        
+        local NotifText = Instance.new("TextLabel")
+        NotifText.Parent = Notif
+        NotifText.BackgroundTransparency = 1
+        NotifText.Size = UDim2.new(1, 0, 1, 0)
+        NotifText.Font = Enum.Font.Gotham
+        NotifText.Text = text
+        NotifText.TextColor3 = Theme.Text
+        NotifText.TextSize = IsMobile and 12 or 13
+        NotifText.ZIndex = 1001
+        
+                local AccentLine = Instance.new("Frame")
+        AccentLine.Parent = Notif
+        AccentLine.BackgroundColor3 = Theme.Accent
+        AccentLine.BorderSizePixel = 0
+        AccentLine.Position = UDim2.new(0, 0, 0, 0)
+        AccentLine.Size = UDim2.new(0, 2, 1, 0)
+        AccentLine.ZIndex = 1001
+        
+        -- Position above toggle bar if minimized
+        local yPos = Window.Minimized and -100 or -60
+        Tween(Notif, {Position = UDim2.new(0.5, -100, 1, yPos)}, 0.3)
+        
+        task.wait(duration)
+        
+        Tween(Notif, {Position = UDim2.new(0.5, -100, 1, 0)}, 0.3)
+        task.wait(0.3)
+        Notif:Destroy()
     end
     
     -- Entrance animation
