@@ -1115,9 +1115,10 @@ function Library:CreateWindow(title)
                    selected.TextXAlignment = Enum.TextXAlignment.Right
                    selected.AutoButtonColor = false
 
-                   local arrow = Instance.new("TextLabel")
+                   local arrow = Instance.new("TextButton")
                    arrow.Parent = dropdownFrame
                    arrow.BackgroundTransparency = 1
+                   arrow.BorderSizePixel = 0
                    arrow.Position = UDim2.new(1, -20, 0, 0)
                    arrow.Size = UDim2.new(0, 20, 1, 0)
                    arrow.Font = Enum.Font.Gotham
@@ -1125,6 +1126,7 @@ function Library:CreateWindow(title)
                    arrow.TextColor3 = Theme.TextDim
                    arrow.TextSize = IsMobile and 12 or 13
                    arrow.TextXAlignment = Enum.TextXAlignment.Center
+                   arrow.AutoButtonColor = false
 
                    local listFrame = Instance.new("Frame")
                    listFrame.Parent = dropdownFrame
