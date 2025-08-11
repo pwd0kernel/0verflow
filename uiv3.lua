@@ -1192,7 +1192,8 @@ function Library:CreateWindow(title)
                        if not listFrame.Visible then return end
                        local target
                        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-                           target = input.Target
+                           local ok, tgt = pcall(function() return input.Target end)
+                           if ok then target = tgt end
                        end
                        if target then
                            local isGui = typeof(target) == "Instance" and target:IsA("GuiObject")
