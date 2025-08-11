@@ -1100,7 +1100,15 @@ function Library:CreateWindow(title)
 
                 return {
                     Button = BtnFrame,
-                    OnClick = function(fn) return ClickedEvent.Event:Connect(fn) end,
+                    OnClick = function(self, fn)
+                        -- Support both button.OnClick(fn) and button:OnClick(fn)
+                        if typeof(self) == "function" and fn == nil then
+                            -- called as button.OnClick(callback)
+                            return ClickedEvent.Event:Connect(self)
+                        else
+                            return ClickedEvent.Event:Connect(fn)
+                        end
+                    end,
                     SetText = function(txt) BtnFrame.Text = txt end,
                     Destroy = function() BtnFrame:Destroy() end
                 }
@@ -1267,8 +1275,14 @@ function Library:CreateWindow(title)
                     Get = function()
                         return value
                     end,
-                    OnChange = function(fn)
-                        return ChangedEvent.Event:Connect(fn)
+                    OnChange = function(self, fn)
+                        -- Support both slider.OnChange(fn) and slider:OnChange(fn)
+                        if typeof(self) == "function" and fn == nil then
+                            -- called as slider.OnChange(callback)
+                            return ChangedEvent.Event:Connect(self)
+                        else
+                            return ChangedEvent.Event:Connect(fn)
+                        end
                     end
                 }
                 return api
