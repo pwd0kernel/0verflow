@@ -1187,36 +1187,32 @@ function Library:CreateWindow(title)
                        end)
                    end
 
-                   -- Dismiss dropdown if clicking outside - safer approach
-                   local function onMouseInput(input)
+                   -- Dismiss dropdown if clicking outside - use position-based detection
+                   local function checkClickOutside()
                        if not listFrame.Visible then return end
-                       -- Only handle mouse/touch input, input.Target is guaranteed to exist here
-                       if input.Target then
-                           local isGui = typeof(input.Target) == "Instance" and input.Target:IsA("GuiObject")
-                           if not (isGui and (listFrame:IsAncestorOf(input.Target) or input.Target == selected or input.Target == arrow)) then
-                               close()
-                           end
-                       else
+                       
+                       local mouse = UserInputService:GetMouseLocation()
+                       local dropdownPos = dropdownFrame.AbsolutePosition
+                       local dropdownSize = dropdownFrame.AbsoluteSize
+                       local listPos = listFrame.AbsolutePosition
+                       local listSize = listFrame.AbsoluteSize
+                       
+                       -- Check if click is inside dropdown or list area
+                       local inDropdown = mouse.X >= dropdownPos.X and mouse.X <= dropdownPos.X + dropdownSize.X and
+                                         mouse.Y >= dropdownPos.Y and mouse.Y <= dropdownPos.Y + dropdownSize.Y
+                       local inList = mouse.X >= listPos.X and mouse.X <= listPos.X + listSize.X and
+                                     mouse.Y >= listPos.Y and mouse.Y <= listPos.Y + listSize.Y
+                       
+                       if not (inDropdown or inList) then
                            close()
                        end
                    end
                    
-                   -- Connect only to mouse and touch events to avoid Target property issues
-                   local mouseConnection = UserInputService.InputBegan:Connect(function(input)
-                       if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                           onMouseInput(input)
-                       end
-                   end)
-                   
-                   local touchConnection = UserInputService.InputBegan:Connect(function(input)
-                       if input.UserInputType == Enum.UserInputType.Touch then
-                           onMouseInput(input)
-                       end
-                   end)
-                   
-                   -- Close on any key press
-                   local keyConnection = UserInputService.InputBegan:Connect(function(input)
-                       if input.UserInputType == Enum.UserInputType.Keyboard and listFrame.Visible then
+                   -- Connect to input events without using Target property
+                   local inputConnection = UserInputService.InputBegan:Connect(function(input)
+                       if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                           checkClickOutside()
+                       elseif input.UserInputType == Enum.UserInputType.Keyboard and listFrame.Visible then
                            close()
                        end
                    end)
