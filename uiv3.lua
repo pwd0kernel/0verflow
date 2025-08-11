@@ -1190,14 +1190,14 @@ function Library:CreateWindow(title)
                    -- Dismiss dropdown if clicking outside
                    local function onInput(input)
                        if not listFrame.Visible then return end
-                       local target
                        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
                            local ok, tgt = pcall(function() return input.Target end)
-                           if ok then target = tgt end
-                       end
-                       if target then
-                           local isGui = typeof(target) == "Instance" and target:IsA("GuiObject")
-                           if not (isGui and (listFrame:IsAncestorOf(target) or target == selected or target == arrow)) then
+                           if ok and tgt then
+                               local isGui = typeof(tgt) == "Instance" and tgt:IsA("GuiObject")
+                               if not (isGui and (listFrame:IsAncestorOf(tgt) or tgt == selected or tgt == arrow)) then
+                                   close()
+                               end
+                           else
                                close()
                            end
                        else
