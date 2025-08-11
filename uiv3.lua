@@ -1065,6 +1065,146 @@ function Library:CreateWindow(title)
                     end
                 }
             end
+
+               -- Dropdown element
+               function Section:Dropdown(nameOrOptions, options, callback)
+                   local opts
+                   if typeof(nameOrOptions) == "table" then
+                       opts = nameOrOptions
+                       callback = opts.callback
+                   else
+                       opts = options or {}
+                       opts.name = nameOrOptions
+                       opts.callback = callback
+                   end
+                   local name = opts.name or "Dropdown"
+                   local items = opts.items or opts.choices or {"Option 1", "Option 2"}
+                   local default = opts.default or items[1]
+                   local color = opts.color or Theme.Accent
+                   local dropdownFrame = Instance.new("Frame")
+                   dropdownFrame.Parent = Elements
+                   dropdownFrame.BackgroundColor3 = Theme.Card
+                   dropdownFrame.Size = UDim2.new(1, 0, 0, IsMobile and 36 or 32)
+                   dropdownFrame.ClipsDescendants = true
+
+                   local corner = Instance.new("UICorner")
+                   corner.CornerRadius = UDim.new(0, 6)
+                   corner.Parent = dropdownFrame
+
+                   local label = Instance.new("TextLabel")
+                   label.Parent = dropdownFrame
+                   label.BackgroundTransparency = 1
+                   label.Position = UDim2.new(0, 12, 0, 0)
+                   label.Size = UDim2.new(1, -44, 1, 0)
+                   label.Font = Enum.Font.Gotham
+                   label.Text = name
+                   label.TextColor3 = Theme.Text
+                   label.TextSize = IsMobile and 12 or 13
+                   label.TextXAlignment = Enum.TextXAlignment.Left
+                   label.TextTruncate = Enum.TextTruncate.AtEnd
+
+                   local selected = Instance.new("TextButton")
+                   selected.Parent = dropdownFrame
+                   selected.BackgroundTransparency = 1
+                   selected.Position = UDim2.new(1, -90, 0, 0)
+                   selected.Size = UDim2.new(0, 70, 1, 0)
+                   selected.Font = Enum.Font.Gotham
+                   selected.Text = tostring(default)
+                   selected.TextColor3 = color
+                   selected.TextSize = IsMobile and 12 or 13
+                   selected.TextXAlignment = Enum.TextXAlignment.Right
+                   selected.AutoButtonColor = false
+
+                   local arrow = Instance.new("TextLabel")
+                   arrow.Parent = dropdownFrame
+                   arrow.BackgroundTransparency = 1
+                   arrow.Position = UDim2.new(1, -20, 0, 0)
+                   arrow.Size = UDim2.new(0, 20, 1, 0)
+                   arrow.Font = Enum.Font.Gotham
+                   arrow.Text = "▼"
+                   arrow.TextColor3 = Theme.TextDim
+                   arrow.TextSize = IsMobile and 12 or 13
+                   arrow.TextXAlignment = Enum.TextXAlignment.Center
+
+                   local listFrame = Instance.new("Frame")
+                   listFrame.Parent = dropdownFrame
+                   listFrame.BackgroundColor3 = Theme.Surface
+                   listFrame.Position = UDim2.new(0, 0, 1, 0)
+                   listFrame.Size = UDim2.new(1, 0, 0, 0)
+                   listFrame.Visible = false
+                   listFrame.ZIndex = 10
+                   local listCorner = Instance.new("UICorner")
+                   listCorner.CornerRadius = UDim.new(0, 6)
+                   listCorner.Parent = listFrame
+
+                   local layout = Instance.new("UIListLayout")
+                   layout.Parent = listFrame
+                   layout.SortOrder = Enum.SortOrder.LayoutOrder
+
+                   local value = default
+                   local function setValue(v)
+                       value = v
+                       selected.Text = tostring(v)
+                       if callback then callback(v) end
+                   end
+                   setValue(default)
+
+                   local function open()
+                       listFrame.Visible = true
+                       Tween(listFrame, {Size = UDim2.new(1, 0, 0, #items * 28)}, 0.15)
+                   end
+                   local function close()
+                       Tween(listFrame, {Size = UDim2.new(1, 0, 0, 0)}, 0.15)
+                       task.spawn(function()
+                           task.wait(0.15)
+                           listFrame.Visible = false
+                       end)
+                   end
+
+                   selected.MouseButton1Click:Connect(function()
+                       if listFrame.Visible then close() else open() end
+                   end)
+                   arrow.MouseButton1Click:Connect(function()
+                       if listFrame.Visible then close() else open() end
+                   end)
+
+                   for _, item in ipairs(items) do
+                       local btn = Instance.new("TextButton")
+                       btn.Parent = listFrame
+                       btn.BackgroundTransparency = 1
+                       btn.Size = UDim2.new(1, 0, 0, 28)
+                       btn.Font = Enum.Font.Gotham
+                       btn.Text = tostring(item)
+                       btn.TextColor3 = Theme.Text
+                       btn.TextSize = IsMobile and 12 or 13
+                       btn.TextXAlignment = Enum.TextXAlignment.Left
+                       btn.AutoButtonColor = true
+                       btn.MouseButton1Click:Connect(function()
+                           setValue(item)
+                           close()
+                       end)
+                   end
+
+                   -- Dismiss dropdown if clicking outside
+                   local function onInput(input)
+                       if listFrame.Visible and not listFrame:IsAncestorOf(input.Target) and input.Target ~= selected and input.Target ~= arrow then
+                           close()
+                       end
+                   end
+                   UserInputService.InputBegan:Connect(onInput)
+
+                   return {
+                       Set = function(v) setValue(v) end,
+                       Get = function() return value end,
+                       OnChange = function(self, fn)
+                           if typeof(self) == "function" and fn == nil then
+                               return selected.MouseButton1Click:Connect(self)
+                           else
+                               return selected.MouseButton1Click:Connect(fn)
+                           end
+                       end
+                   }
+               end
             
             function Section:Button(name, callback)
                 local BtnFrame = Instance.new("TextButton")
@@ -1361,6 +1501,8 @@ function Library.QuickWindow(spec)
                         step = item.step,
                         callback = item.callback,
                     })
+                   elseif kind == "dropdown" then
+                       section:Dropdown(item)
                 elseif kind == "label" then
                     section:Label(item.text or item.name or "")
                 end
