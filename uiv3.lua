@@ -1,5 +1,3 @@
--- 0verflow Hub Minimal UI - Improved Toggle API Edition
--- Ultra-minimal floating bar with simplified toggle system
 -- Created for pwd0kernel
 
 local Players = game:GetService("Players")
