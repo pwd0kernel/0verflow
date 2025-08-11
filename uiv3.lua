@@ -1189,8 +1189,12 @@ function Library:CreateWindow(title)
 
                    -- Dismiss dropdown if clicking outside
                    local function onInput(input)
-                       if listFrame.Visible and not listFrame:IsAncestorOf(input.Target) and input.Target ~= selected and input.Target ~= arrow then
-                           close()
+                       local target = input.Target
+                       if listFrame.Visible then
+                           local isGui = typeof(target) == "Instance" and target:IsA("GuiObject")
+                           if not (isGui and (listFrame:IsAncestorOf(target) or target == selected or target == arrow)) then
+                               close()
+                           end
                        end
                    end
                    UserInputService.InputBegan:Connect(onInput)
