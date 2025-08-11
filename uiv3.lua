@@ -1217,6 +1217,14 @@ function Library:CreateWindow(title)
                        end
                    end)
 
+                   -- Clean up connection when dropdown is destroyed
+                   dropdownFrame.Destroying:Connect(function()
+                       if inputConnection then
+                           inputConnection:Disconnect()
+                           inputConnection = nil
+                       end
+                   end)
+
                    return {
                        Set = function(v) setValue(v) end,
                        Get = function() return value end,
@@ -1226,6 +1234,13 @@ function Library:CreateWindow(title)
                            else
                                return selected.MouseButton1Click:Connect(fn)
                            end
+                       end,
+                       Destroy = function()
+                           if inputConnection then
+                               inputConnection:Disconnect()
+                               inputConnection = nil
+                           end
+                           dropdownFrame:Destroy()
                        end
                    }
                end
