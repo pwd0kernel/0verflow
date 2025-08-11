@@ -1187,23 +1187,39 @@ function Library:CreateWindow(title)
                        end)
                    end
 
-                   -- Dismiss dropdown if clicking outside
-                   local function onInput(input)
+                   -- Dismiss dropdown if clicking outside - safer approach
+                   local function onMouseInput(input)
                        if not listFrame.Visible then return end
-                       if input.UserInputType ~= Enum.UserInputType.MouseButton1 and input.UserInputType ~= Enum.UserInputType.Touch then
-                           return
-                       end
-                       local ok, tgt = pcall(function() return input.Target end)
-                       if ok and tgt then
-                           local isGui = typeof(tgt) == "Instance" and tgt:IsA("GuiObject")
-                           if not (isGui and (listFrame:IsAncestorOf(tgt) or tgt == selected or tgt == arrow)) then
+                       -- Only handle mouse/touch input, input.Target is guaranteed to exist here
+                       if input.Target then
+                           local isGui = typeof(input.Target) == "Instance" and input.Target:IsA("GuiObject")
+                           if not (isGui and (listFrame:IsAncestorOf(input.Target) or input.Target == selected or input.Target == arrow)) then
                                close()
                            end
                        else
                            close()
                        end
                    end
-                   UserInputService.InputBegan:Connect(onInput)
+                   
+                   -- Connect only to mouse and touch events to avoid Target property issues
+                   local mouseConnection = UserInputService.InputBegan:Connect(function(input)
+                       if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                           onMouseInput(input)
+                       end
+                   end)
+                   
+                   local touchConnection = UserInputService.InputBegan:Connect(function(input)
+                       if input.UserInputType == Enum.UserInputType.Touch then
+                           onMouseInput(input)
+                       end
+                   end)
+                   
+                   -- Close on any key press
+                   local keyConnection = UserInputService.InputBegan:Connect(function(input)
+                       if input.UserInputType == Enum.UserInputType.Keyboard and listFrame.Visible then
+                           close()
+                       end
+                   end)
 
                    return {
                        Set = function(v) setValue(v) end,
