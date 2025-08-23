@@ -1,3 +1,5 @@
+-- 0verflow Hub UI Library
+-- Professional Dark/Cyan Theme with Matrix-inspired elements
 local Library = {}
 Library.__index = Library
 
@@ -9,39 +11,52 @@ local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
--- Professional Dark Theme (matching the image)
+-- 0verflow Hub Theme - Dark with Cyan accents
 local Theme = {
-    -- Base colors
-    Background = Color3.fromRGB(17, 17, 27),
-    Surface = Color3.fromRGB(23, 23, 35),
-    SurfaceLight = Color3.fromRGB(28, 28, 42),
-    SurfaceBright = Color3.fromRGB(35, 35, 52),
+    -- Base colors (Deep dark)
+    Background = Color3.fromRGB(8, 8, 10),
+    Surface = Color3.fromRGB(12, 12, 15),
+    SurfaceLight = Color3.fromRGB(18, 18, 22),
+    SurfaceBright = Color3.fromRGB(24, 24, 30),
     
-    -- Accent colors (purple theme like Vernon)
-    Primary = Color3.fromRGB(139, 92, 246),
-    PrimaryDim = Color3.fromRGB(109, 40, 217),
-    PrimaryBright = Color3.fromRGB(167, 139, 250),
+    -- 0verflow Signature Colors (Cyan/Blue gradient)
+    Primary = Color3.fromRGB(0, 220, 255),      -- Bright cyan
+    PrimaryDim = Color3.fromRGB(0, 150, 200),   -- Darker cyan
+    PrimaryBright = Color3.fromRGB(100, 240, 255), -- Light cyan
+    Accent = Color3.fromRGB(0, 255, 200),       -- Teal accent
     
     -- Text colors
-    TextPrimary = Color3.fromRGB(244, 244, 245),
-    TextSecondary = Color3.fromRGB(156, 163, 175),
-    TextMuted = Color3.fromRGB(107, 114, 128),
+    TextPrimary = Color3.fromRGB(245, 245, 250),
+    TextSecondary = Color3.fromRGB(140, 160, 180),
+    TextMuted = Color3.fromRGB(80, 90, 100),
+    TextAccent = Color3.fromRGB(0, 220, 255),
     
     -- State colors
-    Success = Color3.fromRGB(34, 197, 94),
-    Warning = Color3.fromRGB(251, 146, 60),
-    Error = Color3.fromRGB(239, 68, 68),
-    Info = Color3.fromRGB(59, 130, 246),
+    Success = Color3.fromRGB(0, 255, 150),
+    Warning = Color3.fromRGB(255, 200, 0),
+    Error = Color3.fromRGB(255, 50, 80),
+    Info = Color3.fromRGB(0, 180, 255),
     
-    -- Border colors
-    Border = Color3.fromRGB(55, 65, 81),
-    BorderLight = Color3.fromRGB(75, 85, 99),
+    -- Border colors with glow effect
+    Border = Color3.fromRGB(30, 35, 40),
+    BorderLight = Color3.fromRGB(0, 100, 120),
+    GlowColor = Color3.fromRGB(0, 220, 255),
     
     -- Typography
     Font = Enum.Font.Gotham,
     FontBold = Enum.Font.GothamBold,
-    FontMono = Enum.Font.RobotoMono
+    FontMono = Enum.Font.Code
 }
+
+-- 0verflow Hub ASCII Art
+local ASCII_LOGO = [[
+ ___            __ _               
+/ _ \__   _____ _ _| |_ _____ __ __
+| | | \ \ / / _ \ '__| _/ _ \ \ V  V /
+| |_| |\ V /  __/ |  | ||  __/  \_/\_/ 
+ \___/  \_/ \___|_|  |_| \___|        
+                HUB v2.0
+]]
 
 -- Utility Functions
 local function CreateTween(instance, properties, duration, easingStyle)
@@ -94,19 +109,18 @@ end
 -- Main Library
 function Library:CreateWindow(config)
     config = config or {}
-    local windowName = config.Name or "Vernon"
-    local windowSubtitle = config.Subtitle or "Management"
-    local windowSize = config.Size or UDim2.new(0, 1100, 0, 650)
+    local windowName = config.Name or "0verflow Hub"
+    local windowSize = config.Size or UDim2.new(0, 720, 0, 500)
     local hideKey = config.HideKey or Enum.KeyCode.RightShift
     
     -- Create ScreenGui
     local screenGui = Instance.new("ScreenGui")
-    screenGui.Name = HttpService:GenerateGUID(false)
+    screenGui.Name = "0verflowHub_" .. HttpService:GenerateGUID(false)
     screenGui.ResetOnSpawn = false
     screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     screenGui.Parent = CoreGui
     
-    -- Main Frame with modern design
+    -- Main Frame with glow effect
     local mainFrame = Instance.new("Frame")
     mainFrame.Name = "MainFrame"
     mainFrame.BackgroundColor3 = Theme.Background
@@ -116,181 +130,218 @@ function Library:CreateWindow(config)
     mainFrame.Parent = screenGui
     
     local mainCorner = Instance.new("UICorner")
-    mainCorner.CornerRadius = UDim.new(0, 16)
+    mainCorner.CornerRadius = UDim.new(0, 12)
     mainCorner.Parent = mainFrame
     
-    -- Navigation sidebar (left side)
+    -- Animated glow border
+    local mainStroke = Instance.new("UIStroke")
+    mainStroke.Color = Theme.GlowColor
+    mainStroke.Thickness = 2
+    mainStroke.Transparency = 0.3
+    mainStroke.Parent = mainFrame
+    
+    -- Gradient for border
+    local strokeGradient = Instance.new("UIGradient")
+    strokeGradient.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Theme.Primary),
+        ColorSequenceKeypoint.new(0.5, Theme.Accent),
+        ColorSequenceKeypoint.new(1, Theme.Primary)
+    }
+    strokeGradient.Parent = mainStroke
+    
+    -- Animate gradient
+    task.spawn(function()
+        while mainFrame.Parent do
+            strokeGradient.Rotation = (strokeGradient.Rotation + 1) % 360
+            task.wait(0.03)
+        end
+    end)
+    
+    -- Title Bar with 0verflow branding
+    local titleBar = Instance.new("Frame")
+    titleBar.Name = "TitleBar"
+    titleBar.BackgroundColor3 = Theme.Surface
+    titleBar.BorderSizePixel = 0
+    titleBar.Size = UDim2.new(1, 0, 0, 48)
+    titleBar.Parent = mainFrame
+    
+    local titleCorner = Instance.new("UICorner")
+    titleCorner.CornerRadius = UDim.new(0, 12)
+    titleCorner.Parent = titleBar
+    
+    local titleFix = Instance.new("Frame")
+    titleFix.BackgroundColor3 = Theme.Surface
+    titleFix.BorderSizePixel = 0
+    titleFix.Position = UDim2.new(0, 0, 0.5, 0)
+    titleFix.Size = UDim2.new(1, 0, 0.5, 1)
+    titleFix.Parent = titleBar
+    
+    -- 0verflow Logo/Icon
+    local logo = Instance.new("TextLabel")
+    logo.BackgroundTransparency = 1
+    logo.Position = UDim2.new(0, 16, 0.5, -10)
+    logo.Size = UDim2.new(0, 20, 0, 20)
+    logo.Font = Theme.FontBold
+    logo.Text = "0"
+    logo.TextColor3 = Theme.Primary
+    logo.TextSize = 20
+    logo.Parent = titleBar
+    
+    -- Title text with gradient
+    local titleText = Instance.new("TextLabel")
+    titleText.BackgroundTransparency = 1
+    titleText.Position = UDim2.new(0, 44, 0, 0)
+    titleText.Size = UDim2.new(0.5, 0, 1, 0)
+    titleText.Font = Theme.FontBold
+    titleText.Text = windowName
+    titleText.TextColor3 = Theme.TextPrimary
+    titleText.TextSize = 16
+    titleText.TextXAlignment = Enum.TextXAlignment.Left
+    titleText.Parent = titleBar
+    
+    -- Version badge
+    local versionBadge = Instance.new("Frame")
+    versionBadge.BackgroundColor3 = Theme.Primary
+    versionBadge.BackgroundTransparency = 0.8
+    versionBadge.Position = UDim2.new(0, 180, 0.5, -8)
+    versionBadge.Size = UDim2.new(0, 40, 0, 16)
+    versionBadge.Parent = titleBar
+    
+    local badgeCorner = Instance.new("UICorner")
+    badgeCorner.CornerRadius = UDim.new(0, 4)
+    badgeCorner.Parent = versionBadge
+    
+    local versionText = Instance.new("TextLabel")
+    versionText.BackgroundTransparency = 1
+    versionText.Size = UDim2.new(1, 0, 1, 0)
+    versionText.Font = Theme.Font
+    versionText.Text = "v2.0"
+    versionText.TextColor3 = Theme.Primary
+    versionText.TextSize = 10
+    versionText.Parent = versionBadge
+    
+    -- Status indicator (animated dot)
+    local statusDot = Instance.new("Frame")
+    statusDot.BackgroundColor3 = Theme.Success
+    statusDot.Position = UDim2.new(1, -80, 0.5, -4)
+    statusDot.Size = UDim2.new(0, 8, 0, 8)
+    statusDot.Parent = titleBar
+    
+    local statusCorner = Instance.new("UICorner")
+    statusCorner.CornerRadius = UDim.new(1, 0)
+    statusCorner.Parent = statusDot
+    
+    -- Pulse animation for status
+    task.spawn(function()
+        while statusDot.Parent do
+            CreateTween(statusDot, {BackgroundTransparency = 0.3}, 1)
+            task.wait(1)
+            CreateTween(statusDot, {BackgroundTransparency = 0}, 1)
+            task.wait(1)
+        end
+    end)
+    
+    local statusText = Instance.new("TextLabel")
+    statusText.BackgroundTransparency = 1
+    statusText.Position = UDim2.new(1, -70, 0.5, -8)
+    statusText.Size = UDim2.new(0, 50, 0, 16)
+    statusText.Font = Theme.Font
+    statusText.Text = "Online"
+    statusText.TextColor3 = Theme.TextSecondary
+    statusText.TextSize = 11
+    statusText.Parent = titleBar
+    
+    -- Window controls with hover effects
+    local closeButton = Instance.new("TextButton")
+    closeButton.BackgroundColor3 = Theme.Error
+    closeButton.BackgroundTransparency = 0.8
+    closeButton.Position = UDim2.new(1, -36, 0.5, -12)
+    closeButton.Size = UDim2.new(0, 24, 0, 24)
+    closeButton.Font = Theme.Font
+    closeButton.Text = "×"
+    closeButton.TextColor3 = Theme.TextPrimary
+    closeButton.TextSize = 18
+    closeButton.Parent = titleBar
+    
+    local closeCorner = Instance.new("UICorner")
+    closeCorner.CornerRadius = UDim.new(0, 6)
+    closeCorner.Parent = closeButton
+    
+    closeButton.MouseEnter:Connect(function()
+        CreateTween(closeButton, {
+            BackgroundTransparency = 0.2,
+            TextColor3 = Color3.fromRGB(255, 255, 255)
+        }, 0.2)
+    end)
+    
+    closeButton.MouseLeave:Connect(function()
+        CreateTween(closeButton, {
+            BackgroundTransparency = 0.8,
+            TextColor3 = Theme.TextPrimary
+        }, 0.2)
+    end)
+    
+    closeButton.MouseButton1Click:Connect(function()
+        -- Glitch effect before closing
+        for i = 1, 3 do
+            mainFrame.Visible = false
+            task.wait(0.05)
+            mainFrame.Visible = true
+            task.wait(0.05)
+        end
+        CreateTween(mainFrame, {
+            Size = UDim2.new(0, windowSize.X.Offset, 0, 0),
+            BackgroundTransparency = 1
+        }, 0.3)
+        task.wait(0.3)
+        screenGui:Destroy()
+    end)
+    
+    -- Navigation sidebar with 0verflow styling
     local sidebar = Instance.new("Frame")
     sidebar.BackgroundColor3 = Theme.Surface
     sidebar.BorderSizePixel = 0
-    sidebar.Position = UDim2.new(0, 0, 0, 0)
-    sidebar.Size = UDim2.new(0, 240, 1, 0)
+    sidebar.Position = UDim2.new(0, 0, 0, 48)
+    sidebar.Size = UDim2.new(0, 190, 1, -48)
     sidebar.Parent = mainFrame
     
-    local sidebarCorner = Instance.new("UICorner")
-    sidebarCorner.CornerRadius = UDim.new(0, 16)
-    sidebarCorner.Parent = sidebar
-    
-    -- Logo section
-    local logoSection = Instance.new("Frame")
-    logoSection.BackgroundTransparency = 1
-    logoSection.Size = UDim2.new(1, 0, 0, 80)
-    logoSection.Parent = sidebar
-    
-    local logoIcon = Instance.new("ImageLabel")
-    logoIcon.BackgroundColor3 = Theme.Primary
-    logoIcon.Position = UDim2.new(0, 20, 0.5, -20)
-    logoIcon.Size = UDim2.new(0, 40, 0, 40)
-    logoIcon.Parent = logoSection
-    
-    local logoIconCorner = Instance.new("UICorner")
-    logoIconCorner.CornerRadius = UDim.new(0, 12)
-    logoIconCorner.Parent = logoIcon
-    
-    local logoText = Instance.new("TextLabel")
-    logoText.BackgroundTransparency = 1
-    logoText.Position = UDim2.new(0, 70, 0, 20)
-    logoText.Size = UDim2.new(1, -90, 0, 20)
-    logoText.Font = Theme.FontBold
-    logoText.Text = windowName
-    logoText.TextColor3 = Theme.TextPrimary
-    logoText.TextSize = 18
-    logoText.TextXAlignment = Enum.TextXAlignment.Left
-    logoText.Parent = logoSection
-    
-    local logoSubtext = Instance.new("TextLabel")
-    logoSubtext.BackgroundTransparency = 1
-    logoSubtext.Position = UDim2.new(0, 70, 0, 40)
-    logoSubtext.Size = UDim2.new(1, -90, 0, 20)
-    logoSubtext.Font = Theme.Font
-    logoSubtext.Text = windowSubtitle
-    logoSubtext.TextColor3 = Theme.TextMuted
-    logoSubtext.TextSize = 12
-    logoSubtext.TextXAlignment = Enum.TextXAlignment.Left
-    logoSubtext.Parent = logoSection
+    -- Sidebar separator line with glow
+    local separator = Instance.new("Frame")
+    separator.BackgroundColor3 = Theme.BorderLight
+    separator.BackgroundTransparency = 0.5
+    separator.Position = UDim2.new(1, -1, 0, 0)
+    separator.Size = UDim2.new(0, 1, 1, 0)
+    separator.Parent = sidebar
     
     -- Tab container
     local tabContainer = Instance.new("ScrollingFrame")
     tabContainer.BackgroundTransparency = 1
     tabContainer.BorderSizePixel = 0
-    tabContainer.Position = UDim2.new(0, 0, 0, 80)
-    tabContainer.Size = UDim2.new(1, 0, 1, -160)
+    tabContainer.Position = UDim2.new(0, 0, 0, 0)
+    tabContainer.Size = UDim2.new(1, 0, 1, 0)
     tabContainer.ScrollBarThickness = 0
     tabContainer.Parent = sidebar
     
     local tabLayout = Instance.new("UIListLayout")
-    tabLayout.Padding = UDim.new(0, 4)
+    tabLayout.Padding = UDim.new(0, 2)
     tabLayout.SortOrder = Enum.SortOrder.LayoutOrder
     tabLayout.Parent = tabContainer
     
     local tabPadding = Instance.new("UIPadding")
-    tabPadding.PaddingLeft = UDim.new(0, 20)
-    tabPadding.PaddingRight = UDim.new(0, 20)
-    tabPadding.PaddingTop = UDim.new(0, 10)
+    tabPadding.PaddingLeft = UDim.new(0, 12)
+    tabPadding.PaddingRight = UDim.new(0, 12)
+    tabPadding.PaddingTop = UDim.new(0, 12)
+    tabPadding.PaddingBottom = UDim.new(0, 12)
     tabPadding.Parent = tabContainer
     
-    -- Bottom section (Settings, Log Out)
-    local bottomSection = Instance.new("Frame")
-    bottomSection.BackgroundTransparency = 1
-    bottomSection.Position = UDim2.new(0, 0, 1, -80)
-    bottomSection.Size = UDim2.new(1, 0, 0, 80)
-    bottomSection.Parent = sidebar
-    
-    -- Header bar
-    local header = Instance.new("Frame")
-    header.BackgroundTransparency = 1
-    header.Position = UDim2.new(0, 240, 0, 0)
-    header.Size = UDim2.new(1, -240, 0, 70)
-    header.Parent = mainFrame
-    
-    -- Search bar
-    local searchBar = Instance.new("Frame")
-    searchBar.BackgroundColor3 = Theme.SurfaceLight
-    searchBar.Position = UDim2.new(0, 30, 0.5, -18)
-    searchBar.Size = UDim2.new(0, 300, 0, 36)
-    searchBar.Parent = header
-    
-    local searchCorner = Instance.new("UICorner")
-    searchCorner.CornerRadius = UDim.new(0, 10)
-    searchCorner.Parent = searchBar
-    
-    local searchIcon = Instance.new("TextLabel")
-    searchIcon.BackgroundTransparency = 1
-    searchIcon.Position = UDim2.new(0, 12, 0, 0)
-    searchIcon.Size = UDim2.new(0, 20, 1, 0)
-    searchIcon.Font = Theme.Font
-    searchIcon.Text = "🔍"
-    searchIcon.TextColor3 = Theme.TextMuted
-    searchIcon.TextSize = 14
-    searchIcon.Parent = searchBar
-    
-    local searchInput = Instance.new("TextBox")
-    searchInput.BackgroundTransparency = 1
-    searchInput.Position = UDim2.new(0, 40, 0, 0)
-    searchInput.Size = UDim2.new(1, -50, 1, 0)
-    searchInput.Font = Theme.Font
-    searchInput.PlaceholderText = "Search anything"
-    searchInput.PlaceholderColor3 = Theme.TextMuted
-    searchInput.Text = ""
-    searchInput.TextColor3 = Theme.TextPrimary
-    searchInput.TextSize = 14
-    searchInput.TextXAlignment = Enum.TextXAlignment.Left
-    searchInput.Parent = searchBar
-    
-    -- User profile section
-    local profileSection = Instance.new("Frame")
-    profileSection.BackgroundTransparency = 1
-    profileSection.AnchorPoint = Vector2.new(1, 0.5)
-    profileSection.Position = UDim2.new(1, -30, 0.5, 0)
-    profileSection.Size = UDim2.new(0, 200, 0, 40)
-    profileSection.Parent = header
-    
-    local profileImage = Instance.new("ImageLabel")
-    profileImage.BackgroundColor3 = Theme.Primary
-    profileImage.AnchorPoint = Vector2.new(1, 0.5)
-    profileImage.Position = UDim2.new(1, 0, 0.5, 0)
-    profileImage.Size = UDim2.new(0, 36, 0, 36)
-    profileImage.Parent = profileSection
-    
-    local profileCorner = Instance.new("UICorner")
-    profileCorner.CornerRadius = UDim.new(1, 0)
-    profileCorner.Parent = profileImage
-    
-    local profileName = Instance.new("TextLabel")
-    profileName.BackgroundTransparency = 1
-    profileName.AnchorPoint = Vector2.new(1, 0)
-    profileName.Position = UDim2.new(1, -46, 0, 2)
-    profileName.Size = UDim2.new(0, 100, 0, 18)
-    profileName.Font = Theme.FontBold
-    profileName.Text = LocalPlayer.Name
-    profileName.TextColor3 = Theme.TextPrimary
-    profileName.TextSize = 13
-    profileName.TextXAlignment = Enum.TextXAlignment.Right
-    profileName.Parent = profileSection
-    
-    local profileRole = Instance.new("TextLabel")
-    profileRole.BackgroundTransparency = 1
-    profileRole.AnchorPoint = Vector2.new(1, 0)
-    profileRole.Position = UDim2.new(1, -46, 0, 20)
-    profileRole.Size = UDim2.new(0, 100, 0, 18)
-    profileRole.Font = Theme.Font
-    profileRole.Text = "HR and People Lead"
-    profileRole.TextColor3 = Theme.TextMuted
-    profileRole.TextSize = 11
-    profileRole.TextXAlignment = Enum.TextXAlignment.Right
-    profileRole.Parent = profileSection
-    
     -- Content area
-    local contentArea = Instance.new("ScrollingFrame")
+    local contentArea = Instance.new("Frame")
     contentArea.BackgroundTransparency = 1
-    contentArea.BorderSizePixel = 0
-    contentArea.Position = UDim2.new(0, 240, 0, 70)
-    contentArea.Size = UDim2.new(1, -240, 1, -70)
-    contentArea.ScrollBarThickness = 6
-    contentArea.ScrollBarImageColor3 = Theme.Border
+    contentArea.Position = UDim2.new(0, 190, 0, 48)
+    contentArea.Size = UDim2.new(1, -190, 1, -48)
     contentArea.Parent = mainFrame
     
-    AddDraggable(mainFrame, header)
+    AddDraggable(mainFrame, titleBar)
     
     -- Hide/Show
     UserInputService.InputBegan:Connect(function(input, processed)
@@ -307,44 +358,32 @@ function Library:CreateWindow(config)
     function Window:CreateTab(name, icon)
         local Tab = {}
         
-        -- Tab button with icon
+        -- Tab button
         local tabButton = Instance.new("TextButton")
         tabButton.BackgroundColor3 = Theme.Surface
         tabButton.BackgroundTransparency = 1
         tabButton.BorderSizePixel = 0
-        tabButton.Size = UDim2.new(1, 0, 0, 44)
+        tabButton.Size = UDim2.new(1, 0, 0, 36)
+        tabButton.Font = Theme.Font
+        tabButton.Text = "  " .. (icon or "") .. "  " .. name
+        tabButton.TextColor3 = Theme.TextSecondary
+        tabButton.TextSize = 14
+        tabButton.TextXAlignment = Enum.TextXAlignment.Left
         tabButton.AutoButtonColor = false
         tabButton.Parent = tabContainer
         
         local tabCorner = Instance.new("UICorner")
-        tabCorner.CornerRadius = UDim.new(0, 10)
+        tabCorner.CornerRadius = UDim.new(0, 8)
         tabCorner.Parent = tabButton
         
-        local tabIcon = Instance.new("TextLabel")
-        tabIcon.BackgroundTransparency = 1
-        tabIcon.Position = UDim2.new(0, 16, 0.5, -10)
-        tabIcon.Size = UDim2.new(0, 20, 0, 20)
-        tabIcon.Font = Theme.Font
-        tabIcon.Text = icon or "📁"
-        tabIcon.TextColor3 = Theme.TextSecondary
-        tabIcon.TextSize = 16
-        tabIcon.Parent = tabButton
-        
-        local tabLabel = Instance.new("TextLabel")
-        tabLabel.BackgroundTransparency = 1
-        tabLabel.Position = UDim2.new(0, 44, 0, 0)
-        tabLabel.Size = UDim2.new(1, -44, 1, 0)
-        tabLabel.Font = Theme.Font
-        tabLabel.Text = name
-        tabLabel.TextColor3 = Theme.TextSecondary
-        tabLabel.TextSize = 14
-        tabLabel.TextXAlignment = Enum.TextXAlignment.Left
-        tabLabel.Parent = tabButton
-        
-        -- Tab content (card-based layout)
-        local tabContent = Instance.new("Frame")
+        -- Tab content
+        local tabContent = Instance.new("ScrollingFrame")
         tabContent.BackgroundTransparency = 1
+        tabContent.BorderSizePixel = 0
+        tabContent.Position = UDim2.new(0, 0, 0, 0)
         tabContent.Size = UDim2.new(1, 0, 1, 0)
+        tabContent.ScrollBarThickness = 3
+        tabContent.ScrollBarImageColor3 = Theme.Border
         tabContent.Visible = false
         tabContent.Parent = contentArea
         
@@ -698,73 +737,6 @@ function Library:CreateWindow(config)
             
             return textboxFrame
         end
-        
-        function Tab:AddCard(config)
-            config = config or {}
-            local title = config.Title or "Card"
-            local value = config.Value or "0"
-            local subtitle = config.Subtitle or ""
-            local color = config.Color or Theme.Primary
-            
-            local card = Instance.new("Frame")
-            card.BackgroundColor3 = Theme.Surface
-            card.Size = UDim2.new(0.23, -10, 0, 120)
-            card.Parent = tabContent
-            
-            local cardCorner = Instance.new("UICorner")
-            cardCorner.CornerRadius = UDim.new(0, 12)
-            cardCorner.Parent = card
-            
-            local cardIcon = Instance.new("Frame")
-            cardIcon.BackgroundColor3 = color
-            cardIcon.BackgroundTransparency = 0.8
-            cardIcon.Position = UDim2.new(0, 20, 0, 20)
-            cardIcon.Size = UDim2.new(0, 40, 0, 40)
-            cardIcon.Parent = card
-            
-            local iconCorner = Instance.new("UICorner")
-            iconCorner.CornerRadius = UDim.new(0, 10)
-            iconCorner.Parent = cardIcon
-            
-            local cardTitle = Instance.new("TextLabel")
-            cardTitle.BackgroundTransparency = 1
-            cardTitle.Position = UDim2.new(0, 20, 0, 70)
-            cardTitle.Size = UDim2.new(1, -40, 0, 16)
-            cardTitle.Font = Theme.Font
-            cardTitle.Text = title
-            cardTitle.TextColor3 = Theme.TextMuted
-            cardTitle.TextSize = 12
-            cardTitle.TextXAlignment = Enum.TextXAlignment.Left
-            cardTitle.Parent = card
-            
-            local cardValue = Instance.new("TextLabel")
-            cardValue.BackgroundTransparency = 1
-            cardValue.Position = UDim2.new(0, 70, 0, 20)
-            cardValue.Size = UDim2.new(1, -90, 0, 40)
-            cardValue.Font = Theme.FontBold
-            cardValue.Text = value
-            cardValue.TextColor3 = Theme.TextPrimary
-            cardValue.TextSize = 24
-            cardValue.TextXAlignment = Enum.TextXAlignment.Left
-            cardValue.Parent = card
-            
-            if subtitle ~= "" then
-                local cardSubtitle = Instance.new("TextLabel")
-                cardSubtitle.BackgroundTransparency = 1
-                cardSubtitle.Position = UDim2.new(0, 20, 0, 88)
-                cardSubtitle.Size = UDim2.new(1, -40, 0, 14)
-                cardSubtitle.Font = Theme.Font
-                cardSubtitle.Text = subtitle
-                cardSubtitle.TextColor3 = color
-                cardSubtitle.TextSize = 11
-                cardSubtitle.TextXAlignment = Enum.TextXAlignment.Left
-                cardSubtitle.Parent = card
-            end
-            
-            return card
-        end
-        
-        -- ...existing Tab functions...
         
         table.insert(Window.Tabs, Tab)
         return Tab
