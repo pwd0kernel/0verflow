@@ -1,4 +1,5 @@
--- 0verflow Hub UI Library v2.0
+-- 0verflow Hub UI Library
+-- Professional Dark/Cyan Theme with Matrix-inspired elements
 local Library = {}
 Library.__index = Library
 
@@ -69,33 +70,22 @@ local function CreateTween(instance, properties, duration, easingStyle)
     return tween
 end
 
-local function AddRippleEffect(button)
-    button.ClipsDescendants = true
-    
-    button.MouseButton1Click:Connect(function()
-        local ripple = Instance.new("Frame")
-        ripple.BackgroundColor3 = Theme.Primary
-        ripple.BackgroundTransparency = 0.6
-        ripple.BorderSizePixel = 0
-        ripple.Position = UDim2.new(0.5, 0, 0.5, 0)
-        ripple.Size = UDim2.new(0, 0, 0, 0)
-        ripple.Parent = button
-        
-        local rippleCorner = Instance.new("UICorner")
-        rippleCorner.CornerRadius = UDim.new(1, 0)
-        rippleCorner.Parent = ripple
-        
-        CreateTween(ripple, {
-            Size = UDim2.new(2, 0, 2, 0),
-            BackgroundTransparency = 1
-        }, 0.5)
-        
-        game:GetService("Debris"):AddItem(ripple, 0.5)
-    end)
-end
-
 local function AddDraggable(frame, dragHandle)
-    local dragging, dragInput, dragStart, startPos
+    local dragging = false
+    local dragInput = nil
+    local dragStart = nil
+    local startPos = nil
+    
+    local function update(input)
+        if not dragging then return end
+        local delta = input.Position - dragStart
+        frame.Position = UDim2.new(
+            startPos.X.Scale,
+            startPos.X.Offset + delta.X,
+            startPos.Y.Scale,
+            startPos.Y.Offset + delta.Y
+        )
+    end
     
     dragHandle.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -119,58 +109,9 @@ local function AddDraggable(frame, dragHandle)
     
     UserInputService.InputChanged:Connect(function(input)
         if input == dragInput and dragging then
-            local delta = input.Position - dragStart
-            frame.Position = UDim2.new(
-                startPos.X.Scale,
-                startPos.X.Offset + delta.X,
-                startPos.Y.Scale,
-                startPos.Y.Offset + delta.Y
-            )
+            update(input)
         end
     end)
-end
-
--- Notification System
-local function CreateNotification(text, duration, notifType)
-    duration = duration or 3
-    notifType = notifType or "Info"
-    
-    local notif = Instance.new("Frame")
-    notif.BackgroundColor3 = Theme.Surface
-    notif.BorderSizePixel = 0
-    notif.Position = UDim2.new(1, 0, 1, -100)
-    notif.Size = UDim2.new(0, 250, 0, 60)
-    notif.Parent = game:GetService("CoreGui"):FindFirstChild("0verflowHub_Notifications") or Instance.new("ScreenGui", CoreGui)
-    
-    local notifCorner = Instance.new("UICorner")
-    notifCorner.CornerRadius = UDim.new(0, 8)
-    notifCorner.Parent = notif
-    
-    local notifStroke = Instance.new("UIStroke")
-    notifStroke.Color = Theme[notifType] or Theme.Info
-    notifStroke.Thickness = 2
-    notifStroke.Transparency = 0
-    notifStroke.Parent = notif
-    
-    local notifText = Instance.new("TextLabel")
-    notifText.BackgroundTransparency = 1
-    notifText.Position = UDim2.new(0, 12, 0, 0)
-    notifText.Size = UDim2.new(1, -24, 1, 0)
-    notifText.Font = Theme.Font
-    notifText.Text = text
-    notifText.TextColor3 = Theme.TextPrimary
-    notifText.TextSize = 14
-    notifText.TextWrapped = true
-    notifText.Parent = notif
-    
-    -- Slide in
-    CreateTween(notif, {Position = UDim2.new(1, -260, 1, -100)}, 0.3)
-    
-    -- Fade out and remove
-    task.wait(duration)
-    CreateTween(notif, {Position = UDim2.new(1, 0, 1, -100)}, 0.3)
-    task.wait(0.3)
-    notif:Destroy()
 end
 
 -- Main Library
@@ -187,16 +128,6 @@ function Library:CreateWindow(config)
     screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     screenGui.Parent = CoreGui
     
-    -- Shadow/Blur Background
-    local shadowFrame = Instance.new("Frame")
-    shadowFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    shadowFrame.BackgroundTransparency = 0.5
-    shadowFrame.BorderSizePixel = 0
-    shadowFrame.Position = UDim2.new(0, -50, 0, -50)
-    shadowFrame.Size = UDim2.new(1, 100, 1, 100)
-    shadowFrame.Visible = false
-    shadowFrame.Parent = screenGui
-    
     -- Main Frame with glow effect
     local mainFrame = Instance.new("Frame")
     mainFrame.Name = "MainFrame"
@@ -204,23 +135,12 @@ function Library:CreateWindow(config)
     mainFrame.BorderSizePixel = 0
     mainFrame.Position = UDim2.new(0.5, -windowSize.X.Offset/2, 0.5, -windowSize.Y.Offset/2)
     mainFrame.Size = windowSize
+    mainFrame.ClipsDescendants = true
     mainFrame.Parent = screenGui
     
     local mainCorner = Instance.new("UICorner")
     mainCorner.CornerRadius = UDim.new(0, 12)
     mainCorner.Parent = mainFrame
-    
-    -- Drop shadow
-    local shadow = Instance.new("ImageLabel")
-    shadow.BackgroundTransparency = 1
-    shadow.Position = UDim2.new(0, -20, 0, -20)
-    shadow.Size = UDim2.new(1, 40, 1, 40)
-    shadow.Image = "rbxasset://textures/ui/GuiImagePlaceholder.png"
-    shadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
-    shadow.ImageTransparency = 0.5
-    shadow.ScaleType = Enum.ScaleType.Slice
-    shadow.SliceCenter = Rect.new(20, 20, 20, 20)
-    shadow.Parent = mainFrame
     
     -- Animated glow border
     local mainStroke = Instance.new("UIStroke")
@@ -238,14 +158,13 @@ function Library:CreateWindow(config)
     }
     strokeGradient.Parent = mainStroke
     
-    -- Animate gradient with pulse effect
-    task.spawn(function()
-        local time = 0
-        while mainFrame.Parent do
-            strokeGradient.Rotation = (strokeGradient.Rotation + 1) % 360
-            mainStroke.Transparency = 0.3 + math.sin(time) * 0.1
-            time = time + 0.05
-            task.wait(0.03)
+    -- Optimized gradient animation
+    local gradientConnection
+    gradientConnection = RunService.Heartbeat:Connect(function()
+        if mainFrame.Parent then
+            strokeGradient.Rotation = (strokeGradient.Rotation + 2) % 360
+        else
+            gradientConnection:Disconnect()
         end
     end)
     
@@ -268,21 +187,12 @@ function Library:CreateWindow(config)
     titleFix.Size = UDim2.new(1, 0, 0.5, 1)
     titleFix.Parent = titleBar
     
-    -- Title gradient overlay
-    local titleGradient = Instance.new("UIGradient")
-    titleGradient.Color = ColorSequence.new{
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(200, 200, 200))
-    }
-    titleGradient.Rotation = 90
-    titleGradient.Parent = titleBar
-    
-    -- 0verflow Logo with animation
+    -- 0verflow Logo/Icon with glow
     local logoContainer = Instance.new("Frame")
     logoContainer.BackgroundColor3 = Theme.Primary
     logoContainer.BackgroundTransparency = 0.9
-    logoContainer.Position = UDim2.new(0, 12, 0.5, -14)
-    logoContainer.Size = UDim2.new(0, 28, 0, 28)
+    logoContainer.Position = UDim2.new(0, 12, 0.5, -12)
+    logoContainer.Size = UDim2.new(0, 24, 0, 24)
     logoContainer.Parent = titleBar
     
     local logoCorner = Instance.new("UICorner")
@@ -291,29 +201,18 @@ function Library:CreateWindow(config)
     
     local logo = Instance.new("TextLabel")
     logo.BackgroundTransparency = 1
-    logo.Position = UDim2.new(0.5, 0, 0.5, 0)
-    logo.Size = UDim2.new(0, 20, 0, 20)
-    logo.AnchorPoint = Vector2.new(0.5, 0.5)
+    logo.Size = UDim2.new(1, 0, 1, 0)
     logo.Font = Theme.FontBold
     logo.Text = "0"
     logo.TextColor3 = Theme.Primary
     logo.TextSize = 18
     logo.Parent = logoContainer
     
-    -- Logo rotation animation
-    task.spawn(function()
-        while logo.Parent do
-            CreateTween(logo, {Rotation = 360}, 10, Enum.EasingStyle.Linear)
-            task.wait(10)
-            logo.Rotation = 0
-        end
-    end)
-    
-    -- Title text with gradient
+    -- Title text
     local titleText = Instance.new("TextLabel")
     titleText.BackgroundTransparency = 1
-    titleText.Position = UDim2.new(0, 48, 0, 0)
-    titleText.Size = UDim2.new(0.5, 0, 1, 0)
+    titleText.Position = UDim2.new(0, 44, 0, 0)
+    titleText.Size = UDim2.new(0.5, -44, 1, 0)
     titleText.Font = Theme.FontBold
     titleText.Text = windowName
     titleText.TextColor3 = Theme.TextPrimary
@@ -321,12 +220,12 @@ function Library:CreateWindow(config)
     titleText.TextXAlignment = Enum.TextXAlignment.Left
     titleText.Parent = titleBar
     
-    -- Version badge with glow
+    -- Version badge
     local versionBadge = Instance.new("Frame")
     versionBadge.BackgroundColor3 = Theme.Primary
-    versionBadge.BackgroundTransparency = 0.8
+    versionBadge.BackgroundTransparency = 0.85
     versionBadge.Position = UDim2.new(0, 180, 0.5, -8)
-    versionBadge.Size = UDim2.new(0, 50, 0, 16)
+    versionBadge.Size = UDim2.new(0, 40, 0, 16)
     versionBadge.Parent = titleBar
     
     local badgeCorner = Instance.new("UICorner")
@@ -343,75 +242,56 @@ function Library:CreateWindow(config)
     versionText.BackgroundTransparency = 1
     versionText.Size = UDim2.new(1, 0, 1, 0)
     versionText.Font = Theme.FontMono
-    versionText.Text = "v2.0.0"
+    versionText.Text = "v2.0"
     versionText.TextColor3 = Theme.Primary
     versionText.TextSize = 10
     versionText.Parent = versionBadge
     
-    -- Status indicator with connection info
-    local statusContainer = Instance.new("Frame")
-    statusContainer.BackgroundTransparency = 1
-    statusContainer.Position = UDim2.new(1, -100, 0.5, -8)
-    statusContainer.Size = UDim2.new(0, 90, 0, 16)
-    statusContainer.Parent = titleBar
-    
+    -- Status indicator (animated dot)
     local statusDot = Instance.new("Frame")
     statusDot.BackgroundColor3 = Theme.Success
-    statusDot.Position = UDim2.new(0, 0, 0.5, -4)
+    statusDot.Position = UDim2.new(1, -80, 0.5, -4)
     statusDot.Size = UDim2.new(0, 8, 0, 8)
-    statusDot.Parent = statusContainer
+    statusDot.Parent = titleBar
     
     local statusCorner = Instance.new("UICorner")
     statusCorner.CornerRadius = UDim.new(1, 0)
     statusCorner.Parent = statusDot
     
-    -- Glow effect for status
-    local statusGlow = Instance.new("ImageLabel")
-    statusGlow.BackgroundTransparency = 1
-    statusGlow.Position = UDim2.new(0.5, -12, 0.5, -12)
-    statusGlow.Size = UDim2.new(0, 24, 0, 24)
-    statusGlow.Image = "rbxasset://textures/ui/GuiImagePlaceholder.png"
-    statusGlow.ImageColor3 = Theme.Success
-    statusGlow.ImageTransparency = 0.8
-    statusGlow.Parent = statusDot
-    
-    -- Pulse animation for status
-    task.spawn(function()
+    -- Optimized pulse animation
+    local pulseConnection
+    pulseConnection = task.spawn(function()
         while statusDot.Parent do
-            CreateTween(statusGlow, {ImageTransparency = 0.5, Size = UDim2.new(0, 30, 0, 30)}, 1)
+            CreateTween(statusDot, {BackgroundTransparency = 0.3}, 1, Enum.EasingStyle.Sine)
             task.wait(1)
-            CreateTween(statusGlow, {ImageTransparency = 0.9, Size = UDim2.new(0, 24, 0, 24)}, 1)
+            CreateTween(statusDot, {BackgroundTransparency = 0}, 1, Enum.EasingStyle.Sine)
             task.wait(1)
         end
     end)
     
     local statusText = Instance.new("TextLabel")
     statusText.BackgroundTransparency = 1
-    statusText.Position = UDim2.new(0, 14, 0, 0)
-    statusText.Size = UDim2.new(1, -14, 1, 0)
+    statusText.Position = UDim2.new(1, -70, 0.5, -8)
+    statusText.Size = UDim2.new(0, 50, 0, 16)
     statusText.Font = Theme.Font
-    statusText.Text = "Connected"
+    statusText.Text = "Online"
     statusText.TextColor3 = Theme.TextSecondary
     statusText.TextSize = 11
-    statusText.TextXAlignment = Enum.TextXAlignment.Left
-    statusText.Parent = statusContainer
+    statusText.TextXAlignment = Enum.TextXAlignment.Right
+    statusText.Parent = titleBar
     
-    -- Window controls
-    local controlsContainer = Instance.new("Frame")
-    controlsContainer.BackgroundTransparency = 1
-    controlsContainer.Position = UDim2.new(1, -36, 0.5, -12)
-    controlsContainer.Size = UDim2.new(0, 24, 0, 24)
-    controlsContainer.Parent = titleBar
-    
+    -- Window controls with hover effects
     local closeButton = Instance.new("TextButton")
     closeButton.BackgroundColor3 = Theme.Error
     closeButton.BackgroundTransparency = 0.8
-    closeButton.Size = UDim2.new(1, 0, 1, 0)
+    closeButton.Position = UDim2.new(1, -36, 0.5, -12)
+    closeButton.Size = UDim2.new(0, 24, 0, 24)
     closeButton.Font = Theme.Font
     closeButton.Text = "×"
     closeButton.TextColor3 = Theme.TextPrimary
-    closeButton.TextSize = 18
-    closeButton.Parent = controlsContainer
+    closeButton.TextSize = 20
+    closeButton.AutoButtonColor = false
+    closeButton.Parent = titleBar
     
     local closeCorner = Instance.new("UICorner")
     closeCorner.CornerRadius = UDim.new(0, 6)
@@ -421,33 +301,35 @@ function Library:CreateWindow(config)
         CreateTween(closeButton, {
             BackgroundTransparency = 0.2,
             TextColor3 = Color3.fromRGB(255, 255, 255)
-        }, 0.2)
+        }, 0.15)
     end)
     
     closeButton.MouseLeave:Connect(function()
         CreateTween(closeButton, {
             BackgroundTransparency = 0.8,
             TextColor3 = Theme.TextPrimary
-        }, 0.2)
+        }, 0.15)
     end)
     
     closeButton.MouseButton1Click:Connect(function()
-        -- Matrix-style close animation
-        for i = 1, 5 do
-            mainFrame.BackgroundTransparency = i * 0.2
-            for _, v in pairs(mainFrame:GetDescendants()) do
-                if v:IsA("TextLabel") then
-                    v.TextTransparency = i * 0.2
-                elseif v:IsA("Frame") then
-                    v.BackgroundTransparency = math.min(1, v.BackgroundTransparency + 0.2)
-                end
-            end
+        -- Improved glitch effect
+        for i = 1, 3 do
+            mainFrame.BackgroundTransparency = 0.5
+            task.wait(0.05)
+            mainFrame.BackgroundTransparency = 0
             task.wait(0.05)
         end
+        CreateTween(mainFrame, {
+            Size = UDim2.new(0, windowSize.X.Offset, 0, 0),
+            BackgroundTransparency = 1
+        }, 0.3, Enum.EasingStyle.Back)
+        task.wait(0.3)
+        if gradientConnection then gradientConnection:Disconnect() end
+        if pulseConnection then task.cancel(pulseConnection) end
         screenGui:Destroy()
     end)
     
-    -- Navigation sidebar
+    -- Navigation sidebar with 0verflow styling
     local sidebar = Instance.new("Frame")
     sidebar.BackgroundColor3 = Theme.Surface
     sidebar.BorderSizePixel = 0
@@ -455,22 +337,13 @@ function Library:CreateWindow(config)
     sidebar.Size = UDim2.new(0, 190, 1, -48)
     sidebar.Parent = mainFrame
     
-    -- Sidebar accent line
-    local accentLine = Instance.new("Frame")
-    accentLine.BackgroundColor3 = Theme.Primary
-    accentLine.BorderSizePixel = 0
-    accentLine.Position = UDim2.new(0, 0, 0, 0)
-    accentLine.Size = UDim2.new(0, 2, 1, 0)
-    accentLine.Parent = sidebar
-    
-    local accentGradient = Instance.new("UIGradient")
-    accentGradient.Color = ColorSequence.new{
-        ColorSequenceKeypoint.new(0, Theme.Primary),
-        ColorSequenceKeypoint.new(0.5, Theme.Accent),
-        ColorSequenceKeypoint.new(1, Theme.Primary)
-    }
-    accentGradient.Rotation = 90
-    accentGradient.Parent = accentLine
+    -- Sidebar separator line with glow
+    local separator = Instance.new("Frame")
+    separator.BackgroundColor3 = Theme.BorderLight
+    separator.BackgroundTransparency = 0.7
+    separator.Position = UDim2.new(1, -1, 0, 0)
+    separator.Size = UDim2.new(0, 1, 1, 0)
+    separator.Parent = sidebar
     
     -- Tab container
     local tabContainer = Instance.new("ScrollingFrame")
@@ -478,9 +351,10 @@ function Library:CreateWindow(config)
     tabContainer.BorderSizePixel = 0
     tabContainer.Position = UDim2.new(0, 0, 0, 0)
     tabContainer.Size = UDim2.new(1, 0, 1, -30)
-    tabContainer.ScrollBarThickness = 3
+    tabContainer.ScrollBarThickness = 2
     tabContainer.ScrollBarImageColor3 = Theme.Primary
     tabContainer.ScrollBarImageTransparency = 0.5
+    tabContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
     tabContainer.Parent = sidebar
     
     local tabLayout = Instance.new("UIListLayout")
@@ -495,22 +369,22 @@ function Library:CreateWindow(config)
     tabPadding.PaddingBottom = UDim.new(0, 12)
     tabPadding.Parent = tabContainer
     
-    -- Footer watermark
-    local footer = Instance.new("Frame")
-    footer.BackgroundColor3 = Theme.SurfaceLight
-    footer.BackgroundTransparency = 0.5
-    footer.Position = UDim2.new(0, 0, 1, -30)
-    footer.Size = UDim2.new(1, 0, 0, 30)
-    footer.Parent = sidebar
+    -- Update canvas size automatically
+    tabLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        tabContainer.CanvasSize = UDim2.new(0, 0, 0, tabLayout.AbsoluteContentSize.Y + 24)
+    end)
     
+    -- Watermark
     local watermark = Instance.new("TextLabel")
     watermark.BackgroundTransparency = 1
-    watermark.Size = UDim2.new(1, 0, 1, 0)
+    watermark.Position = UDim2.new(0, 0, 1, -24)
+    watermark.Size = UDim2.new(1, 0, 0, 20)
     watermark.Font = Theme.FontMono
-    watermark.Text = "0VERFLOW © 2025"
+    watermark.Text = "0VERFLOW HUB"
     watermark.TextColor3 = Theme.TextMuted
-    watermark.TextSize = 9
-    watermark.Parent = footer
+    watermark.TextSize = 10
+    watermark.TextTransparency = 0.5
+    watermark.Parent = sidebar
     
     -- Content area
     local contentArea = Instance.new("Frame")
@@ -521,17 +395,13 @@ function Library:CreateWindow(config)
     
     AddDraggable(mainFrame, titleBar)
     
-    -- Hide/Show with animation
-    UserInputService.InputBegan:Connect(function(input, processed)
+    -- Hide/Show functionality
+    local hiddenConnection
+    hiddenConnection = UserInputService.InputBegan:Connect(function(input, processed)
         if not processed and input.KeyCode == hideKey then
+            mainFrame.Visible = not mainFrame.Visible
             if mainFrame.Visible then
-                CreateTween(mainFrame, {Size = UDim2.new(0, windowSize.X.Offset, 0, 0)}, 0.3)
-                task.wait(0.3)
-                mainFrame.Visible = false
-            else
-                mainFrame.Visible = true
-                mainFrame.Size = UDim2.new(0, windowSize.X.Offset, 0, 0)
-                CreateTween(mainFrame, {Size = windowSize}, 0.3)
+                CreateTween(mainFrame, {BackgroundTransparency = 0}, 0.2)
             end
         end
     end)
@@ -541,16 +411,12 @@ function Library:CreateWindow(config)
         CurrentTab = nil
     }
     
-    function Window:Notify(text, duration, notifType)
-        CreateNotification(text, duration, notifType)
-    end
-    
     function Window:CreateTab(name, icon)
         local Tab = {}
         
-        -- Tab button with hover effect
+        -- Tab button
         local tabButton = Instance.new("TextButton")
-        tabButton.BackgroundColor3 = Theme.Surface
+        tabButton.BackgroundColor3 = Theme.SurfaceLight
         tabButton.BackgroundTransparency = 1
         tabButton.BorderSizePixel = 0
         tabButton.Size = UDim2.new(1, 0, 0, 36)
@@ -559,45 +425,32 @@ function Library:CreateWindow(config)
         tabButton.AutoButtonColor = false
         tabButton.Parent = tabContainer
         
+        local tabText = Instance.new("TextLabel")
+        tabText.BackgroundTransparency = 1
+        tabText.Position = UDim2.new(0, 8, 0, 0)
+        tabText.Size = UDim2.new(1, -8, 1, 0)
+        tabText.Font = Theme.Font
+        tabText.Text = (icon and icon .. "  " or "") .. name
+        tabText.TextColor3 = Theme.TextSecondary
+        tabText.TextSize = 14
+        tabText.TextXAlignment = Enum.TextXAlignment.Left
+        tabText.Parent = tabButton
+        
         local tabCorner = Instance.new("UICorner")
         tabCorner.CornerRadius = UDim.new(0, 8)
         tabCorner.Parent = tabButton
         
-        -- Tab icon
-        local tabIcon = Instance.new("TextLabel")
-        tabIcon.BackgroundTransparency = 1
-        tabIcon.Position = UDim2.new(0, 8, 0.5, -8)
-        tabIcon.Size = UDim2.new(0, 16, 0, 16)
-        tabIcon.Font = Theme.Font
-        tabIcon.Text = icon or "📁"
-        tabIcon.TextColor3 = Theme.TextSecondary
-        tabIcon.TextSize = 14
-        tabIcon.Parent = tabButton
-        
-        -- Tab name
-        local tabName = Instance.new("TextLabel")
-        tabName.BackgroundTransparency = 1
-        tabName.Position = UDim2.new(0, 32, 0.5, -8)
-        tabName.Size = UDim2.new(1, -40, 0, 16)
-        tabName.Font = Theme.Font
-        tabName.Text = name
-        tabName.TextColor3 = Theme.TextSecondary
-        tabName.TextSize = 14
-        tabName.TextXAlignment = Enum.TextXAlignment.Left
-        tabName.Parent = tabButton
-        
-        -- Selection indicator
-        local indicator = Instance.new("Frame")
-        indicator.BackgroundColor3 = Theme.Primary
-        indicator.BorderSizePixel = 0
-        indicator.Position = UDim2.new(0, 0, 0.5, -8)
-        indicator.Size = UDim2.new(0, 2, 0, 16)
-        indicator.Visible = false
-        indicator.Parent = tabButton
+        -- Tab indicator
+        local tabIndicator = Instance.new("Frame")
+        tabIndicator.BackgroundColor3 = Theme.Primary
+        tabIndicator.BackgroundTransparency = 1
+        tabIndicator.Position = UDim2.new(0, 0, 0, 0)
+        tabIndicator.Size = UDim2.new(0, 3, 1, 0)
+        tabIndicator.Parent = tabButton
         
         local indicatorCorner = Instance.new("UICorner")
-        indicatorCorner.CornerRadius = UDim.new(1, 0)
-        indicatorCorner.Parent = indicator
+        indicatorCorner.CornerRadius = UDim.new(0, 2)
+        indicatorCorner.Parent = tabIndicator
         
         -- Tab content
         local tabContent = Instance.new("ScrollingFrame")
@@ -608,6 +461,7 @@ function Library:CreateWindow(config)
         tabContent.ScrollBarThickness = 3
         tabContent.ScrollBarImageColor3 = Theme.Primary
         tabContent.ScrollBarImageTransparency = 0.5
+        tabContent.CanvasSize = UDim2.new(0, 0, 0, 0)
         tabContent.Visible = false
         tabContent.Parent = contentArea
         
@@ -627,37 +481,10 @@ function Library:CreateWindow(config)
             tabContent.CanvasSize = UDim2.new(0, 0, 0, contentLayout.AbsoluteContentSize.Y + 48)
         end)
         
-        -- Tab selection with animation
-        tabButton.MouseButton1Click:Connect(function()
-            if Window.CurrentTab then
-                Window.CurrentTab.Button.BackgroundTransparency = 1
-                Window.CurrentTab.Icon.TextColor3 = Theme.TextSecondary
-                Window.CurrentTab.Name.TextColor3 = Theme.TextSecondary
-                Window.CurrentTab.Indicator.Visible = false
-                Window.CurrentTab.Content.Visible = false
-            end
-            
-            CreateTween(tabButton, {BackgroundTransparency = 0.9}, 0.2)
-            tabButton.BackgroundColor3 = Theme.Primary
-            tabIcon.TextColor3 = Theme.Primary
-            tabName.TextColor3 = Theme.TextPrimary
-            indicator.Visible = true
-            tabContent.Visible = true
-            
-            Window.CurrentTab = {
-                Button = tabButton,
-                Icon = tabIcon,
-                Name = tabName,
-                Indicator = indicator,
-                Content = tabContent
-            }
-        end)
-        
-        -- Hover effects
+        -- Tab hover effect
         tabButton.MouseEnter:Connect(function()
             if Window.CurrentTab and Window.CurrentTab.Button == tabButton then return end
-            CreateTween(tabButton, {BackgroundTransparency = 0.95}, 0.2)
-            tabButton.BackgroundColor3 = Theme.SurfaceLight
+            CreateTween(tabButton, {BackgroundTransparency = 0.9}, 0.2)
         end)
         
         tabButton.MouseLeave:Connect(function()
@@ -665,15 +492,45 @@ function Library:CreateWindow(config)
             CreateTween(tabButton, {BackgroundTransparency = 1}, 0.2)
         end)
         
+        -- Tab selection
+        tabButton.MouseButton1Click:Connect(function()
+            if Window.CurrentTab then
+                CreateTween(Window.CurrentTab.Button, {BackgroundTransparency = 1}, 0.2)
+                CreateTween(Window.CurrentTab.Button.TabIndicator, {BackgroundTransparency = 1}, 0.2)
+                Window.CurrentTab.Button.TabText.TextColor3 = Theme.TextSecondary
+                Window.CurrentTab.Content.Visible = false
+            end
+            
+            CreateTween(tabButton, {BackgroundTransparency = 0.85}, 0.2)
+            CreateTween(tabIndicator, {BackgroundTransparency = 0}, 0.2)
+            tabButton.BackgroundColor3 = Theme.Primary
+            tabText.TextColor3 = Theme.TextPrimary
+            tabContent.Visible = true
+            
+            Window.CurrentTab = {
+                Button = tabButton, 
+                Content = tabContent,
+                TabIndicator = tabIndicator,
+                TabText = tabText
+            }
+        end)
+        
         -- Auto-select first tab
         if #Window.Tabs == 0 then
-            tabButton:GetPropertyChangedSignal("Parent"):Connect(function()
-                task.wait()
-                tabButton.MouseButton1Click:Fire()
-            end)
+            tabButton.BackgroundTransparency = 0.85
+            tabButton.BackgroundColor3 = Theme.Primary
+            tabIndicator.BackgroundTransparency = 0
+            tabText.TextColor3 = Theme.TextPrimary
+            tabContent.Visible = true
+            Window.CurrentTab = {
+                Button = tabButton,
+                Content = tabContent,
+                TabIndicator = tabIndicator,
+                TabText = tabText
+            }
         end
         
-        -- Tab elements
+        -- Tab elements (keeping all existing functions but with improvements)
         function Tab:AddSection(name)
             local section = Instance.new("Frame")
             section.BackgroundTransparency = 1
@@ -683,12 +540,20 @@ function Library:CreateWindow(config)
             local sectionLabel = Instance.new("TextLabel")
             sectionLabel.BackgroundTransparency = 1
             sectionLabel.Size = UDim2.new(1, 0, 1, 0)
-            sectionLabel.Font = Theme.Font
+            sectionLabel.Font = Theme.FontBold
             sectionLabel.Text = name:upper()
             sectionLabel.TextColor3 = Theme.TextMuted
-            sectionLabel.TextSize = 12
+            sectionLabel.TextSize = 11
             sectionLabel.TextXAlignment = Enum.TextXAlignment.Left
             sectionLabel.Parent = section
+            
+            -- Section divider
+            local divider = Instance.new("Frame")
+            divider.BackgroundColor3 = Theme.Border
+            divider.BackgroundTransparency = 0.7
+            divider.Position = UDim2.new(0, 0, 1, -1)
+            divider.Size = UDim2.new(1, 0, 0, 1)
+            divider.Parent = section
             
             return section
         end
@@ -720,30 +585,43 @@ function Library:CreateWindow(config)
             buttonStroke.Parent = button
             
             button.MouseEnter:Connect(function()
-                CreateTween(button, {BackgroundColor3 = Theme.SurfaceBright}, 0.2)
-                CreateTween(buttonStroke, {Transparency = 0.6}, 0.2)
+                CreateTween(button, {BackgroundColor3 = Theme.SurfaceBright}, 0.15)
+                CreateTween(buttonStroke, {
+                    Color = Theme.Primary,
+                    Transparency = 0.5
+                }, 0.15)
             end)
             
             button.MouseLeave:Connect(function()
-                CreateTween(button, {BackgroundColor3 = Theme.SurfaceLight}, 0.2)
-                CreateTween(buttonStroke, {Transparency = 0.8}, 0.2)
+                CreateTween(button, {BackgroundColor3 = Theme.SurfaceLight}, 0.15)
+                CreateTween(buttonStroke, {
+                    Color = Theme.Border,
+                    Transparency = 0.8
+                }, 0.15)
             end)
             
             button.MouseButton1Click:Connect(function()
-                -- Click effect
-                local clickEffect = Instance.new("Frame")
-                clickEffect.BackgroundColor3 = Theme.Primary
-                clickEffect.BackgroundTransparency = 0.7
-                clickEffect.BorderSizePixel = 0
-                clickEffect.Size = UDim2.new(1, 0, 1, 0)
-                clickEffect.Parent = button
+                -- Ripple effect
+                local ripple = Instance.new("Frame")
+                ripple.BackgroundColor3 = Theme.Primary
+                ripple.BackgroundTransparency = 0.6
+                ripple.BorderSizePixel = 0
+                ripple.Position = UDim2.new(0.5, 0, 0.5, 0)
+                ripple.Size = UDim2.new(0, 0, 0, 0)
+                ripple.AnchorPoint = Vector2.new(0.5, 0.5)
+                ripple.Parent = button
                 
-                local effectCorner = Instance.new("UICorner")
-                effectCorner.CornerRadius = UDim.new(0, 8)
-                effectCorner.Parent = clickEffect
+                local rippleCorner = Instance.new("UICorner")
+                rippleCorner.CornerRadius = UDim.new(0, 8)
+                rippleCorner.Parent = ripple
                 
-                CreateTween(clickEffect, {BackgroundTransparency = 1}, 0.3)
-                game:GetService("Debris"):AddItem(clickEffect, 0.3)
+                CreateTween(ripple, {
+                    Size = UDim2.new(1, 0, 1, 0),
+                    BackgroundTransparency = 1
+                }, 0.4)
+                
+                task.wait(0.4)
+                ripple:Destroy()
                 
                 task.spawn(callback)
             end)
@@ -785,7 +663,7 @@ function Library:CreateWindow(config)
             toggleLabel.Parent = toggleFrame
             
             local switch = Instance.new("Frame")
-            switch.BackgroundColor3 = Theme.Border
+            switch.BackgroundColor3 = default and Theme.Primary or Theme.Border
             switch.Position = UDim2.new(1, -48, 0.5, -10)
             switch.Size = UDim2.new(0, 36, 0, 20)
             switch.Parent = toggleFrame
@@ -796,7 +674,7 @@ function Library:CreateWindow(config)
             
             local switchDot = Instance.new("Frame")
             switchDot.BackgroundColor3 = Theme.TextPrimary
-            switchDot.Position = UDim2.new(0, 2, 0.5, -7)
+            switchDot.Position = default and UDim2.new(1, -16, 0.5, -7) or UDim2.new(0, 2, 0.5, -7)
             switchDot.Size = UDim2.new(0, 14, 0, 14)
             switchDot.Parent = switch
             
@@ -809,17 +687,12 @@ function Library:CreateWindow(config)
             local function updateToggle()
                 if toggled then
                     CreateTween(switch, {BackgroundColor3 = Theme.Primary}, 0.2)
-                    CreateTween(switchDot, {Position = UDim2.new(1, -16, 0.5, -7)}, 0.2)
+                    CreateTween(switchDot, {Position = UDim2.new(1, -16, 0.5, -7)}, 0.2, Enum.EasingStyle.Quart)
                 else
                     CreateTween(switch, {BackgroundColor3 = Theme.Border}, 0.2)
-                    CreateTween(switchDot, {Position = UDim2.new(0, 2, 0.5, -7)}, 0.2)
+                    CreateTween(switchDot, {Position = UDim2.new(0, 2, 0.5, -7)}, 0.2, Enum.EasingStyle.Quart)
                 end
                 callback(toggled)
-            end
-            
-            if default then
-                switch.BackgroundColor3 = Theme.Primary
-                switchDot.Position = UDim2.new(1, -16, 0.5, -7)
             end
             
             local detector = Instance.new("TextButton")
@@ -831,6 +704,20 @@ function Library:CreateWindow(config)
             detector.MouseButton1Click:Connect(function()
                 toggled = not toggled
                 updateToggle()
+            end)
+            
+            detector.MouseEnter:Connect(function()
+                CreateTween(toggleStroke, {
+                    Color = Theme.Primary,
+                    Transparency = 0.5
+                }, 0.15)
+            end)
+            
+            detector.MouseLeave:Connect(function()
+                CreateTween(toggleStroke, {
+                    Color = Theme.Border,
+                    Transparency = 0.8
+                }, 0.15)
             end)
             
             return toggleFrame
@@ -876,16 +763,18 @@ function Library:CreateWindow(config)
             sliderValue.Position = UDim2.new(0.7, 0, 0, 8)
             sliderValue.Size = UDim2.new(0.3, -12, 0, 20)
             sliderValue.Font = Theme.FontMono
-            sliderValue.Text = tostring(default)
+            sliderValue.Text = tostring(math.floor(default))
             sliderValue.TextColor3 = Theme.Primary
             sliderValue.TextSize = 14
             sliderValue.TextXAlignment = Enum.TextXAlignment.Right
             sliderValue.Parent = sliderFrame
             
-            local sliderBar = Instance.new("Frame")
+            local sliderBar = Instance.new("TextButton")
             sliderBar.BackgroundColor3 = Theme.Border
             sliderBar.Position = UDim2.new(0, 12, 0, 32)
-            sliderBar.Size = UDim2.new(1, -24, 0, 4)
+            sliderBar.Size = UDim2.new(1, -24, 0, 6)
+            sliderBar.AutoButtonColor = false
+            sliderBar.Text = ""
             sliderBar.Parent = sliderFrame
             
             local sliderBarCorner = Instance.new("UICorner")
@@ -895,17 +784,39 @@ function Library:CreateWindow(config)
             local sliderFill = Instance.new("Frame")
             sliderFill.BackgroundColor3 = Theme.Primary
             sliderFill.Size = UDim2.new((default - min) / (max - min), 0, 1, 0)
+            sliderFill.BorderSizePixel = 0
             sliderFill.Parent = sliderBar
             
             local sliderFillCorner = Instance.new("UICorner")
             sliderFillCorner.CornerRadius = UDim.new(1, 0)
             sliderFillCorner.Parent = sliderFill
             
+            local sliderDot = Instance.new("Frame")
+            sliderDot.BackgroundColor3 = Theme.TextPrimary
+            sliderDot.Position = UDim2.new((default - min) / (max - min), -6, 0.5, -6)
+            sliderDot.Size = UDim2.new(0, 12, 0, 12)
+            sliderDot.Parent = sliderBar
+            
+            local sliderDotCorner = Instance.new("UICorner")
+            sliderDotCorner.CornerRadius = UDim.new(1, 0)
+            sliderDotCorner.Parent = sliderDot
+            
             local dragging = false
+            
+            local function updateSlider(input)
+                local percent = math.clamp((input.Position.X - sliderBar.AbsolutePosition.X) / sliderBar.AbsoluteSize.X, 0, 1)
+                local value = math.floor(min + (max - min) * percent)
+                
+                CreateTween(sliderFill, {Size = UDim2.new(percent, 0, 1, 0)}, 0.05)
+                CreateTween(sliderDot, {Position = UDim2.new(percent, -6, 0.5, -6)}, 0.05)
+                sliderValue.Text = tostring(value)
+                callback(value)
+            end
             
             sliderBar.InputBegan:Connect(function(input)
                 if input.UserInputType == Enum.UserInputType.MouseButton1 then
                     dragging = true
+                    updateSlider(input)
                 end
             end)
             
@@ -917,12 +828,7 @@ function Library:CreateWindow(config)
             
             UserInputService.InputChanged:Connect(function(input)
                 if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-                    local percent = math.clamp((input.Position.X - sliderBar.AbsolutePosition.X) / sliderBar.AbsoluteSize.X, 0, 1)
-                    local value = math.floor(min + (max - min) * percent)
-                    
-                    sliderFill.Size = UDim2.new(percent, 0, 1, 0)
-                    sliderValue.Text = tostring(value)
-                    callback(value)
+                    updateSlider(input)
                 end
             end)
             
@@ -968,15 +874,21 @@ function Library:CreateWindow(config)
             textbox.Focused:Connect(function()
                 CreateTween(textboxStroke, {
                     Color = Theme.Primary,
-                    Transparency = 0
-                }, 0.2)
+                    Transparency = 0.3
+                }, 0.15)
+                CreateTween(textboxFrame, {
+                    BackgroundColor3 = Theme.SurfaceBright
+                }, 0.15)
             end)
             
             textbox.FocusLost:Connect(function(enterPressed)
                 CreateTween(textboxStroke, {
                     Color = Theme.Border,
                     Transparency = 0.8
-                }, 0.2)
+                }, 0.15)
+                CreateTween(textboxFrame, {
+                    BackgroundColor3 = Theme.SurfaceLight
+                }, 0.15)
                 callback(textbox.Text, enterPressed)
             end)
             
@@ -989,11 +901,11 @@ function Library:CreateWindow(config)
     
     -- Opening animation
     mainFrame.Size = UDim2.new(0, 0, 0, 0)
-    mainFrame.ClipsDescendants = true
-    CreateTween(mainFrame, {Size = windowSize}, 0.5, Enum.EasingStyle.Back)
-    
-    -- Show welcome notification
-    Window:Notify("Welcome to 0verflow Hub v2.0", 3, "Success")
+    mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+    CreateTween(mainFrame, {
+        Size = windowSize,
+        Position = UDim2.new(0.5, -windowSize.X.Offset/2, 0.5, -windowSize.Y.Offset/2)
+    }, 0.5, Enum.EasingStyle.Back)
     
     return Window
 end
